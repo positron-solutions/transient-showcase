@@ -85,8 +85,10 @@ of =magit=.
   - [[#mixing-interactive][Mixing Interactive]]
     - [[#early-completion][Early completion]]
   - [[#pre-commands-explained][Pre-Commands Explained]]
+    - [[#warning][Warning!]]
 - [[#using--managing-states][Using & Managing States]]
-  - [[#basic-infixes][Basic Infixes]]
+  - [[#infixes][Infixes]]
+    - [[#basic-infixes][Basic Infixes]]
     - [[#reading-infix-values][Reading Infix Values]]
   - [[#scope][Scope]]
     - [[#errata-with-prefix-arg-c-u-universal-argument][Errata with prefix arg (C-u universal argument).]]
@@ -106,6 +108,8 @@ of =magit=.
   - [[#lisp-variables][Lisp Variables]]
 - [[#controlling-visibility][Controlling Visibility]]
   - [[#predicates][Predicates]]
+  - [[#inapt-temporarily-unavailable][Inapt (Temporarily Unavailable)]]
+    - [[#documentation-in-manaual-missing][Documentation in manaual missing]]
   - [[#levels][Levels]]
     - [[#defining-group--suffix-levels][Defining group & suffix levels]]
     - [[#using-the-levels-ui][Using the Levels UI]]
@@ -754,6 +758,33 @@ of =magit=.
 
    The [[https://magit.vc/manual/transient.html#Transient-State][official long manual]] has some more detail.  These examples should prepare
    you to visualize the forms used in those explanations.
+
+*** Warning!
+
+    Some of the trickiest bugs you can introduce will happen when using the
+    following variables and functions at varying points in command lifecycles:
+
+    - =transient-current-command=
+    - =transient--command=
+    - =transient-current-prefix=
+    - =transient--prefix=
+    - =transient-args=
+
+    During the pre-command and post-command, these can change.  When you are
+    overriding the pre-command, you may discover things such as the result of
+    =transient-args= changing.  Calling =transient-setup= may update things.
+    Even if you call =transient-args= on on the specific transient, the results
+    change during the lifecycle and depending on the pre-command.
+
+    *In particular* it seems like layout predicates should use
+    =transient--prefix= while suffix bodies should use
+    =transient-current-prefix=. Be aware that the lifecycle is dynamic.
+
+    Not all pre-commands are compatible with all situations and suffixes!
+
+    [[Debugging][Debugging]]
+
+    READ THIS OR YOU MAY LOSE YOUR MIND!
    
 * Using & Managing States
 
@@ -773,6 +804,7 @@ of =magit=.
   - Obtaining a scope in a custom =initialize-scope= method
   - Default values in prefix definition
   - Saved values of infixes
+  - Saved values in other infixes / prefixs with shared =history-key=
   - User-set infix values from the current or parent prefix
   - Ad-hoc values in regular =defvar= and =defcustom= etc
   - Reading values from another, perhaps distant prefix
@@ -799,18 +831,64 @@ of =magit=.
 
   This is what is meant by "creating user interfaces as expressive as elisp."
     
-** TODO Basic Infixes
+** Infixes
 
    Functions need arguments.  Infixes are specialized suffixes with behavior
-   defaults that make sense for setting and storing values.  They also have
+   defaults that make sense for setting and storing values for consumption in
+   suffixes.  It's like passing arguments into the suffix.  They also have
    support for persisting state across invocations and Emacs sessions.
+
+*** Basic Infixes
+
+    Infix classes built-in all descend from =transient-infix= and can be seen
+    clearly in the =eieio-class-browser=.  View their slots and documentaiton
+    with ~(describe-class transient-infix)~ etc.  Here you can see what most
+    infixes look like and how they behave.
+
+   #+begin_src elisp :tangle yes :var  _=print-args-prelude
+
+     ;; infix defined with a macro
+     (transient-define-argument ts--exclusive-switches ()
+       "This is a specialized infix for only selecting one of several values."
+       :class 'transient-switches
+       :argument-format "--%s-snowcone"
+       :argument-regexp "\\(--\\(grape\\|orange\\|cherry\\|lime\\)-snowcone\\)"
+       :choices '("grape" "orange" "cherry" "lime"))
+
+     (transient-define-prefix ts-basic-infixes ()
+       "This transient just shows off many typical infix types."
+       ["Infixes"
+
+        ;; from macro
+        ("-e" "exclusive switches" ts--exclusive-switches)
+
+        ;; shorthand definitions
+        ("-b" "switch with shortarg" ("-w" "--switch-short")) ; with :short-arg != :key
+        ("-s" "switch" "--switch")
+        ("-a" "argument" "--argument=" :prompt "Let's argue because: ")
+
+        ;; a bit of inline EIEIO in our shorthand
+        ("-n" "never empty" "--non-null=" :always-read t
+         :init-value (lambda (obj) (oset obj value "better-than-nothing")))
+
+        ("-c" "choices" "--choice=" :choices (foo bar baz))]
+
+       ["Show Args"
+        ("s" "show arguments" ts-suffix-print-args)])
+
+     ;; (ts-basic-infixes)
+   #+end_src
 
 *** Reading Infix Values   
 
    *Reminder* in the section on [[*Pre-Commands Explained][pre-commands]] the discussion about the
     =:transient= mentions that the values available in a suffix body depend on
-    whether the pre-command called =transient--export= before evaluating the
+    whe ther the pre-command called =transient--export= before evaluating the
     suffix body.
+
+    There are two basic ways to read infixes:
+
+    - =(transient-
     
 ** Scope
 
@@ -820,6 +898,13 @@ of =magit=.
    Suffixes can then read back that scope in their body.  The suffix object is
    given the scope and can use it to alter its own display or behavior.  The
    layout also can interpret the scope while it is initializing.
+
+   *WARNING* When writing predicates against the scope, you will need to
+   determine whether =transient--prefix= or =transient-current-prefix= is
+   correct when writing prefix-generic suffixes.  It is very subtle if you
+   accidentally choose the wrong one and the parent has a nil scope while the
+   child has an entirely different scope.  These variables change throughout the
+   lifecycle!  Use [[*Watching evaluation in Edebug][edebug]] you must!
 
    #+begin_src elisp :tangle yes
 
@@ -836,19 +921,25 @@ of =magit=.
        :transient 'transient--do-exit
        (interactive)
        (let ((scope (oref transient-current-prefix scope)))
-         (transient-setup (oref transient-current-prefix command) nil nil :scope (* scope 2))))
+         (if (numberp scope)
+             (transient-setup transient-current-command nil nil :scope (* scope 2))
+           (message (propertize (format "scope was non-numeric! %s" scope) 'face 'warning))
+           (transient-setup transient-current-command))))
 
      (transient-define-suffix ts--update-scope-with-prefix-re-enter (new-scope)
        "Re-enter the prefix with double the scope."
        ;; :transient 'transient--do-replace ; builds up the stack
        :transient 'transient--do-exit ; do not build up the stack
        (interactive "P")
-       (message "universl arg: %s" new-scope)
-       (transient-setup (oref transient-current-prefix command) nil nil :scope new-scope))
-
+       (message "universal arg: %s" new-scope)
+       (transient-setup transient-current-command nil nil :scope new-scope))
 
      (transient-define-prefix ts-scope (scope)
        "Message with the object at a location"
+
+       ;; note!  this is a location where we definitely had to use
+       ;; `transient--prefix' or get the transient object from the ts-scope symbol.
+       ;; `transient-current-prefix' is not correct here!
        [:description (lambda () (format "Scope: %s" (oref transient--prefix scope)))
         [("r" "read scope" ts--read-prefix-scope)
          ("d" "double scope" ts--double-scope-re-enter)
@@ -858,6 +949,12 @@ of =magit=.
 
      ;; Setting an interactive argument for `eval-last-sexp' is a little different
      ;; (let ((current-prefix-arg 4)) (call-interactively 'ts-scope))
+
+     ;; (ts-scope)
+     ;; Then press "C-u 4 o" to update the scope
+     ;; Then d to double
+     ;; Then r to read
+     ;; ... and so on
    #+end_src
 
 *** TODO Errata with prefix arg (=C-u= universal argument).
@@ -1395,6 +1492,63 @@ of =magit=.
        ;; (ts-predicates)
    #+end_src
 
+** Inapt (Temporarily Unavailable)
+
+   "Greyed out" suffixes.  Inapt is better if an option is temporarily
+   unavailable due to a state that varies with each invocation of the
+   transient.
+
+   Inapt predicates work on suffixes, but not on groups (which would have to
+   modify every child).
+
+   *Note*, like visibility predicates, =inapt-*= predicates do not take effect
+   until the transient has it's layout fully redone.  Therefore this example
+   uses a child transient and updates the scope.
+
+   #+begin_src elisp :tangle yes :var _=print-args-prelude :var __=levels-prelude
+
+     (defun ts--child-scope-p ()
+       "Returns the scope of the current transient.
+     When this is called in layouts, it's the transient being layed out"
+       (let ((scope (oref transient--prefix scope)))
+         (message "The scope is: %s" scope)
+         scope))
+
+     ;; the wave suffixes were :transient t as defined, so we need to manually
+     ;; override them to the `transient--do-return' value for :transient slot so
+     ;; that they return back to the parent.
+     (transient-define-prefix ts--inapt-children ()
+       ["Inapt Predicates Child"
+        ("s" "switched" ts--wave-surely
+         :transient transient--do-return
+         :if ts--child-scope-p)
+        ("u" "unswitched" ts--wave-normally
+         :transient transient--do-return
+         :if-not ts--child-scope-p)]
+
+       ;; in the body, we read the value of the parent and set our scope to
+       ;; non-nil if the switch is set
+       (interactive)
+       (let ((scope (transient-arg-value "--switch" (transient-args 'ts-inapt-parent))))
+         (message "scope: %s" scope)
+         (message "type: %s" (type-of scope))
+         (transient-setup 'ts--inapt-children nil nil :scope (if scope t nil))))
+
+     (transient-define-prefix ts-inapt-parent ()
+       "Inapt Predicates Parent"
+
+       [("-s" "switch" "--switch")
+        ("a" "show arguments" ts-suffix-print-args)
+        ("c" "launch child prefix" ts--inapt-children :transient transient--do-recurse)])
+
+     ;; (ts-inapt-parent)
+   #+end_src
+
+***  TODO Documentation in manaual missing
+
+    There is not a single mention of inapt even though it's fully implemented
+    and works.
+
 ** Levels
 
    Levels are another way to control visibility.
@@ -1495,7 +1649,7 @@ of =magit=.
 
 *** TODO Consuming scope to initialize a child
 
-*** TODO Obtaining a valid scope if prefix was not set with it    
+*** TODO Obtaining a valid scope if prefix was not set with it
 
 ** Custom Infix Types
 
