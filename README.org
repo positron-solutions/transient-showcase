@@ -64,7 +64,7 @@ of =magit=.
   - [[#the-shorthand-form][The Shorthand form]]
   - [[#keyword-arguments-style][Keyword Arguments Style]]
   - [[#macro-child-definition-style][Macro Child Definition Style]]
-  - [[#overriding-in-the-prefix-definition][Overriding in the prefix definition]]
+  - [[#overriding-slots-in-the-prefix-definition][Overriding slots in the prefix definition]]
   - [[#quoting-note-for-vectors][Quoting Note for Vectors]]
 - [[#groups--layouts][Groups & Layouts]]
   - [[#layouts][Layouts]]
@@ -93,6 +93,10 @@ of =magit=.
   - [[#scope][Scope]]
     - [[#errata-with-prefix-arg-c-u-universal-argument][Errata with prefix arg (C-u universal argument).]]
   - [[#prefix-value--history][Prefix Value & History]]
+  - [[#history-keys][History Keys]]
+    - [[#detangling-with-initialization-setting-and-saving][Detangling with Initialization, Setting, and Saving]]
+  - [[#disabling-set--save-on-a-suffix][Disabling Set / Save on a Suffix]]
+    - [[#sticky-infix-support][Sticky infix support]]
 - [[#controlling-clis][Controlling CLI's]]
   - [[#reading-arguments-within-suffixes][Reading arguments within suffixes]]
   - [[#switches--arguments][Switches & Arguments]]
@@ -104,17 +108,19 @@ of =magit=.
     - [[#incompatible-switches][Incompatible Switches]]
     - [[#short-args][Short Args]]
     - [[#choices-from-a-function][Choices from a function]]
+    - [[#multiple-instances][multiple instances]]
   - [[#dispatching-args-into-a-process][Dispatching args into a process]]
   - [[#lisp-variables][Lisp Variables]]
 - [[#controlling-visibility][Controlling Visibility]]
   - [[#predicates][Predicates]]
   - [[#inapt-temporarily-unavailable][Inapt (Temporarily Unavailable)]]
-    - [[#documentation-in-manaual-missing][Documentation in manaual missing]]
+    - [[#documentation-in-manual-missing][Documentation in manual missing]]
   - [[#levels][Levels]]
     - [[#defining-group--suffix-levels][Defining group & suffix levels]]
     - [[#using-the-levels-ui][Using the Levels UI]]
 - [[#advanced][Advanced]]
   - [[#dynamically-generating-layouts][Dynamically generating layouts]]
+    - [[#correction-in-manual][Correction in manual]]
   - [[#using-prefix-scope-in-children][Using prefix scope in children]]
     - [[#consuming-scope-to-initialize-a-child][Consuming scope to initialize a child]]
     - [[#obtaining-a-valid-scope-if-prefix-was-not-set-with-it][Obtaining a valid scope if prefix was not set with it]]
@@ -200,7 +206,7 @@ of =magit=.
 
   =Prefix -> Infix -> Infix -> Suffix=
 
-  See [[*Infix.-.Setting.Up.Arguments][Infix examples]] to get a better idea.
+  See [[*Basic Infixes][Infix examples]] to get a better idea.
   
 ** Summary
 
@@ -316,7 +322,7 @@ of =magit=.
 
    #+end_src
 
-** Overriding in the prefix definition
+** Overriding slots in the prefix definition
 
    Even if you define a property via one of the macros, you can still override
    that property in the later prefix definition.  The example below overrides
@@ -791,9 +797,8 @@ of =magit=.
   There are several ways to create state.  The [[*Nesting & Flow Control][flow control]] examples in the
   previous section mainly covered how to get from one command to the other.
   This section covers how to save values and then read them later, sometimes
-  from a completely different transient.  *Coupled with [[*Custom Infix
-  Types][custom infix types]], you can create some seriously rich user
-  expression.*
+  from a completely different transient.  *Coupled with [[*Custom Infix Types][custom infix types]], you
+  can create some seriously rich user expression.*
 
   To spark your imagination, here's a non-exhaustive list of how to get data
   into your commands:
@@ -967,15 +972,29 @@ of =magit=.
 
 ** Prefix Value & History
 
-  Each transient has a =:value=.  We can get this as a list of strings for any
-  prefix by calling =transient-args= on =transient-current-command= in the
-  suffix's interactive form.  If you know the command you want the value of, you
-  can use it's symbol instead of =transient-current-command=.
+   Briefly, there are three locations for state you need to be aware of for this section:
+
+   - Each transient's prefix object has a =:value= that is updated by
+     =transient-set= and =transient-save=
+   - The values obtained from =transient-args= are usually quite ephemeral and
+     don't even persist beyond the body of form of the suffixes you usually read
+     them in
+   - =transient-values= contains saved values that are used to rehydrate the
+     prefix =:value= slot when the prefix is created
+   - =transient-history= is used to make it faster for the user to flip through
+     previous states (which can have independent histories for infixes and
+     prefixes).  These are never used unless calling =transient-history-prev=
+     and =transient-history-next=.
+     
+   We can get this as a list of strings for any
+   prefix by calling =transient-args= on =transient-current-command= in the
+   suffix's interactive form.  If you know the command you want the value of, you
+   can use it's symbol instead of =transient-current-command=.
 
   This is related to history keys.  If you set the arguments and then save them
-  using (=C-s=) for the command =transient-save=, not only will the transient be
-  updated with the new value, but if you call the child independently, it can
-  still read
+  using (=C-x s=) for the command =transient-save=, not only will the transient
+  be updated with the new value, but if you call the child independently, it can
+  still read the value from the suffix.
 
   #+begin_src elisp :tangle yes :var _=print-args-prelude
 
@@ -1008,13 +1027,14 @@ of =magit=.
         :always-read t)
        ("-f" "flavor" "--flavor="
         :choices ("grape" "orange" "cherry" "lime")
-        :always-read t)
+        :always-read t)]
+
+      ;; Definitely check out the =C-x= menu
+      ["C-x Menu Behaviors"
        ("S" "save snowcone settings"
-        (lambda ()
-          (interactive)
-          (message "saved!")
-          (transient-save))
-        :transient t)]
+        (lambda () (interactive) (message "saved!") (transient-save)) :transient t)
+       ("R" "reset snowcone settings"
+        (lambda () (interactive) (message "reset!") (transient-reset)) :transient t)]
 
       ["Actions"
        ("m" "message arguments" ts-suffix-print-args)
@@ -1032,6 +1052,136 @@ of =magit=.
     ;; (ts-suffix-eat-snowcone)
 
   #+end_src
+
+  It's worth bringing up the [[elisp:(describe-variable 'transient-show-common-commands)][=transient-show-common-commands=]] variable. *You may
+  want to set this when working on the history support for your transients.*
+  Otherwise, just remember the (=C-x=) menu inside transients.
+
+** History Keys
+
+   History lets you *set* infixes using prior values.  It's per-prefix,
+   per-suffix usually.  Using previous examples like =ts-snowcone-eater=, you
+   can flip through history using:
+
+   - =C-x p= for =transient-history-prev=
+   - =C-x n= for =transient-history-next=
+
+   These bindings are revealed when =transient-show-common-commands= is =t= or
+   when you hit the =C-x= prefix.
+
+   However, what if you *don't* want a unique history for some infixes or even
+   prefixes?
+
+   *Note* As a more advanced example, using EIEIO and dynamic layout techniques
+   to modify the slot of =:history-key=, you can also make unique histories for
+   the same prefix/infix by setting that slot value depending on the context you
+   want unique histories for.
+
+   The following example can demonstrate the behavior with some user effort:
+
+  #+name: ts-ping-example   
+  #+begin_src elisp :tangle yes :var _=print-args-prelude
+
+    (transient-define-prefix ts-ping ()
+      "Ping thing pong."
+
+      :history-key 'non-unique-name
+
+      ["Ping"
+       ("-g" "game" "--game=")
+       ("p" "ping the pong" ts-pong)
+       ("a" "print args" ts-suffix-print-args :transient nil)])
+
+    (transient-define-prefix ts-pong ()
+      "Pong the ping."
+
+      :history-key 'non-unique-name
+      
+      ["Pong"
+       ("-g" "game" "--game=")
+       ("p" "pong the ping" ts-ping)
+       ("a" "print args" ts-suffix-print-args :transient nil)])
+
+    ;; (ts-ping)
+    ;; Okay here's where it gets weird
+    ;; 1.  Set the value of game to something and remember it
+    ;; 2.  Press a to print the args
+    ;; 3.  Re-open ts-ping.
+    ;; 4.  C-x p to load the previous history, see the old value?
+    ;; 5.  p to switch to the ts-pong transient
+    ;; 6.  C-x p to load the previous history, see the old value from ts-ping???
+    ;; 7. Note that ts-pong uses the same history as ts-ping!
+  #+end_src
+
+*** Detangling with Initialization, Setting, and Saving
+
+    Set values show up in the prefix's =value= slot.
+
+    #+begin_src elisp :tangle no :var _=ts-ping-example
+
+      (oref (plist-get (symbol-plist 'ts-ping) 'transient--prefix) value)
+      
+    #+end_src
+
+    The prefix value will get the last value that was *set* using
+    =transient-set=.
+
+    However, the prefix value shown in =transient-values= is only updated when
+    calling =transient-save=.
+
+    Saved values show up in =transient-values=.  If you save =ts-ping=, you can
+    see the saved value here:
+
+    #+begin_src elisp :tangle no :var _=ts-ping-example
+
+      (assoc 'ts-ping transient-values)
+
+    #+end_src
+
+    *These two values may be independent.* They are written at the same time
+    when calling =transient-save=.  During prefix initializaton, the =:value= is
+    written from =transient-values=.
+
+    Play with the =ts-snowcone-eater= and =ts-ping= and =ts-pong= in the =C-x=
+    menu while also looking at what gets stored in =transient-values=,
+    =transient-history= and the prefix's slots.
+
+    When you re-evaluate the prefix or reload Emacs, you will see the result of
+    initialization from =transient-values=.
+
+** Disabling Set / Save on a Suffix
+
+   To disable saving and setting values, causing a prefix to always end up using
+   the default value, set the =:unsavable= slot to =t=.
+
+   #+begin_src elisp :tangle yes :var _=print-args-prelude
+
+     (transient-define-prefix ts-goldfish ()
+       "A prefix that cannot remember anything."
+       ["Goldfish"
+        ("-r" "rememeber" "--i-remember="
+         :unsavable t ; infix isn't saved
+         :always-read t) ; infix always asks for new value
+         ;; overriding the method to provide a starting value
+         :init-value (lambda (obj) (oset obj value "nothing")))
+        ("a" "print args" ts-suffix-print-args :transient nil)])
+
+     ;; (ts-goldfish)
+
+   #+end_src
+
+   Try to update =remember= and then set and save.  Reload it.  It will never
+   pay attention to history or setting & saving the transient value.
+
+*** TODO Sticky infix support
+
+    There was going to be a =ts-elephant= example, but it requires a bit too
+    much EIEIO to do without just relying on =transient-set= in suffixes.
+
+    There needs to be a slot that causes infixes to always be set on export.
+    This would cover cases where the most frequent user input changes just
+    rapidly enough that both setting every time and saving are equally
+    inconvenient.
 
 * Controlling CLI's
 
@@ -1229,27 +1379,27 @@ of =magit=.
 
    #+begin_src elisp :tangle yes :var  _=print-args-prelude    
 
-       (transient-define-prefix ts-incompatible ()
-         :incompatible '(
+     (transient-define-prefix ts-incompatible ()
+       :incompatible '(
+                       
+                       ;; update your transient version if you experience #129 / #155
+                       ("--switch" "--value=")
 
-                         ;; update your transient version if you experience #129 / #155
-                         ("--switch" "--value=")
+                       ("--switch" "--toggle" "--flip")
+                       ("--argument=" "--value=" "--special-arg="))
 
-                         ("--switch" "--toggle" "--flip")
-                         ("--argument=" "--value=" "--special-arg="))
+       ["Arguments"
+        ("-s" "switch" "--switch")
+        ("-t" "toggle" "--toggle")
+        ("-f" "flip" "--flip")
 
-         ["Arguments"
-          ("-s" "switch" "--switch")
-          ("-t" "toggle" "--toggle")
-          ("-f" "flip" "--flip")
+        ("-a" "argument" "--argument=")
+        ("v" "value" "--value=")
+        ("C-a" "special arg" "--special-arg=")]
+       ["Show Args"
+        ("s" "show arguments" ts-suffix-print-args)])
 
-          ("-a" "argument" "--argument=")
-          ("v" "value" "--value=")
-          ("C-a" "special arg" "--special-arg=")]
-         ["Show Args"
-          ("s" "show arguments" ts-suffix-print-args)])
-
-       ;; (ts-incompatible)
+     ;; (ts-incompatible)
 
    #+end_src
 
@@ -1296,6 +1446,11 @@ of =magit=.
 
      ;; (ts-choices-with-completions)
    #+end_src
+
+*** TODO multiple instances
+
+    Switches and arguments that can be used multiple times are supported.
+    Example needs to be written.
 
 ** Dispatching args into a process
 
@@ -1544,7 +1699,7 @@ of =magit=.
      ;; (ts-inapt-parent)
    #+end_src
 
-***  TODO Documentation in manaual missing
+***  TODO Documentation in manual missing
 
     There is not a single mention of inapt even though it's fully implemented
     and works.
@@ -1641,9 +1796,91 @@ of =magit=.
 
    [[https://magit.vc/manual/transient.html#index-transient_002dsetup_002dchildren][transient-setup-children]]
    
-   is a prefix method that can be overriden in order to modify or eliminate some
-   children from display.  If you need a central place for children to
+   This is a group method that can be overriden in order to modify or eliminate
+   some children from display.  If you need a central place for children to
    coordinate some behavior, this may work for you.
+
+   #+begin_src elisp :tangle yes
+
+     (transient-define-prefix ts-generated-child ()
+       "A prefix that uses `setup-children' to generate single child."
+
+       ["Replace this child"
+        ;; Let's override the group's method
+        :setup-children
+        (lambda (_) ; we don't care about the stupid child
+
+          ;; remember to return a list
+          (list (transient-parse-suffix
+                 transient--prefix
+                 '("r" "replacement" (lambda ()
+                                       (interactive)
+                                       (message "okay!"))))))
+
+        ("s" "haha stupid suffix" (lambda ()
+                                    (interactive)
+                                    (message "You should replace me!")))])
+
+     ;; (ts-generated-child)
+
+   #+end_src
+
+   =transient--parse-child= takes the same configuration format as
+   =transient-define-prefix=.  You can see the layout format in the [[id:49cb2ea4-66fa-4bc4-ab91-268580e907a5][layout
+   hacking appendix]].  =transient--prarse-group= works almost exactly the
+   same, just for groups.
+
+   The same thing, but parsing an entire group spec:
+
+   #+begin_src elisp :tangle no
+
+     (transient-define-prefix ts-generated-group ()
+       "A prefix that uses `setup-children' to generate a group."
+
+       ["Replace this child"
+        ;; Let's override the group's method
+        :setup-children
+        (lambda (_) ; we don't care about stupid child
+
+          ;; the result of parsing here will be a group
+          (transient-parse-suffixes
+           transient--prefix
+           ["Group Name" ("r" "replacement" (lambda ()
+                                              (interactive)
+                                              (message "okay!")))]))
+
+        ("s" "haha stupid suffix" (lambda ()
+                                    (interactive)
+                                    (message "You should replace me!")))])
+
+     ;; (ts-generated-group)     
+
+   #+end_src
+
+   If you need to define a dynamic group class, override
+   =transient-setup-children=.  It will work almost entirely the same as the
+   examples above.  Set your group class in the prefix using the =:class= key.
+
+   *Note* you don't need to be inside of a layout body to hack around with
+   dynamic layouts.  Mess around in [[elisp:(ielm))][ielm]].
+
+   #+begin_src elisp :tangle no :results replace
+
+     (transient--parse-child 'magit-dispatch '("a" "action" (lambda () (interactive) (message "hey"))))
+
+   #+end_src
+
+   *Note* you can replace =transient--prefix= with =ts-generated-group= in the
+   example above.  =transient--prefix= is just a variable that happens to hold
+   the prefix during layout.
+
+*** TODO Correction in manual
+
+    - There is a =transient--parse-child= but not a =transient-parse-child=
+      function.
+
+    - These functions do mostly the same job.  Why do we need to specify a
+      prefix for =transient-parse-suffixes=, for scope etc?
   
 ** TODO Using prefix scope in children
 
@@ -1653,8 +1890,21 @@ of =magit=.
 
 ** Custom Infix Types
 
+   Not everything is a string or boolean.  You may want to represent complex
+   objects in your transint infixes.  If your objects can be rehydrated from
+   some serialized ID, you may want history support.
+   
    If you need to set and display a custom type, use the simple OOP techniques of
-   [[*EIEIO][EIEIO]].  =:initform= is a default value.  =:initarg= configures which argument
+   [[*EIEIO][EIEIO]].
+
+   We will use several new pieces here:
+
+   - =transient-get-suffix= To get suffix by a key, location, or command symbol
+   - =transient-format-description= Method works on children to get their
+     description string
+   
+
+   =:initform= is a default value.  =:initarg= configures which argument
    to pick up from the class constructor.
 
    Let's write a transient menu that can interrogate transient prefixes!  We
@@ -1664,13 +1914,8 @@ of =magit=.
    First we need an infix to pick, store, and display the suffix or group we are
    operating on.
 
-   We will use several new pieces here:
 
-   - =transient-get-suffix= To get suffix by a key, location, or command symbol
-   - =transient-format-description= Method works on children to get their
-     description string
-
-   #+begin_src elisp :tangle yes
+   #+begin_src elisp :tangle yes :var _=levels-prelude
 
      ;; The children we will be picking can be of several forms.  The
      ;; transient--layout symbol property of a prefix is a vector of vectors, lists,
@@ -1682,7 +1927,26 @@ of =magit=.
         ((vectorp layout-child) (or (plist-get (aref layout-child 2) :description) "<group>")) ; group
         ((stringp layout-child) layout-child) ; plain-text child
         ((listp layout-child) (plist-get (elt layout-child 2) :description)) ; suffix
-        (t (format "idk: %s" layout-child))))
+        (t (format "You traversed into a child's list elements: %s" (type-of layout-child)))))
+
+     ;; We repeat the read using a lisp expression from `read-from-minibuffer' to get
+     ;; the LOC key for `transient-get-suffix' until we get a valid result.  This
+     ;; ensures we don't store an invalid LOC.
+     (defun transient-child-variable--reader (prompt initial-input history)
+       "Read a location and check that it exists within the current transient."
+       (save-match-data
+         (cl-block nil ; allows cl-return
+           (while t
+             ;; read a string, then read it as a lisp object
+             (let* ((loc (read (read-from-minibuffer prompt initial-input nil nil history)))
+                    (child (ignore-errors (transient-get-suffix transient-current-command loc))))
+               (when child
+                 (cl-return child)) ; breaks loop
+               (message
+                (propertize
+                 (format "Location could not be found in prefix %s"
+                         transient-current-command) 'face 'error))
+               (sit-for 1)))))) ; wait a second
 
      ;; Inherit from variable abstract class
      (defclass transient-child-variable (transient-variable)
@@ -1708,34 +1972,22 @@ of =magit=.
               'face 'transient-value)
            (propertize "¯\_(ツ)_/¯" 'face 'transient-inactive-value))))
 
-     ;; We repeat the read using a lisp expression from `read-from-minibuffer' to get
-     ;; the LOC key for `transient-get-suffix' until we get a valid result.  This
-     ;; ensures we don't store an invalid LOC.
-     (defun transient-child-variable--reader (prompt initial-input history)
-       "Read a location and check that it exists within the current transient."
-       (save-match-data
-         (cl-block nil ; allows cl-return
-           (while t
-             ;; read a string, then read it as a lisp object
-             (let* ((loc (read (read-from-minibuffer prompt initial-input nil nil history)))
-                    (child (ignore-errors (transient-get-suffix transient-current-command loc))))
-               (when child
-                 (cl-return child)) ; breaks loop
-               (message
-                (propertize
-                 (format "Location could not be found in prefix %s"
-                         transient-current-command) 'face 'error))
-               (sit-for 1)))))) ; wait a second
-
-     ;; TODO really wish I don't need explicit infix declation
+     ;; Now that we have our class defined, we can create an infix the usual
+     ;; way, just specifying our class
      (transient-define-infix ts--inception-child ()
        :class transient-child-variable)
 
      ;; All set!  This transient just tests our or new toy.
      (transient-define-prefix ts-inception-set ()
        "Pick a suffix, any suffix"
-       [["Pick"
-         ("c" "child" ts--inception-child :class transient-child-variable)]])
+       ["Pick a suffix"
+         ("c" "child" ts--inception-child :class transient-child-variable)]
+
+       ["Some suffixex"
+        ("s" "surely" ts--wave-surely)
+        ("d" "definitely" ts--wave-definitely)
+        ("e" "eventually" ts--wave-eventually)
+        ("n" "normally" ts--wave-normally)])
 
      ;; (ts-inception-set)
 
@@ -1885,6 +2137,9 @@ of =magit=.
     you can go on without every transient you open trying to call the debugger.
 
 ** Layout Hacking
+   :PROPERTIES:
+   :ID:       49cb2ea4-66fa-4bc4-ab91-268580e907a5
+   :END:
 
     First you need to explort the layout data structures.
 
