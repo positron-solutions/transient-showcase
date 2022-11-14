@@ -19,7 +19,8 @@ of =magit=.
   If you install the package, you can read source for each example with the
   normal.  =describe-function= command.  All commands are under =ts-*= prefix.
   Somewhat useful suffixes are under =ts-suffix-*= while less useful ones under
-  =ts--*=.  They will come in handly when you are developing new applications.
+  =ts--suffix-*=.  They will come in handly when you are developing new
+  applications.
 
   While this file is also the README for this repository, it's not intended to be used
   copy-paste.  Many links will only open in Emacs.  Some definitions are
@@ -48,6 +49,8 @@ of =magit=.
   After executing the block above, you can =execute-extended-command= (*M-x*)
   and select =ts-hello= to show this transient.  All transient prefixes are also
   commands that show up in (*M-x*)
+
+  *Note* If the example above is hard to read, review some [[info:elisp#Top][elisp]] [[*Essential Elisp][syntax]]
    
 * Contents                                                         :noexport:
 :PROPERTIES:
@@ -139,6 +142,7 @@ of =magit=.
     - [[#ts-suffix-show-level][ts-suffix-show-level]]
     - [[#ts--define-waver][ts--define-waver]]
     - [[#ts-suffix-print-args][ts-suffix-print-args]]
+  - [[#essential-elisp][Essential Elisp]]
 - [[#further-reading][Further Reading]]
 :END:
 
@@ -806,7 +810,7 @@ of =magit=.
   - Interactive forms
   - Prefix arguments (=C-u= universal argument)
   - Setting the scope in =transient-setup=
-  - Obtaining a scope in a custom =initialize-scope= method
+  - Obtaining a scope in a custom =transient-init-scope= method
   - Default values in prefix definition
   - Saved values of infixes
   - Saved values in other infixes / prefixs with shared =history-key=
@@ -1216,6 +1220,7 @@ of =magit=.
    and force the infix to be an argument by setting =:class transient-option=.
 
    #+begin_src elisp :tangle yes :var _=print-args-prelude
+
      (transient-define-prefix ts-switches-and-arguments (arg)
        "Wave at the user"
        [["Arguments"
@@ -1251,6 +1256,8 @@ of =magit=.
         ("-s" "switch" "--switch")
         ("-a" "argument" "--argument=")
         ("t" "toggle" "--toggle")
+        ;; If you actually need to enforce values, set the :reader slot with
+        ;; `transient-read-number-N+' etc
         ("v" "value" "--value=" :prompt "\"default\" or an integer: ")]
 
        ["Commands"
@@ -1260,6 +1267,9 @@ of =magit=.
      ;; (ts-wave)
    #+end_src
 
+   *Note*, after setting or saving a value on this transient using the =C-x=
+   menu, the next time the transient is set up, it will have a different value.
+
 *** Argument and Switch Macros
 
    If you need to fine-tune a switch, use =transient-define-infix=.  Likewise,
@@ -1267,19 +1277,16 @@ of =magit=.
    definitions can be used as a reference while the [[https://magit.vc/manual/transient/Suffix-Slots.html#Slots-of-transient_002dinfix][manual]] provides more
    explanation.
 
-   #+begin_src elisp :tangle yes :var _=reporter_prelude
+   #+begin_src elisp :tangle yes :var _=print-args-prelude
 
      (transient-define-infix ts--random-init-infix ()
        "Switch on and off"
        :argument "--switch"
        :shortarg "-s" ; will be used for :key when key is not set
        :description "switch"
-       ; if you haven't seen setf, think of it as having the power to set via a getter
-       :init-value (lambda (ob)
-                     (setf
-                      (slot-value ob 'value) ; get value
-                      (eq 0 (random 2))))) ; write t with 50% probability
-
+       :init-value (lambda (obj)
+                     (oset obj value                   
+                           (eq 0 (random 2))))) ; write t with 50% probability
      (transient-define-prefix ts-maybe-on ()
        "A randomly intializing switch."
        ["Arguments"
@@ -1288,7 +1295,12 @@ of =magit=.
         ("s" "show arguments" ts-suffix-print-args)])
 
      ;; (ts-maybe-on)
-     
+     ;; (ts-maybe-on)
+     ;; ...
+     ;; Run the command a few times to see the random initialization of `ts--random-init-infix'
+     ;; It will only take more than ten tries for one in a thousand users.  Good luck.
+
+
    #+end_src
 
 *** Choices
@@ -1380,11 +1392,8 @@ of =magit=.
    #+begin_src elisp :tangle yes :var  _=print-args-prelude    
 
      (transient-define-prefix ts-incompatible ()
-       :incompatible '(
-                       
-                       ;; update your transient version if you experience #129 / #155
-                       ("--switch" "--value=")
-
+       ;; update your transient version if you experience #129 / #155
+       :incompatible '(("--switch" "--value=")
                        ("--switch" "--toggle" "--flip")
                        ("--argument=" "--value=" "--special-arg="))
 
@@ -1541,6 +1550,10 @@ of =magit=.
     ;; (ts-cowsay)
 
   #+end_src
+
+*** TODO
+
+    Clean up cowsay example.  Check for binary before attempting to run it.
    
 ** Lisp Variables
 
@@ -1882,11 +1895,33 @@ of =magit=.
     - These functions do mostly the same job.  Why do we need to specify a
       prefix for =transient-parse-suffixes=, for scope etc?
   
-** TODO Using prefix scope in children
+** Using prefix scope in children
 
-*** TODO Consuming scope to initialize a child
+   Basically you are on your own.  Just call =(oref transient--prefix scope)=
+   during layout setup or =(oref transient-current-prefix)= during suffix
+   bodies.
 
-*** TODO Obtaining a valid scope if prefix was not set with it
+*** Obtaining Missing Scope   
+
+    Because suffixes are basically also commands (riding in the same symbol
+    plist), a suffix can be called independently.  In this case, if its expecting
+    to read the scope from the prefix when there is no prefix, it might fail.
+
+    Therefore, a method called =transient-init-scope= can be overriden and used
+    at the correct point in the lifecycle for the suffix to correct the issue.
+
+    *Note*, the behavior is actually quite ad-hoc.  You will read the prefix
+    yourself and then decide if you want to use some fallback.   
+
+    There is a perfectly short example in [[https://github.com/magit/magit/blob/40fb3d20026139ad1c3a3d9069b40d7d61bf8786/lisp/magit-transient.el#L56-L61][Magit source]] for the custom
+    =magit--git-variable= subclass of the =transient-variable= infix.
+
+    Each infix instance is declared in =transient-define-infix=, potentially with
+    a =:scope= slot, possibly holding a function.
+
+    If it's holding a function, that function will be used as a backup during
+    initialization in case there is no prefix or it has nothing in its =scope=
+    slot.
 
 ** Custom Infix Types
 
@@ -1992,6 +2027,11 @@ of =magit=.
      ;; (ts-inception-set)
 
     #+end_src
+
+** TODO Add set, save, history support    
+   
+   This example is really cool because it works with an arbitary object, but it
+   needs support for serializing & de-serializing via =transient-values=.
    
 * Appendixes
   
@@ -2264,6 +2304,18 @@ of =magit=.
                   prefix-arg scope args)))
 
    #+end_src
+
+** Essential Elisp
+
+  - [[info:elisp#Macros][transient-define-prefix]] is a macro that creates a command and attaches a
+    =transient-prefix= object to the command symbol's plist.
+  - [[info:elisp#Lambda][lambda]] is a macro to create an anonymous function
+  - [[info:elisp#Using Interactive][interactive]] is a macro that makes the function compatible with the command
+    interface, the =M-x= or =execute-extended-command= menu
+  - [[info:elisp#Vector Functions][The brackets]] are just vector syntax.
+
+    Use the built-in elisp manual by calling the command =elisp-index-search=.
+    See shortdocs for functions using =shortdoc-display-groups=.
     
 * Further Reading
 
