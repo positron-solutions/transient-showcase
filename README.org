@@ -750,6 +750,9 @@ of =magit=.
 
 
 ** Pre-Commands Explained
+   :PROPERTIES:
+   :ID:       0c106a1b-d824-4321-89a5-b1e06b468c63
+   :END:
 
    In few words, the value in the =:transient= slot affects what state the body
    of your command will see and what will happen after your command, during the
@@ -2007,19 +2010,17 @@ of =magit=.
      ;; ensures we don't store an invalid LOC.
      (defun ts-child-infix--reader (prompt initial-input history)
        "Read a location and check that it exists within the current transient."
-       (save-match-data
-         (cl-block nil ; allows cl-return
-           (while t
-             ;; read a string, then read it as a lisp object
-             (let* ((command (oref transient--prefix command))
-                    (loc (read (read-from-minibuffer prompt initial-input nil nil history)))
-                    (child (ignore-errors (transient-get-suffix command loc))))
-               (when child
-                 (cl-return loc)) ; breaks loop
-               (message
-                (propertize
-                 (format "Location could not be found in prefix %s"
-                         command) 'face 'error)))))))
+       (let ((command (oref transient--prefix command))
+             (success nil))
+         (while (not success)
+           (let* ((loc (read (read-from-minibuffer prompt initial-input nil nil history)))
+                  (child (ignore-errors (transient-get-suffix command loc))))
+             (if child (setq success loc)
+               (message (propertize
+                 (format
+                  "Location could not be found in prefix %s"
+                  command) 'face 'error)) (sit-for 3))))
+         success)) 
 
      ;; Inherit from variable abstract class
      (defclass ts-child-infix (transient-variable)
@@ -2038,56 +2039,38 @@ of =magit=.
      ;; behaviors.
      (cl-defmethod transient-init-value ((obj ts-child-infix))
        "Set the value and object-value using the prefix's value."
-
        (let* ((prefix-value (oref transient--prefix value))
-             (key (oref obj command))
-             (value (car (alist-get key prefix-value)))
-             (value-object (transient-get-suffix (oref transient--prefix command) value)))
-
-       (if-let* ((prefix-value (oref transient--prefix value))
-                 (key (oref obj command))
-                 (value (car (alist-get key prefix-value)))
-                 (value-object (transient-get-suffix (oref transient--prefix command) value)))
-           (progn
-             (oset obj value value)
-             (oset obj value-object value-object))
-         (progn
-           (oset obj value nil)
-           (oset obj value-object nil)))))
+              (key (oref obj command))
+              (value (car (alist-get key prefix-value))) ; car?
+              (value-object (transient-get-suffix (oref transient--prefix command) value)))
+         (oset obj value value)
+         (oset obj value-object value-object))))
 
      (cl-defmethod transient-infix-set ((obj ts-child-infix) value)
        "When the `value' is updated, update the `value-object' as well."
-       (if-let* ((command (oref transient--prefix command))
-                 (child (ignore-errors (transient-get-suffix command value))))
-           (progn (oset obj value-object child)
-                  (oset obj value value))
-         (progn
-           (oset obj value-object nil)
-           (oset obj value nil))))
+       (let* ((command (oref transient--prefix command))
+              (child (ignore-errors (transient-get-suffix command value))))
+         (oset obj value-object child)
+         (oset obj value (if child value nil))))
 
-     ;; If you are making a suffix that stores a value, you need to define
-     ;; this method.  You also need this method if your value needs some
-     ;; processing or use of an alternate value for later rehydration.  Tell
-     ;; the prefix what to store when setting / saving
+     ;; If you are making a suffix that needs history, you need to define this
+     ;; method.  You also need this method if your value needs some processing
+     ;; or use of an alternate value for later rehydration.  Tell the prefix
+     ;; what to store when setting / saving
      (cl-defmethod transient-infix-value ((obj ts-child-infix))
        "Return our actual value for rehydration later."
 
-       ;; this is identical to the method defined for `transient-infix', but
-       ;; don't forget this if you want history on a suffix for example.
+       ;; this is almost identical to the method defined for `transient-infix',
+       ;; but don't forget this if you want history on a suffix for example.
        (list (oref obj command) (oref obj value)))
 
      ;; Show user's a useful representation of your ugly value
      (cl-defmethod transient-format-value ((obj ts-child-infix))
        "All transient children have some description we can display.
      Show either the child's description or a default if no child is selected."
-       (if-let ((value
-                 (if (slot-boundp obj 'value)
-                     (oref obj value)
-                   nil))
-                (value-object
-                 (if (slot-boundp obj 'value-object)
-                     (oref obj value-object)
-                   nil)))
+       (if-let* ((value (and (slot-boundp obj 'value) (oref obj value)))
+                 (value-object (and (slot-boundp obj 'value-object)
+                                    (oref obj value-object))))
            (propertize
             (format "(%s)" (ts--layout-child-desc value-object))
             'face 'transient-value)
@@ -2118,10 +2101,11 @@ of =magit=.
      ;; (ts-inception)
      ;; Try setting the infix to "e" (yes, include quotes)
      ;; Try: (1 2)
-     ;; Try: 'ts--wave-normally
+     ;; Try: ts--wave-normally
      ;; Set the infix and re-open it
      ;; Save the infix, re-evaluate the prefix, and open the prefix again
      ;; Try flipping through history
+     ;; Now do think of doing things like this with org ids, magit-sections, buffers etc.
     #+end_src
 
     This is a difficult example, but once you understand the pieces, you can
@@ -2130,21 +2114,25 @@ of =magit=.
 
     Revisit the section on [[id:6f6c8eba-1c0e-41c4-b57f-c06ab00f64d1][detangling setting, saving and
     history]].  Watching the values update will make it clear what
-    representations are bing stored.
+    representations are bing stored, where, and when.
 
 *** Reading custom infix values
 
     =(transient-arg-value "somekey" (transient-args transient-current-command))=
 
-    This works okay if values were exported.
+    This works okay if values were exported, which usually is true during suffix
+    bodies.  (See [[id:0c106a1b-d824-4321-89a5-b1e06b468c63][the precommand
+    sections of flow control]])
 
     If you can identify the specific suffix you need, you can retreive the value
     from =(transient-current-suffixes)=, which is also set during
     =(transient--export)=.  This is recommended for custom infixes since
     =transient-arg-value= is somewhat intended for CLI's.
 
-    =transient-get-suffix= is the best because you can use commands or keys in a
-    prefix as essentially full addresses.
+    *=transient-get-suffix= is the best because you can use commands or keys in a
+    prefix as essentially full addresses.*
+
+    
     
 * Appendixes
   
