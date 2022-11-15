@@ -641,25 +641,27 @@ of =magit=.
          ;; because we need to clean up this transient or create some conditions
          ;; to trigger the following transient correctly.  This exmample will
          ;; work with `transient--do-replace' or no custom pre-command
-         
-         ("bc" "become child" ts-suffix-setup-child :transient transient--do-replace)])
 
-      ;; (ts-simple-with-setup-suffix)
+         ("bc" "become child" ts-suffix-setup-child :transient transient--do-recurse)])
+
+      ;; (ts-parent-with-setup-suffix)
 
     #+end_src    
 
-**** Errata
+**** TODO Errata
 
      This example should also work with the =transient--do-recurse= pre-command,
      but the child transient does not return.  There is a difference in the
      behavior that should not depend on if the suffix /is/ the prefix or just sets
      up the prefix.  *Possible bug*.
 
+     Also check that the comment in =ts-suffix-setup-child= is fully accurate.
+
 ** Mixing Interactive
 
    You can mix normal Emacs completion flows with transient UI's.
 
-   See [[elisp:(elisp-index-search "interactive codes")][Interactive codes]] are listed in the Elisp manual.
+   See [[info:elisp#Interactive Codes][Interactive codes]] are listed in the Elisp manual.
 
    *Note*, this also works when binding existing commands that recieve user
    input.
@@ -1118,6 +1120,9 @@ of =magit=.
   #+end_src
 
 *** Detangling with Initialization, Setting, and Saving
+    :PROPERTIES:
+    :ID:       6f6c8eba-1c0e-41c4-b57f-c06ab00f64d1
+    :END:
 
     Set values show up in the prefix's =value= slot.
 
@@ -1177,15 +1182,40 @@ of =magit=.
    Try to update =remember= and then set and save.  Reload it.  It will never
    pay attention to history or setting & saving the transient value.
 
-*** TODO Sticky infix support
+** Setting or Saving Every Time a Suffix is Used
 
-    There was going to be a =ts-elephant= example, but it requires a bit too
-    much EIEIO to do without just relying on =transient-set= in suffixes.
+   #+begin_src elisp :tangle yes :var _=print-args-prelude
+
+     (transient-define-suffix ts-suffix-remember-and-wave ()
+       "Wave, and force the prefix to set it's saveable infix values."
+       (interactive)
+
+       ;; (transient-reset) ; forget
+       (transient-set) ; save for this session
+       ;; If you combine reset with set, you get a reset for future sessions only.
+       ;; (transient-save) ; save for this and future sessions
+       ;; (transient-reset-value some-other-prefix-object)
+
+       (message "Waves at user at: %s.  You will never be forgotten." (current-time-string)))
+
+     (transient-define-prefix ts-elephant ()
+       "A prefix that always remembers its infixes."
+       ["Elephant"
+        ("-r" "rememeber" "--i-remember="
+         :always-read t)
+        ("w" "remember and wave" ts-suffix-remember-and-wave)
+        ("a" "print args (skips remembering)" ts-suffix-print-args :transient nil)])
+
+     ;; (ts-elephant)
+
+   #+end_src   
+
+*** TODO Sticky infix support
 
     There needs to be a slot that causes infixes to always be set on export.
     This would cover cases where the most frequent user input changes just
     rapidly enough that both setting every time and saving are equally
-    inconvenient.
+    inconvenient.  Using =transient-set= is kind of brute-ish.
 
 * Controlling CLI's
 
@@ -1821,7 +1851,7 @@ of =magit=.
        ["Replace this child"
         ;; Let's override the group's method
         :setup-children
-        (lambda (_) ; we don't care about the stupid child
+        (lambda (_) ; we don't care about the stupid suffix
 
           ;; remember to return a list
           (list (transient-parse-suffix
@@ -1853,7 +1883,7 @@ of =magit=.
        ["Replace this child"
         ;; Let's override the group's method
         :setup-children
-        (lambda (_) ; we don't care about stupid child
+        (lambda (_) ; we don't care about the stupid suffix
 
           ;; the result of parsing here will be a group
           (transient-parse-suffixes
@@ -1929,28 +1959,26 @@ of =magit=.
    objects in your transint infixes.  If your objects can be rehydrated from
    some serialized ID, you may want history support.
    
-   If you need to set and display a custom type, use the simple OOP techniques of
-   [[*EIEIO][EIEIO]].
+   If you need to set and display a custom type, use the simple OOP techniques
+   of [[*EIEIO][EIEIO]].  Also check the [[info:transient#Suffix Value Methods][suffix value methods]] section of the transient
+   manual.
 
-   We will use several new pieces here:
+   *Essential behaviors for your custom infix:*
+     
+   - Defining a reader to set the infix with user input
+   - =prompt= slot's default form, =initform= for asking the user for input
+   - =transient-init-value= to rehydrate saved values
+   - =transient-infix-value= so that setting & saving persist what you want to rehydrate
+   - =transient-format-value= to display a user-meaningful form for your value
 
-   - =transient-get-suffix= To get suffix by a key, location, or command symbol
-   - =transient-format-description= Method works on children to get their
-     description string
-   
+   We will also use some layout introspection:
 
-   =:initform= is a default value.  =:initarg= configures which argument
-   to pick up from the class constructor.
+   - =transient-get-suffix= To get suffix by *key*, *location*, or *command symbol*
+   - Getting a description from raw layout children (not EIEIO objects).  See
+     [[id:49cb2ea4-66fa-4bc4-ab91-268580e907a5][Layout Hacking]].
 
-   Let's write a transient menu that can interrogate transient prefixes!  We
-   need to be able to pick a child from the prefix's layout and then get
-   information about its properties and finally to set the properties.
-
-   First we need an infix to pick, store, and display the suffix or group we are
-   operating on.
-
-
-   #+begin_src elisp :tangle yes :var _=levels-prelude
+   #+name: custom-infixes
+   #+begin_src elisp :tangle yes :var _=levels-prelude :var __=print-args-prelude
 
      ;; The children we will be picking can be of several forms.  The
      ;; transient--layout symbol property of a prefix is a vector of vectors, lists,
@@ -2071,6 +2099,32 @@ of =magit=.
 
     #+end_src
 
+*** Typical OOP
+
+    Like all OOP, the three things you want to do are:
+
+**** Override methods
+
+     =cl-defmethod= and sometimes =cl-call-next-method=
+
+**** Override default values     
+
+     Inside the =defclass= form, you can set slots that you don't like.
+     =:initform= is a default value.  =:initarg= configures which argument
+     to pick up from the class constructor.
+
+**** Read & Update
+
+     =oref= and =oset=
+
+**** Call Methods
+
+     =(method-name object arguments)=
+
+**** Introspection
+
+     See methods like =slot-boundp= in the EIEIO [[info:eieio#Function Index][eieio method index]]
+
 *** Transient's defclass's and their inheritance
 
     Here's a list of all of transient's =defclass= and their ancestry.  This is
@@ -2079,23 +2133,33 @@ of =magit=.
     #+begin_src elisp :tangle no :results replace
 
       (eieio-class-browser) ; shows all known classes and their ancestry
-      
-      ;;    +--transient-child
-      ;;    |    +--transient-group
-      ;;    |    |    +--transient-subgroups
-      ;;    |    |    +--transient-columns
-      ;;    |    |    +--transient-row
-      ;;    |    |    +--transient-column
-      ;;    |    +--transient-suffix
-      ;;    |         +--transient-infix
-      ;;    |              +--transient-variable
-      ;;    |              |    +--transient-lisp-variable
-      ;;    |              +--transient-argument
-      ;;    |                   +--transient-switches
-      ;;    |                   +--transient-option
-      ;;    |                   |    +--transient-files
-      ;;    |                   +--transient-switch
-      ;;    +--transient-prefix
+
+      ;;     +--transient-child
+      ;;     |    +--transient-group
+      ;;     |    |    +--transient-subgroups
+      ;;     |    |    +--transient-columns
+      ;;     |    |    +--transient-row
+      ;;     |    |    +--transient-column
+      ;;     |    +--transient-suffix
+      ;;     |         +--magit--git-submodule-suffix
+      ;;     |         +--transient-infix
+      ;;     |              +--transient-variable
+      ;;     |              |    +--magit--git-variable
+      ;;     |              |    |    +--magit--git-branch:upstream
+      ;;     |              |    |    +--magit--git-variable:urls
+      ;;     |              |    |    +--magit--git-variable:choices
+      ;;     |              |    |         +--magit--git-variable:boolean
+      ;;     |              |    +--transient-lisp-variable
+      ;;     |              +--transient-argument
+      ;;     |                   +--transient-switches
+      ;;     |                   +--transient-option
+      ;;     |                   |    +--transient-files
+      ;;     |                   +--transient-switch
+      ;;     +--transient-prefix
+      ;;          +--magit-log-prefix
+      ;;          |    +--magit-log-refresh-prefix
+      ;;          +--magit-diff-prefix
+      ;;               +--magit-diff-refresh-prefix      
 
     #+end_src
 
@@ -2307,6 +2371,9 @@ of =magit=.
 
 ** Essential Elisp
 
+   If you were hit in the face with the first example, you need to learn basic
+   Elisp.  This is not an Elisp guide.  Here's some starting points:
+
   - [[info:elisp#Macros][transient-define-prefix]] is a macro that creates a command and attaches a
     =transient-prefix= object to the command symbol's plist.
   - [[info:elisp#Lambda][lambda]] is a macro to create an anonymous function
@@ -2314,12 +2381,22 @@ of =magit=.
     interface, the =M-x= or =execute-extended-command= menu
   - [[info:elisp#Vector Functions][The brackets]] are just vector syntax.
 
+    Besides the other ways to evaluate elisp used in this README, try =ielm=.
+
     Use the built-in elisp manual by calling the command =elisp-index-search=.
     See shortdocs for functions using =shortdoc-display-groups=.
+
+    The EIEIO and CL manuals are independent from the Elisp manual for some
+    reason.  EIEIO is pretty short and not used much once you get the hang of
+    it. =info-display-manual=
+
+    [[info:cl#Top][Common Lisp manual]] you don't really need the common lisp manual for working
+    with transient.  Don't be alarmed when you see EIEIO using functions like
+    =cl-call-next-method=
     
 * Further Reading
 
-  - [[https://magit.vc/manual/transient.html][*The Transient Manual*]] contains more detailed explanation of behavior.  The examples
+  - [[info:transient#Top][*The Transient Manual*]] ([[https://magit.vc/manual/transient.html][web link]]) contains more detailed explanation of behavior.  The examples
     here should allow you to visualize what is being described.  This guide and
     the manual should be your first and second sources.
     
