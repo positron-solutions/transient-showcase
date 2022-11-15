@@ -1435,6 +1435,7 @@ of =magit=.
         ("-a" "argument" "--argument=")
         ("v" "value" "--value=")
         ("C-a" "special arg" "--special-arg=")]
+
        ["Show Args"
         ("s" "show arguments" ts-suffix-print-args)])
 
@@ -1986,81 +1987,183 @@ of =magit=.
      ;; `transient-format-description'
      (defun ts--layout-child-desc (layout-child)
        "Get the description from a transient layout vector or list."
-       (cond
-        ((vectorp layout-child) (or (plist-get (aref layout-child 2) :description) "<group>")) ; group
-        ((stringp layout-child) layout-child) ; plain-text child
-        ((listp layout-child) (plist-get (elt layout-child 2) :description)) ; suffix
-        (t (format "You traversed into a child's list elements: %s" (type-of layout-child)))))
+       (message "Layout child for : " (type-of layout-child))
+       (let ((description 
+              (cond
+               ((vectorp layout-child) (or (plist-get (aref layout-child 2) :description) "<group, no desc>")) ; group
+               ((stringp layout-child) layout-child) ; plain-text child
+               ((listp layout-child) (plist-get (elt layout-child 2) :description)) ; suffix
+               (t (message (propertize "You traversed into a child's list elements!" 'face 'warning))
+                  (format "(child's interior) element: %s" layout-child)))))
+         (cond
+          ;; The description is sometimes a callable function with no arguments,
+          ;; so let's call it in that case.  Note, the description may be
+          ;; designed for one point in the transient's lifecycle but we could
+          ;; call it in a different one, causing its behavior to change.
+          ((functionp description) (#'apply description))
+          (t description))))
 
      ;; We repeat the read using a lisp expression from `read-from-minibuffer' to get
      ;; the LOC key for `transient-get-suffix' until we get a valid result.  This
      ;; ensures we don't store an invalid LOC.
-     (defun transient-child-variable--reader (prompt initial-input history)
+     (defun ts-child-infix--reader (prompt initial-input history)
        "Read a location and check that it exists within the current transient."
        (save-match-data
          (cl-block nil ; allows cl-return
            (while t
              ;; read a string, then read it as a lisp object
-             (let* ((loc (read (read-from-minibuffer prompt initial-input nil nil history)))
-                    (child (ignore-errors (transient-get-suffix transient-current-command loc))))
+             (let* ((command (oref transient--prefix command))
+                    (loc (read (read-from-minibuffer prompt initial-input nil nil history)))
+                    (child (ignore-errors (transient-get-suffix command loc))))
                (when child
-                 (cl-return child)) ; breaks loop
+                 (cl-return loc)) ; breaks loop
                (message
                 (propertize
                  (format "Location could not be found in prefix %s"
-                         transient-current-command) 'face 'error))
-               (sit-for 1)))))) ; wait a second
+                         command) 'face 'error)))))))
 
      ;; Inherit from variable abstract class
-     (defclass transient-child-variable (transient-variable)
-       ((reader :initform #'transient-child-variable--reader )
-        (transient :initform 'transient--do-call))) ; we want access to transient-current-command
+     (defclass ts-child-infix (transient-variable)
+       ((value-object :initarg value-object :initform nil)
+        ;; this is a new slot for storing the hydrated value.  we re-use the
+        ;; value infrastructure for storing the serialization-friendly value,
+        ;; which is basically a suffix addres or id.
+
+        (reader :initform #'ts-child-infix--reader)
+        (prompt :initform "Location, a key \"c\", suffix-command-symbol like ts--wave-normally or coordinates like (0 2 0): ")))
 
      ;; We have to define this on non-abstract infix classes.  See
-     ;; `transient-init-value' in transient source.
-     (cl-defmethod transient-init-value ((obj transient-child-variable))
-       (oset obj value nil))
+     ;; `transient-init-value' in transient source.  The method on
+     ;; `transient-argument' class is the best example for initializing your
+     ;; suffix based on the prefix's value, but it does support a lot of
+     ;; behaviors.
+     (cl-defmethod transient-init-value ((obj ts-child-infix))
+       "Set the value and object-value using the prefix's value."
 
-     (cl-defmethod transient-prompt ((obj transient-child-variable))
-       "Location, a key \"a\", 'suffix-command, or coordinates like (0 1): ")
+       (let* ((prefix-value (oref transient--prefix value))
+             (key (oref obj command))
+             (value (car (alist-get key prefix-value)))
+             (value-object (transient-get-suffix (oref transient--prefix command) value)))
+         (message " --- transient-init-value --- ")
+         (message " prefix-value: %s" prefix-value)
+         (message " key: %s" key)
+         (message " value: %s" value)
+         (message " value-object: %s" value-object))
 
-     ;; Customize how we display our value since it's actual value is ugly
-     (cl-defmethod transient-format-value ((obj transient-child-variable))
+       (if-let* ((prefix-value (oref transient--prefix value))
+                 (key (oref obj command))
+                 (value (car (alist-get key prefix-value)))
+                 (value-object (transient-get-suffix (oref transient--prefix command) value)))
+           (progn
+             (message "SUCCESFULLY INITIALIZED")             
+             (oset obj value value)
+             (oset obj value-object value-object))
+         (progn
+           (message "FAILED INITIALIZATION")
+           (oset obj value nil)
+           (oset obj value-object nil))))
+
+     (cl-defmethod transient-infix-set ((obj ts-child-infix) value)
+       "When the `value' is updated, update the `value-object' as well."
+
+       (message "--- transient-infix-set --- value arg: %s" value)
+
+       (if-let* ((command (oref transient--prefix command))
+                 (child (ignore-errors (transient-get-suffix command value))))
+           (progn (oset obj value-object child)
+                  (oset obj value value))
+         (progn
+           (message "Invalid value was saved in infix %s" (oref obj command))
+           (oset obj value-object nil)
+           (oset obj value nil)))
+       (message "new value: %s" value)
+       (message "value-object: %s" (oref obj value-object))
+       (message "value %s" (oref obj value)))
+
+     ;; If you are making a suffix that stores a value, you need to define
+     ;; this method.  You also need this method if your value needs some
+     ;; processing or use of an alternate value for later rehydration.  Tell
+     ;; the prefix what to store when setting / saving
+     (cl-defmethod transient-infix-value ((obj ts-child-infix))
+       "Return our actual value for rehydration later."
+
+       ;; this is identical to the method defined for `transient-infix', but
+       ;; don't forget this if you want history on a suffix for example.
+       (list (oref obj command) (oref obj value)))
+
+     ;; Show user's a useful representation of your ugly value
+     (cl-defmethod transient-format-value ((obj ts-child-infix))
        "All transient children have some description we can display.
      Show either the child's description or a default if no child is selected."
-       (let ((value (if (slot-boundp obj 'value) (slot-value obj 'value) nil)))
-         (if value
-             (propertize
-              (format "(%s)" (ts--layout-child-desc value))
-              'face 'transient-value)
-           (propertize "¯\_(ツ)_/¯" 'face 'transient-inactive-value))))
+       (message "$ obs value-object: " (oref obj value-object))
+       (message "$ obs value:" (oref obj value)) 
+
+       (if-let ((value
+                 (if (slot-boundp obj 'value)
+                     (oref obj value)
+                   nil))
+                (value-object
+                 (if (slot-boundp obj 'value-object)
+                     (oref obj value-object)
+                   nil)))
+           (propertize
+            (format "(%s)" (ts--layout-child-desc value-object))
+            'face 'transient-value)
+         (propertize "¯\_(ツ)_/¯" 'face 'transient-inactive-value)))
 
      ;; Now that we have our class defined, we can create an infix the usual
      ;; way, just specifying our class
-     (transient-define-infix ts--inception-child ()
-       :class transient-child-variable)
+     (transient-define-infix ts--inception-child-infix ()
+       :class ts-child-infix)
 
      ;; All set!  This transient just tests our or new toy.
-     (transient-define-prefix ts-inception-set ()
+     (transient-define-prefix ts-inception ()
        "Pick a suffix, any suffix"
-       ["Pick a suffix"
-         ("c" "child" ts--inception-child :class transient-child-variable)]
 
-       ["Some suffixex"
-        ("s" "surely" ts--wave-surely)
-        ("d" "definitely" ts--wave-definitely)
-        ("e" "eventually" ts--wave-eventually)
-        ("n" "normally" ts--wave-normally)])
+       [["Pick a suffix"
+         ("-s" "just a switch" "--switch") ; makes history value structure apparent
+         ("c" "child" ts--inception-child-infix :class ts-child-infix)] 
 
-     ;; (ts-inception-set)
+        ["Some suffixes"
+         ("s" "wave surely" ts--wave-surely)
+         ("d" "wave definitely" ts--wave-definitely)
+         ("e" "wave eventually" ts--wave-eventually)
+         ("C" "call & exit normally" ts--wave-normally :transient nil)]
 
+        ["Read variables"
+         ("r" "read args" ts-suffix-print-args )]])
+
+     ;; (ts-inception)
+     ;; Try setting the infix to "e" (yes, include quotes)
+     ;; Try: (1 2)
+     ;; Try: 'ts--wave-normally
+     ;; Set the infix and re-open it
+     ;; Save the infix, re-evaluate the prefix, and open the prefix again
+     ;; Try flipping through history
     #+end_src
 
-** TODO Add set, save, history support    
-   
-   This example is really cool because it works with an arbitary object, but it
-   needs support for serializing & de-serializing via =transient-values=.
-   
+    This is a difficult example, but once you understand the pieces, you can
+    see some of the magit variables in action like =magit--git-variable= and
+    it's many subclasses.
+
+    Revisit the section on [[id:6f6c8eba-1c0e-41c4-b57f-c06ab00f64d1][detangling setting, saving and
+    history]].  Watching the values update will make it clear what
+    representations are bing stored.
+
+*** Reading custom infix values
+
+    =(transient-arg-value "somekey" (transient-args transient-current-command))=
+
+    This works okay if values were exported.
+
+    If you can identify the specific suffix you need, you can retreive the value
+    from =(transient-current-suffixes)=, which is also set during
+    =(transient--export)=.  This is recommended for custom infixes since
+    =transient-arg-value= is somewhat intended for CLI's.
+
+    =transient-get-suffix= is the best because you can use commands or keys in a
+    prefix as essentially full addresses.
+    
 * Appendixes
   
 ** EIEIO - OOP in Elisp
