@@ -1987,7 +1987,6 @@ of =magit=.
      ;; `transient-format-description'
      (defun ts--layout-child-desc (layout-child)
        "Get the description from a transient layout vector or list."
-       (message "Layout child for : " (type-of layout-child))
        (let ((description 
               (cond
                ((vectorp layout-child) (or (plist-get (aref layout-child 2) :description) "<group, no desc>")) ; group
@@ -2044,41 +2043,27 @@ of =magit=.
              (key (oref obj command))
              (value (car (alist-get key prefix-value)))
              (value-object (transient-get-suffix (oref transient--prefix command) value)))
-         (message " --- transient-init-value --- ")
-         (message " prefix-value: %s" prefix-value)
-         (message " key: %s" key)
-         (message " value: %s" value)
-         (message " value-object: %s" value-object))
 
        (if-let* ((prefix-value (oref transient--prefix value))
                  (key (oref obj command))
                  (value (car (alist-get key prefix-value)))
                  (value-object (transient-get-suffix (oref transient--prefix command) value)))
            (progn
-             (message "SUCCESFULLY INITIALIZED")             
              (oset obj value value)
              (oset obj value-object value-object))
          (progn
-           (message "FAILED INITIALIZATION")
            (oset obj value nil)
-           (oset obj value-object nil))))
+           (oset obj value-object nil)))))
 
      (cl-defmethod transient-infix-set ((obj ts-child-infix) value)
        "When the `value' is updated, update the `value-object' as well."
-
-       (message "--- transient-infix-set --- value arg: %s" value)
-
        (if-let* ((command (oref transient--prefix command))
                  (child (ignore-errors (transient-get-suffix command value))))
            (progn (oset obj value-object child)
                   (oset obj value value))
          (progn
-           (message "Invalid value was saved in infix %s" (oref obj command))
            (oset obj value-object nil)
-           (oset obj value nil)))
-       (message "new value: %s" value)
-       (message "value-object: %s" (oref obj value-object))
-       (message "value %s" (oref obj value)))
+           (oset obj value nil))))
 
      ;; If you are making a suffix that stores a value, you need to define
      ;; this method.  You also need this method if your value needs some
@@ -2095,9 +2080,6 @@ of =magit=.
      (cl-defmethod transient-format-value ((obj ts-child-infix))
        "All transient children have some description we can display.
      Show either the child's description or a default if no child is selected."
-       (message "$ obs value-object: " (oref obj value-object))
-       (message "$ obs value:" (oref obj value)) 
-
        (if-let ((value
                  (if (slot-boundp obj 'value)
                      (oref obj value)
