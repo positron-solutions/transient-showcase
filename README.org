@@ -282,11 +282,12 @@ of =magit=.
    =:transient= property, set to true, meaning the suffix won't exit the
    transient.
 
-   #+begin_src elisp :tangle no :var _=wave-prelude
-     
+   #+begin_src elisp :tangle no :var _=levels-prelude
+
      (transient-define-prefix ts-wave-keyword-args ()
        "Wave at the user"
-       [("w" "wave" ts-suffix-wave :transient t)])
+       [("e" "wave eventually & stay" ts--wave-eventually :transient t)
+        ("s" "wave surely & leave" ts--wave-surely :transient nil)])
 
      ;; (ts-wave-keyword-args)
 
@@ -302,13 +303,13 @@ of =magit=.
    makes the prefix definition more compact at the expense of a more verbose
    command.
 
-   #+name ts-wave-suffix-def
+   #+name: ts-wave-suffix-def
    #+begin_src elisp :tangle yes
      
-     (transient-define-suffix ts-suffix-wave-suffix ()
+     (transient-define-suffix ts-suffix-wave-macroed ()
        "Macro-defined suffix that waves."
        :transient t
-       :key "wm"
+       :key "T"
        :description "wave from macro definition"
        (interactive)
        (message "Waves from a macro definition at: %s" (current-time-string)))
@@ -320,7 +321,7 @@ of =magit=.
 
      (transient-define-prefix ts-wave-macro-defined ()
        "Wave using a macro-defined suffix"
-       [(ts-suffix-wave-suffix)]) ; note, information moved from prefix to the suffix.
+       [(ts-suffix-wave-macroed)]) ; note, information moved from prefix to the suffix.
 
      ;; (ts-wave-macro-defined)
 
@@ -333,18 +334,19 @@ of =magit=.
    the =:transient=, =:description=, and =:key= properties of the
    =ts-suffix-wave= suffix defined above:
 
+   #+name: ts-wave-overridden
    #+begin_src elisp :tangle yes :var _=ts-wave-suffix-def
 
-     (defun ts--wave-everride ()
+     (defun ts--wave-override ()
        "Vanilla command used to override suffix's commands."
        (interactive)
        (message "This suffix was overridden.  I am what remains."))
 
-     (transient-define-prefix ts-wave-overriden ()
-       "Wave with overriden suffix behavior"
-       [(ts--wave-suffix
+     (transient-define-prefix ts-wave-overridden ()
+       "Wave with overridden suffix behavior"
+       [(ts-suffix-wave-macroed
          :transient nil
-         :key "wo"
+         :key "O"
          :description "wave overridingly"
          :command ts--wave-override)]) ; we overrode what the suffix even does
 
@@ -538,6 +540,12 @@ of =magit=.
      ;; (ts-wave-dynamic-labels)
    #+end_src
 
+*** TODO Errata
+
+    *Note*, the uuid is generated on every key input.  Layout updates are fun.
+    It should also work when changing descriptions in the layout via hackery.
+    凸( ` ﾛ ´ )凸
+
 * Nesting & Flow Control
 
   Many transients call other transients.  This allows you to express similar
@@ -553,16 +561,23 @@ of =magit=.
    Sometimes you want to execute multiple commands without re-opening the
    transient.  It's the same idea as [[https://github.com/emacsorphanage/god-mode][god mode]] or Evil repeat.
 
-   #+begin_src elisp :tangle yes :var _=wave-prelude
+   #+begin_src elisp :tangle yes :var _=wave-prelude __=ts-wave-overridden
 
      (transient-define-prefix ts-stay-transient ()
        "Some suffixes do not exit."
        ["Exit or Not?"
-        ("we" "wave & exit" ts-wave)
-        ("ws" "wave & stay" ts-wave :transient t)]) ; this suffix will not exit
+
+        ;; this suffix will not exit after calling sub-prefix
+        ("we" "wave & exit" ts-wave-overridden)
+        ("ws" "wave & stay" ts-wave :transient t)])
 
      ;; (ts-stay-transient)
    #+end_src
+
+   *Note*, if =ts-wave= was used in both exit & stay, the =:transient= slot
+   would be clobbered and we would only get one behavior.  Beware of re-using
+   the same object instances in the same layout.  Move the =:transient= slot
+   override between the two suffixes to see the change in behavior.
 
 ** Nesting
 
@@ -600,9 +615,9 @@ of =magit=.
     #+begin_src elisp :tangle yes :var _=wave-prelude __=simple-parent-child
 
       (transient-define-prefix ts-simple-parent-with-return ()
-        ["Simple Parent"
+        ["Parent With Return"
          ("w" "wave parentally" ts-suffix-wave)
-         ("r" "become child & return" ts-simple-child :transient t)])
+         ("r" "become child with return" ts-simple-child :transient t)])
 
       ;; Child does not "return" when called independently
       ;; (ts-simple-child)
@@ -615,9 +630,9 @@ of =magit=.
     If you call =(transient-setup 'transient-command-symbol)=, you will activate
     a replacement transient.
 
-    This form is useful if you want a command to /perhaps/ load a transient in
-    some situation.  The [[*Scope][scope]] example is helpful if you need to give an
-    argument to the transient you are calling into.
+    This form is useful if you want a command to /perhaps/ load yet another
+    transient in some situation.  You may even just want to load the same
+    transient with different context, such as passing in a new [[*Scope][scope]].
 
     #+begin_src elisp :tangle yes :var _=simple-parent-child __=wave-prelude
 
@@ -636,10 +651,10 @@ of =magit=.
 
          ;; You may need to specify a different pre-command (the :transient) key
          ;; because we need to clean up this transient or create some conditions
-         ;; to trigger the following transient correctly.  This exmample will
+         ;; to trigger the following transient correctly.  This example will
          ;; work with `transient--do-replace' or no custom pre-command
 
-         ("bc" "become child" ts-suffix-setup-child :transient transient--do-recurse)])
+         ("bc" "become child" ts-suffix-setup-child :transient transient--do-replace)])
 
       ;; (ts-parent-with-setup-suffix)
 
@@ -665,8 +680,8 @@ of =magit=.
 
      (transient-define-suffix ts--suffix-interactive-string (user-input)
        "An interactive suffix that obtains string input from the user."
-       (interactive "s")
-       (message "You typed: %s" user-input))
+       (interactive "sPlease just tell me what you want!: ")
+       (message "I think you want: %s" user-input))
 
      (transient-define-suffix ts--suffix-interactive-buffer-name (buffer-name)
        "An interactive suffix that obtains a buffer name from the user."
@@ -676,7 +691,7 @@ of =magit=.
      (transient-define-prefix ts-interactive-basic ()
        ["Interactive Command Suffixes"
         ("s" "enter string" ts--suffix-interactive-string)
-        ("b" "select buffer" ts-suffix-interactive-buffer-name)])
+        ("b" "select buffer" ts--suffix-interactive-buffer-name)])
 
      ;; (ts-interactive-basic)
 
@@ -697,28 +712,29 @@ of =magit=.
 
     #+begin_src elisp :tangle true
 
-      (defvar ts--complex nil "Show verbose menu or not")
+      (defvar ts--complex nil "Show complex menu or not")
 
-      (transient-define-suffix ts--toggle-verbose ()
+      (transient-define-suffix ts--toggle-complex ()
         :transient t
-        :description (lambda () (format "toggle verbose: %s" ts--complex))
+        :description (lambda () (format "toggle complex: %s" ts--complex))
         (interactive)
         (setf ts--complex (not ts--complex))
         (message (propertize (concat "Complexity set to: "
                                      (if ts--complex "true" "false"))
                              'face 'success)))
 
-      (transient-define-prefix ts-child ()
-        ["Complex Messages"
+      (transient-define-prefix ts-complex-messager ()
+        "Complex messager, unless `ts--complex' is nil."
+        ["Send Complex Messages"
          ("s" "snow people"
           (lambda () (interactive)
-            (message (propertize "snow people! ☃" 'face 'success 'size 24))))
+            (message (propertize "snow people! ☃" 'face 'success))))
          ("k" "kitty cats"
           (lambda () (interactive)
-            (message (propertize "🐈 kitty cats! 🐈" 'face 'success 'size 24))))
+            (message (propertize "🐈 kitty cats! 🐈" 'face 'success))))
          ("r" "radiations"
           (lambda () (interactive)
-            (message (propertize "radiation! ☢" 'face 'success 'size 24)))
+            (message (propertize "Oh no! radiation! ☢" 'face 'success)))
           ;; radiation is dangerous!
           :transient transient--do-exit)]
 
@@ -726,20 +742,21 @@ of =magit=.
         ;; The command body either sets up the transient or simply returns
         ;; This is the "early completion" we're talking about.
         (if ts--complex
-            (transient-setup 'ts-child) 
+            (transient-setup 'ts-complex-messager) 
           (message "Simple and boring!")))
 
-      (transient-define-prefix ts-parent ()
+      (transient-define-prefix ts-simple-messager ()
+        "Sends messages, optionally switching to complex messages!"
         [["Send Message"
           ;; using `transient--do-recurse' causes suffixes in ts-child to perform
           ;; `transient--do-return' so that we come back to this transient.
-          ("m" "message" ts-child :transient transient--do-recurse)]
-         ["Toggle Verbose"
-          ("t" ts--toggle-verbose)]])
+          ("m" "message" ts-complex-messager :transient transient--do-recurse)]
+         ["Toggle Complexity"
+          ("t" ts--toggle-complex)]])
 
-      ;; (ts-parent)
+      ;; (ts-simple-messager)
       ;; does not "return" when called independently
-      ;; (ts-child)
+      ;; (ts-complex-messager)
 
    #+end_src
 
@@ -749,14 +766,15 @@ of =magit=.
    :ID:       0c106a1b-d824-4321-89a5-b1e06b468c63
    :END:
 
-   In few words, the value in the =:transient= slot affects what state the body
-   of your command will see and what will happen after your command, during the
+   The value in the =:transient= slot affects what state the body of your
+   command will see and what will happen after your command, during the
    post-command.
    
    The =:transient= slot holds a function called the "pre-command."  Before your
    suffix body forms run, the pre-command is called and creates the conditions
    that your suffix may use to, for example, prepare for reading variables that
-   were set on infixes.
+   were set on infixes.  If the pre-command calls =transient-export= then it
+   will add to history.
 
    In =transient-define-prefix= and =transient-define-suffix=, the =t= value is
    actually translated to =transient--do-call= or =transient--do-recurse=
@@ -771,14 +789,14 @@ of =magit=.
 
 *** Warning!
 
-    Some of the trickiest bugs you can introduce will happen when using the
+    Some of the *trickiest bugs you can introduce* will happen when using the
     following variables and functions at varying points in command lifecycles:
 
     - =transient-current-command=
     - =transient--command=
     - =transient-current-prefix=
     - =transient--prefix=
-    - =transient-args=
+    - =transient-args=      
 
     During the pre-command and post-command, these can change.  When you are
     overriding the pre-command, you may discover things such as the result of
@@ -788,13 +806,16 @@ of =magit=.
 
     *In particular* it seems like layout predicates should use
     =transient--prefix= while suffix bodies should use
-    =transient-current-prefix=. Be aware that the lifecycle is dynamic.
+    =transient-current-prefix=.    
 
     Not all pre-commands are compatible with all situations and suffixes!
 
     [[Debugging][Debugging]]
 
-    READ THIS OR YOU MAY LOSE YOUR MIND!
+**** TODO Errata
+
+     There's definitely some edge cases that are unnecessarily complex for the
+     use case.  Think of how life was before =transient--do-recurse=.
    
 * Using & Managing States
 
@@ -817,28 +838,46 @@ of =magit=.
   - User-set infix values from the current or parent prefix
   - Ad-hoc values in regular =defvar= and =defcustom= etc
   - Reading values from another, perhaps distant prefix
-  - Arguments passed into interactive commands to call them as normal elisp functions
+  - Arguments passed into interactive commands to call them as normal elisp
+    functions
 
-  Using all of these mechanisms, you can enable users to rapidly construct
-  complex command sentences, sentences with phrases.  You can basically make a
-  user interface as expressive as elisp.
+** The Magic of Transient    
 
-  A user input sequence like this:
+   Using all of these mechanisms, you can enable users to rapidly construct
+   complex command sentences, sentences with phrases.  You can basically make a
+   user interface as expressive as elisp.
 
-  =Prefix -> Sub-Prefix -> Infix -> Sub-Prefix -> Suffix -> Suffix -> ...=
+   A user input sequence like this:
 
-  Is basically the same as doing this in elisp:
+   =Prefix -> Interactive -> Sub-Prefix -> Infix -> Suffix -> Suffix -> ...=
 
-  #+begin_src elisp :tangle no
+   Is basically the same as doing this in elisp:
 
-    (function
-     (let ((state (function (function argument))))
-       (suffix state)
-       (suffix state)))
+   #+begin_src elisp :tangle no
 
-  #+end_src
+     (let ((input (Sub-Prefix (Prefix) interactive))
+           (infix (Infix))
+       (suffix state infix)
+       (suffix state infix)))
 
-  This is what is meant by "creating user interfaces as expressive as elisp."
+    #+end_src
+
+   With history, you can remember lots of these states.  This allows the user to
+   quickly fire off lots of mostly completed partial expressions.  They are
+   scoped, so you can keep state over different contexts.
+
+   This is what is meant by "creating user interfaces as expressive as elisp."
+
+   Because interactive forms and transients are both still just consuming linear
+   user input, they ultimately have the same capabilities, but if you /think/ in
+   terms of partially constructed elisp expressions, you can do more than if the
+   user has to enter in contextless commands over and over or write more
+   commands and ad-hoc manage their own state.
+
+   Transient's UI also provides greater awareness to the user of the current
+   state.  This makes it easier for the user to achieve the greater complexity
+   that is intended, without remembering the command language you are designing
+   for your application.
     
 ** Infixes
 
@@ -897,7 +936,16 @@ of =magit=.
 
     There are two basic ways to read infixes:
 
-    - =(transient-
+    - =(transient-args transient-current-command)= and parse manually
+    - =(transient-arg-value "--argument-" (transient-args transient-current-command)=
+    - =(transient-suffixes transient-current-command)= and retrieve your fully
+      hydrated suffix
+
+**** TODO The second option requires filtering
+
+     In my opinion the API should make it easer to get raw values from suffixes,
+     but this is also a matter of custom infixes needing to serialize values
+     correctly so that =transient-arg-value= will "just work".
     
 ** Scope
 
@@ -964,6 +1012,7 @@ of =magit=.
      ;; Then d to double
      ;; Then r to read
      ;; ... and so on
+     ;; C-g to exit
    #+end_src
 
 *** TODO Errata with prefix arg (=C-u= universal argument).
@@ -1045,7 +1094,8 @@ of =magit=.
        ("e" "eat snowcone" ts-suffix-eat-snowcone)])
 
     ;; First call will use the transient's default value
-    ;; (ts-suffix-eat-snowcone)
+    ;; M-x ts-suffix-eat-snowcone or `eval-last-sexp' below
+    ;; (call-interactively 'ts-suffix-eat-snowcone)
     ;; (ts-snowcone-eater)    
     ;; Eat some snowcones with different flavors
     ;; ...
@@ -1053,7 +1103,8 @@ of =magit=.
     ;; ...
     ;; Now save the value and exit the transient.
     ;; When you call the suffix independently, it can still read the saved values!
-    ;; (ts-suffix-eat-snowcone)
+    ;; M-x ts-suffix-eat-snowcone or `eval-last-sexp' below
+    ;; (call-interactively 'ts-suffix-eat-snowcone)
 
   #+end_src
 
@@ -1168,7 +1219,7 @@ of =magit=.
        ["Goldfish"
         ("-r" "rememeber" "--i-remember="
          :unsavable t ; infix isn't saved
-         :always-read t) ; infix always asks for new value
+         :always-read t ; infix always asks for new value
          ;; overriding the method to provide a starting value
          :init-value (lambda (obj) (oset obj value "nothing")))
         ("a" "print args" ts-suffix-print-args :transient nil)])
@@ -1177,8 +1228,9 @@ of =magit=.
 
    #+end_src
 
-   Try to update =remember= and then set and save.  Reload it.  It will never
-   pay attention to history or setting & saving the transient value.
+   Try to update =remember= and then set and save it in the =C-x= menu.  Reload
+   it.  It will never pay attention to history or setting & saving the transient
+   value.
 
 ** Setting or Saving Every Time a Suffix is Used
 
@@ -1838,7 +1890,7 @@ of =magit=.
 
    [[https://magit.vc/manual/transient.html#index-transient_002dsetup_002dchildren][transient-setup-children]]
    
-   This is a group method that can be overriden in order to modify or eliminate
+   This is a group method that can be overridden in order to modify or eliminate
    some children from display.  If you need a central place for children to
    coordinate some behavior, this may work for you.
 
@@ -1936,7 +1988,7 @@ of =magit=.
     plist), a suffix can be called independently.  In this case, if its expecting
     to read the scope from the prefix when there is no prefix, it might fail.
 
-    Therefore, a method called =transient-init-scope= can be overriden and used
+    Therefore, a method called =transient-init-scope= can be overridden and used
     at the correct point in the lifecycle for the suffix to correct the issue.
 
     *Note*, the behavior is actually quite ad-hoc.  You will read the prefix
@@ -2113,20 +2165,8 @@ of =magit=.
 
 *** Reading custom infix values
 
-    The most simple way to read args...
-
-    TODO put this somewhere else
-    
-    ~(transient-arg-value "--somekey=" (transient-args transient-current-command))~
-
-    This works okay if values were exported, which usually is true during suffix
-    bodies.  (See [[id:0c106a1b-d824-4321-89a5-b1e06b468c63][the precommand
-    sections of flow control]])
-
-    If you can identify the specific suffix you need, you can retreive the value
-    from =(transient-current-suffixes)=, which is also set during
-    =(transient--export)=.  This is recommended for custom infixes since
-    =transient-arg-value= is somewhat intended for infixes used in CLI's.
+    *Note*, however you store and rehydrate will affect how you read, so try to
+    make it just work with =transient-read-arg=, unlike this example (TODO).
 
     #+name: custom-infixes
     #+begin_src elisp :tangle yes :var _=custom-infixes
@@ -2331,7 +2371,6 @@ of =magit=.
          push transient--transient-map
          push transient--redisplay-map
     -- post-command       (cmd: ts-layout-rows-explicit, event: "M-x", exit: nil)
-    Invalid face reference: org-indent [12 times]
     -- pre-command        (cmd: transient-update, event: "w", exit: nil)
          pop  transient--redisplay-map
     -- post-command       (cmd: transient-update, event: "w", exit: nil)
@@ -2373,6 +2412,11 @@ of =magit=.
 
     When you are done, remember to use [[elisp:(edebug-remove-instrumentation)][=edebug-remove-instrumentation=]] so that
     you can go on without every transient you open trying to call the debugger.
+
+**** Debugging Macro Forms
+     
+    Because edebug works on defuns while suffixes are defined with macros, you
+    may need to macro exand in order to come up with something debuggable.
 
 ** Layout Hacking
    :PROPERTIES:
