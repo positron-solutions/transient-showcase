@@ -619,9 +619,6 @@ of =magit=.
     some situation.  The [[*Scope][scope]] example is helpful if you need to give an
     argument to the transient you are calling into.
 
-    *Note*, the pre-command explanation is critical reading for designing your
-    own setup calls.
-
     #+begin_src elisp :tangle yes :var _=simple-parent-child __=wave-prelude
 
       (transient-define-suffix ts-suffix-setup-child ()
@@ -654,8 +651,6 @@ of =magit=.
      but the child transient does not return.  There is a difference in the
      behavior that should not depend on if the suffix /is/ the prefix or just sets
      up the prefix.  *Possible bug*.
-
-     Also check that the comment in =ts-suffix-setup-child= is fully accurate.
 
 ** Mixing Interactive
 
@@ -1987,7 +1982,7 @@ of =magit=.
      ;; The children we will be picking can be of several forms.  The
      ;; transient--layout symbol property of a prefix is a vector of vectors, lists,
      ;; and strings.  It's not the actual eieio types or we would use
-     ;; `transient-format-description'
+     ;; `transient-format-description' to just ask them for the descriptions.
      (defun ts--layout-child-desc (layout-child)
        "Get the description from a transient layout vector or list."
        (let ((description 
@@ -2118,7 +2113,11 @@ of =magit=.
 
 *** Reading custom infix values
 
-    =(transient-arg-value "somekey" (transient-args transient-current-command))=
+    The most simple way to read args...
+
+    TODO put this somewhere else
+    
+    ~(transient-arg-value "--somekey=" (transient-args transient-current-command))~
 
     This works okay if values were exported, which usually is true during suffix
     bodies.  (See [[id:0c106a1b-d824-4321-89a5-b1e06b468c63][the precommand
@@ -2127,13 +2126,75 @@ of =magit=.
     If you can identify the specific suffix you need, you can retreive the value
     from =(transient-current-suffixes)=, which is also set during
     =(transient--export)=.  This is recommended for custom infixes since
-    =transient-arg-value= is somewhat intended for CLI's.
+    =transient-arg-value= is somewhat intended for infixes used in CLI's.
 
-    *=transient-get-suffix= is the best because you can use commands or keys in a
-    prefix as essentially full addresses.*
+    #+name: custom-infixes
+    #+begin_src elisp :tangle yes :var _=custom-infixes
 
-    
-    
+       (transient-define-suffix ts--inception-update-description ()
+         "Update the description of of the selected child."
+         (interactive)
+         (let* ((args (transient-args transient-current-command))
+
+                (msg-args (message "args: %s" args))
+                (description (transient-arg-value "--description=" args))
+
+                ;; This is the part where we read the other infix
+                (pos (car (cdr (assoc 'ts--inception-child-infix args))))
+
+                (layout-child (transient-get-suffix 'ts-inception-update pos)))
+           (cond
+            ;; Once again, do different bodies based on what we found at the layout position.
+            ((or (listp layout-child) ; child
+                (vectorp layout-child) ; group
+                (stringp layout-child)) ; string child
+             (if (stringp layout-child)
+                 (transient-replace-suffix 'ts-inception-update pos description) ; plain-text child
+               (plist-put (elt layout-child 2) :description description)))
+            (t (message (propertize (format
+                                     "Don't know how to modify whatever is at: %s"
+                                     loc) 'face 'warning))))
+           ;; re-enter the transient manually to display the modified layout
+           (transient-setup transient-current-command)))
+
+      (transient-define-prefix ts-inception-update ()
+        "Pick a suffix, any suffix, and modify it!"
+
+        [["Pick a suffix"
+          ("c" "child" ts--inception-child-infix)]
+
+         ["Update the description!"
+          ("-d" "description" "--description=") ; makes history value structure apparent
+          ("u" "update" ts--inception-update-description :transient transient--do-exit)]
+
+         ["Some suffixes"
+          ("s" "wave surely" ts--wave-surely)
+          ("d" "wave definitely" ts--wave-definitely)
+          ("e" "wave eventually" ts--wave-eventually)
+          ("C" "call & exit normally" ts--wave-normally :transient nil)]
+
+         ["Read variables"
+          ("r" "read args" ts-suffix-print-args )]])
+
+      ;; Pick a suffix,
+      ;; Then set the description
+      ;; Then update the suffix's you picked with the new description!
+      ;; Using a transient to modify a transient (⊃｡•́‿•̀｡)⊃━✿✿✿✿✿✿
+      ;; Try to rename a group, such as (0 0)
+      ;; Rename the very outer group, (0)
+    #+end_src
+
+*** TODO Errata
+
+    Modifying the very outer group doesn't quite work.  It's probably a
+    degenrate layout object, meaning setting a description doesn't cause it to
+    behave like a group with a heading.  Maybe outer groups have a different
+    data structure?  *An exercise left to the reader*
+
+    The flow control for re-display is slightly fighting the history
+    implementation.  It would be better if we could retain values while
+    triggering a redraw without even more hacking & state manipulation.
+
 * Appendixes
   
 ** EIEIO - OOP in Elisp
