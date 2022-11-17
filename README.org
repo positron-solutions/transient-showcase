@@ -73,99 +73,73 @@ of =magit=.
 
 * Contents                                                         :noexport:
 :PROPERTIES:
-:TOC:      :include siblings
+:TOC:      :include siblings :depth 2
 :END:
 :CONTENTS:
-- [[#terminology][Terminology]]
-  - [[#prefixes-and-suffixes][Prefixes and Suffixes]]
-    - [[#conceptual-similarity-to-emacs-prefix-arguments][Conceptual similarity to Emacs prefix arguments]]
-  - [[#nesting-prefixes][Nesting Prefixes]]
-  - [[#infix][Infix]]
-  - [[#summary][Summary]]
-- [[#declaring---equivalent-forms][Declaring - Equivalent Forms]]
-  - [[#the-shorthand-form][The Shorthand form]]
-  - [[#keyword-arguments-style][Keyword Arguments Style]]
-  - [[#macro-child-definition-style][Macro Child Definition Style]]
-  - [[#overriding-slots-in-the-prefix-definition][Overriding slots in the prefix definition]]
-  - [[#quoting-note-for-vectors][Quoting Note for Vectors]]
-- [[#groups--layouts][Groups & Layouts]]
-  - [[#layouts][Layouts]]
-    - [[#groups-one-on-top-of-the-other][Groups one on top of the other]]
-    - [[#groups-side-by-side][Groups side by side]]
-    - [[#group-on-top-of-groups-side-by-side][Group on top of groups side by side]]
-    - [[#empty-strings-make-spaces][Empty strings make spaces]]
-  - [[#manually-setting-group-class][Manually setting group class]]
-  - [[#descriptions][Descriptions]]
-    - [[#dynamic-descriptions][Dynamic Descriptions]]
-- [[#nesting--flow-control][Nesting & Flow Control]]
-  - [[#single-versus-multiple-commands][Single versus multiple commands]]
-  - [[#nesting][Nesting]]
-    - [[#binding-a-sub-prefix][Binding a Sub-Prefix]]
-      - [[#nesting-with-multiple-commands][Nesting with multiple commands]]
-    - [[#setting-up-another-transient-manually][Setting up another transient manually]]
-      - [[#errata][Errata]]
-  - [[#mixing-interactive][Mixing Interactive]]
-    - [[#early-completion][Early completion]]
-  - [[#pre-commands-explained][Pre-Commands Explained]]
-    - [[#warning][Warning!]]
-- [[#using--managing-states][Using & Managing States]]
-  - [[#infixes][Infixes]]
-    - [[#basic-infixes][Basic Infixes]]
-    - [[#reading-infix-values][Reading Infix Values]]
-  - [[#scope][Scope]]
-    - [[#errata-with-prefix-arg-c-u-universal-argument][Errata with prefix arg (C-u universal argument).]]
-  - [[#prefix-value--history][Prefix Value & History]]
-  - [[#history-keys][History Keys]]
-    - [[#detangling-with-initialization-setting-and-saving][Detangling with Initialization, Setting, and Saving]]
-  - [[#disabling-set--save-on-a-suffix][Disabling Set / Save on a Suffix]]
-    - [[#sticky-infix-support][Sticky infix support]]
-- [[#controlling-clis][Controlling CLI's]]
-  - [[#reading-arguments-within-suffixes][Reading arguments within suffixes]]
-  - [[#switches--arguments][Switches & Arguments]]
-    - [[#default-values][Default Values]]
-    - [[#argument-and-switch-macros][Argument and Switch Macros]]
-    - [[#choices][Choices]]
-      - [[#choices-shorthand-in-prefix-definition][Choices shorthand in prefix definition]]
-    - [[#mutually-exclusive-switches][Mutually Exclusive Switches]]
-    - [[#incompatible-switches][Incompatible Switches]]
-    - [[#short-args][Short Args]]
-    - [[#choices-from-a-function][Choices from a function]]
-    - [[#multiple-instances][multiple instances]]
-  - [[#dispatching-args-into-a-process][Dispatching args into a process]]
-  - [[#lisp-variables][Lisp Variables]]
-- [[#controlling-visibility][Controlling Visibility]]
-  - [[#predicates][Predicates]]
-  - [[#inapt-temporarily-unavailable][Inapt (Temporarily Unavailable)]]
-    - [[#documentation-in-manual-missing][Documentation in manual missing]]
-  - [[#levels][Levels]]
-    - [[#defining-group--suffix-levels][Defining group & suffix levels]]
-    - [[#using-the-levels-ui][Using the Levels UI]]
-- [[#advanced][Advanced]]
-  - [[#dynamically-generating-layouts][Dynamically generating layouts]]
-    - [[#correction-in-manual][Correction in manual]]
-  - [[#using-prefix-scope-in-children][Using prefix scope in children]]
-    - [[#consuming-scope-to-initialize-a-child][Consuming scope to initialize a child]]
-    - [[#obtaining-a-valid-scope-if-prefix-was-not-set-with-it][Obtaining a valid scope if prefix was not set with it]]
-  - [[#custom-infix-types][Custom Infix Types]]
-- [[#appendixes][Appendixes]]
-  - [[#eieio---oop-in-elisp][EIEIO - OOP in Elisp]]
-    - [[#transients-defclasss-and-their-inheritance][Transient's defclass's and their inheritance]]
-    - [[#view-class-methods-and-attributes][View Class Methods and Attributes]]
-  - [[#debugging][Debugging]]
-    - [[#print-debug-messages][Print debug messages]]
-    - [[#watching-evaluation-in-edebug][Watching evaluation in Edebug]]
-  - [[#layout-hacking][Layout Hacking]]
-  - [[#hooks][Hooks]]
-  - [[#preludes][Preludes]]
-    - [[#ts-suffix-wave-command][ts-suffix-wave Command]]
-    - [[#ts-suffix-show-level][ts-suffix-show-level]]
-    - [[#ts--define-waver][ts--define-waver]]
-    - [[#ts-suffix-print-args][ts-suffix-print-args]]
-  - [[#essential-elisp][Essential Elisp]]
-- [[#further-reading][Further Reading]]
+- [[Terminology][Terminology]]
+  - [[Prefixes and Suffixes][Prefixes and Suffixes]]
+  - [[Nesting Prefixes][Nesting Prefixes]]
+  - [[Infix][Infix]]
+  - [[Summary][Summary]]
+- [[Declaring - Equivalent Forms][Declaring - Equivalent Forms]]
+  - [[The Shorthand form][The Shorthand form]]
+  - [[Keyword Arguments Style][Keyword Arguments Style]]
+  - [[Macro Child Definition Style][Macro Child Definition Style]]
+  - [[Overriding slots in the prefix definition][Overriding slots in the prefix definition]]
+  - [[Quoting Note for Vectors][Quoting Note for Vectors]]
+- [[Groups & Layouts][Groups & Layouts]]
+  - [[Descriptions][Descriptions]]
+  - [[Layouts][Layouts]]
+  - [[Manually setting group class][Manually setting group class]]
+- [[Nesting & Flow Control][Nesting & Flow Control]]
+  - [[Single versus multiple commands][Single versus multiple commands]]
+  - [[Nesting][Nesting]]
+  - [[Mixing Interactive][Mixing Interactive]]
+  - [[Pre-Commands Explained][Pre-Commands Explained]]
+- [[Using & Managing States][Using & Managing States]]
+  - [[The Magic of Transient][The Magic of Transient]]
+  - [[Infixes][Infixes]]
+  - [[Scope][Scope]]
+  - [[Prefix Value & History][Prefix Value & History]]
+  - [[History Keys][History Keys]]
+  - [[Disabling Set / Save on a Suffix][Disabling Set / Save on a Suffix]]
+  - [[Setting or Saving Every Time a Suffix is Used][Setting or Saving Every Time a Suffix is Used]]
+  - [[Lisp Variables][Lisp Variables]]
+- [[Controlling CLI's][Controlling CLI's]]
+  - [[Reading arguments within suffixes][Reading arguments within suffixes]]
+  - [[Switches & Arguments Again][Switches & Arguments Again]]
+  - [[Dispatching args into a process][Dispatching args into a process]]
+- [[Controlling Visibility][Controlling Visibility]]
+  - [[Visibility Predicates][Visibility Predicates]]
+  - [[Inapt (Temporarily Unavailable)][Inapt (Temporarily Unavailable)]]
+  - [[Levels][Levels]]
+- [[Advanced][Advanced]]
+  - [[Dynamically generating layouts][Dynamically generating layouts]]
+  - [[Using prefix scope in children][Using prefix scope in children]]
+  - [[Custom Infix Types][Custom Infix Types]]
+- [[Appendixes][Appendixes]]
+  - [[EIEIO - OOP in Elisp][EIEIO - OOP in Elisp]]
+  - [[Debugging][Debugging]]
+  - [[Layout Hacking][Layout Hacking]]
+  - [[Hooks][Hooks]]
+  - [[Preludes][Preludes]]
+  - [[Essential Elisp][Essential Elisp]]
+- [[Further Reading][Further Reading]]
+  - [[Package Header][Package Header]]
+  - [[Package Footer][Package Footer]]
 :END:
 
 * Terminology
+:PROPERTIES:
+:TOC:       :include descendants :depth 3 :local depth
+:END:
+:CONTENTS:
+- [[Prefixes and Suffixes][Prefixes and Suffixes]]
+  - [[Conceptual similarity to Emacs prefix arguments][Conceptual similarity to Emacs prefix arguments]]
+- [[Nesting Prefixes][Nesting Prefixes]]
+- [[Infix][Infix]]
+- [[Summary][Summary]]
+:END:
 
   Transient means temporary.  Transient gets it's name from the temporary keymap
   and the popup UI for displaying that keymap.  Emacs has a similar idea
@@ -240,6 +214,16 @@ of =magit=.
     nested
 
 * Declaring - Equivalent Forms
+:PROPERTIES:
+:TOC:       :include descendants :depth 3 :local depth
+:END:
+:CONTENTS:
+- [[The Shorthand form][The Shorthand form]]
+- [[Keyword Arguments Style][Keyword Arguments Style]]
+- [[Macro Child Definition Style][Macro Child Definition Style]]
+- [[Overriding slots in the prefix definition][Overriding slots in the prefix definition]]
+- [[Quoting Note for Vectors][Quoting Note for Vectors]]
+:END:
 
   You can declare the same behavior 3-4 ways
 
@@ -387,6 +371,20 @@ of =magit=.
    symbol as =:property 'symbol=.
 
 * Groups & Layouts
+:PROPERTIES:
+:TOC:       :include descendants :depth 3 :local depth
+:END:
+:CONTENTS:
+- [[Descriptions][Descriptions]]
+  - [[Dynamic Descriptions][Dynamic Descriptions]]
+- [[Layouts][Layouts]]
+  - [[Groups one on top of the other][Groups one on top of the other]]
+  - [[Groups side by side][Groups side by side]]
+  - [[Group on top of groups side by side][Group on top of groups side by side]]
+  - [[Empty strings make spaces][Empty strings make spaces]]
+  - [[A Grid][A Grid]]
+- [[Manually setting group class][Manually setting group class]]
+:END:
 
    To define a transient, you need at least one group.  Groups are
    vectors, delimited as =[ ...group... ]=.
@@ -396,6 +394,76 @@ of =magit=.
 
    If you begin a group vector with a string, you get a group heading.  Groups
    also support some [[https://magit.vc/manual/transient/Group-Specifications.html#Group-Specifications][properties]].  The [[elisp:(describe-function transient-group)][group class]] also has a lot of information.
+
+** Descriptions
+
+   Very straightforward.  Just make the first element in the vector a string or
+   add a =:description= property, which can be a function.
+
+   In the prefix definition of suffixes, the second string is a description.
+
+   The =:description= key is applied last and therefore wins in ambiguous
+   declarations.
+
+   #+begin_src elisp :tangle transient-showcase.el :var _=wave-prelude
+
+     (transient-define-prefix ts-layout-descriptions ()
+       "Prefix with descriptions specified with slots."
+       ["Let's Give This Transient a Title\n" ; yes the newline works
+        ["Group One"
+         ("wo" "wave once" ts-suffix-wave)
+         ("wa" "wave again" ts-suffix-wave)]
+
+        ["Group Two"
+         ("ws" "wave some" ts-suffix-wave)
+         ("wb" "wave better" ts-suffix-wave)]]
+
+       ["Bad title" :description "Group of Groups"
+        ["Group Three"
+         ("k" "bad desc" ts-suffix-wave :description "key-value wins")
+         ("n" ts-suffix-wave :description "no desc necessary")]
+        [:description "Key Only Def"
+         ("wt" "wave too much" ts-suffix-wave)
+         ("we" "wave excessively" ts-suffix-wave)]])
+
+     ;; (ts-layout-descriptions)
+
+   #+end_src
+
+*** Dynamic Descriptions
+
+   *Note:* The property list style for dynamic descriptions is the same for both
+   prefixes and suffixes.  Add =:description symbol-or-lambda-form= to the group
+   vector or suffix list.
+
+   #+begin_src elisp :tangle transient-showcase.el :var _=wave-prelude
+
+      (transient-define-prefix ts-layout-dynamic-descriptions ()
+        "Prefix that generate descriptions dynamically when transient is shown."
+        ;; group using function-name to generate description
+        [:description current-time-string
+         ;; single suffix with dynamic description
+         ("wa" ts-suffix-wave
+          :description (lambda ()
+                         (format "Wave at %s" (current-time-string))))]
+        ;; group with anonymoous function generating description
+        [:description (lambda ()
+                        (format "Group %s" (org-id-new)))
+                      ("wu" "wave uniquely" ts-suffix-wave)])
+
+     ;; (ts-layout-dynamic-descriptions)
+
+   #+end_src
+
+*** TODO Errata
+    :PROPERTIES:
+    :TOC:      :ignore this
+    :END:
+
+
+    *Note*, the uuid is generated on every key input.  Layout updates are fun.
+    It does not also work when changing descriptions in the layout via hackery.
+    凸( ` ﾛ ´ )凸
 
 ** Layouts
 
@@ -493,6 +561,38 @@ of =magit=.
 
    #+end_src
 
+*** A Grid
+
+    So, you put columns into rows that are in columns and stuff like that.  This
+    can be achieved with or without explicit column settings.
+
+    #+begin_src elisp :tangle transient-showcase.el :var _=wave-prelude
+
+      (transient-define-prefix ts-layout-the-grid ()
+        "Prefix with groups in a grid-like arrangement."
+
+        [:description "The Grid\n" ; must use slot or macro is confused
+         ["Left Column" ; note, no newline
+          ("ltt" "left top top" ts-suffix-wave)
+          ("ltb" "left top bottom" ts-suffix-wave)
+          ""
+          ("lbt" "left bottom top" ts-suffix-wave)
+          ("lbb" "left bottom bottom" ts-suffix-wave)] ; note, no newline
+
+         ["Right Column\n"
+          ("rtt" "right top top" ts-suffix-wave)
+          ("rtb" "right top bottom" ts-suffix-wave)
+          ""
+          ("rbt" "right bottom top" ts-suffix-wave)
+          ("rbb" "right bottom bottom\n" ts-suffix-wave)]])
+
+      ;; (ts-layout-the-grid)
+
+    #+end_src
+
+    *Note*, only =transient-columns=, not =transient-column= can act as a group
+    of groups.
+
 ** Manually setting group class
 
    If you need to override the class that the =transient-define-prefix= macro
@@ -513,105 +613,22 @@ of =magit=.
 
    #+end_src
 
-** A Grid
-
-   So, you put columns into rows that are in columns and stuff like that.  This
-   can be achieved with or without explicit column settings.
-
-   #+begin_src elisp :tangle transient-showcase.el :var _=wave-prelude
-
-     (transient-define-prefix ts-layout-the-grid ()
-       "Prefix with groups in a grid-like arrangement."
-
-       [:description "The Grid\n" ; must use slot or macro is confused
-        ["Left Column" ; note, no newline
-         ("ltt" "left top top" ts-suffix-wave)
-         ("ltb" "left top bottom" ts-suffix-wave)
-         ""
-         ("lbt" "left bottom top" ts-suffix-wave)
-         ("lbb" "left bottom bottom" ts-suffix-wave)] ; note, no newline
-
-        ["Right Column\n"
-         ("rtt" "right top top" ts-suffix-wave)
-         ("rtb" "right top bottom" ts-suffix-wave)
-         ""
-         ("rbt" "right bottom top" ts-suffix-wave)
-         ("rbb" "right bottom bottom\n" ts-suffix-wave)]])
-
-     ;; (ts-layout-the-grid)
-
-   #+end_src
-
-   *Note*, only =transient-columns=, not =transient-column= can act as a group
-   of groups.
-
-** Descriptions
-
-   Very straightforward.  Just make the first element in the vector a string or
-   add a =:description= property, which can be a function.
-
-   In the prefix definition of suffixes, the second string is a description.
-
-   The =:description= key is applied last and therefore wins in ambiguous
-   declarations.
-
-   #+begin_src elisp :tangle transient-showcase.el :var _=wave-prelude
-
-     (transient-define-prefix ts-layout-descriptions ()
-       "Prefix with descriptions specified with slots."
-       ["Let's Give This Transient a Title\n" ; yes the newline works
-        ["Group One"
-         ("wo" "wave once" ts-suffix-wave)
-         ("wa" "wave again" ts-suffix-wave)]
-
-        ["Group Two"
-         ("ws" "wave some" ts-suffix-wave)
-         ("wb" "wave better" ts-suffix-wave)]]
-
-       ["Bad title" :description "Group of Groups"
-        ["Group Three"
-         ("k" "bad desc" ts-suffix-wave :description "key-value wins")
-         ("n" ts-suffix-wave :description "no desc necessary")]
-        [:description "Key Only Def"
-         ("wt" "wave too much" ts-suffix-wave)
-         ("we" "wave excessively" ts-suffix-wave)]])
-
-     ;; (ts-layout-descriptions)
-
-   #+end_src
-
-*** Dynamic Descriptions
-
-   *Note:* The property list style for dynamic descriptions is the same for both
-   prefixes and suffixes.  Add =:description symbol-or-lambda-form= to the group
-   vector or suffix list.
-
-   #+begin_src elisp :tangle transient-showcase.el :var _=wave-prelude
-
-      (transient-define-prefix ts-layout-dynamic-descriptions ()
-        "Prefix that generate descriptions dynamically when transient is shown."
-        ;; group using function-name to generate description
-        [:description current-time-string
-         ;; single suffix with dynamic description
-         ("wa" ts-suffix-wave
-          :description (lambda ()
-                         (format "Wave at %s" (current-time-string))))]
-        ;; group with anonymoous function generating description
-        [:description (lambda ()
-                        (format "Group %s" (org-id-new)))
-                      ("wu" "wave uniquely" ts-suffix-wave)])
-
-     ;; (ts-layout-dynamic-descriptions)
-
-   #+end_src
-
-*** TODO Errata
-
-    *Note*, the uuid is generated on every key input.  Layout updates are fun.
-    It does not also work when changing descriptions in the layout via hackery.
-    凸( ` ﾛ ´ )凸
-
 * Nesting & Flow Control
+:PROPERTIES:
+:TOC:       :include descendants :depth 3 :local depth
+:END:
+:CONTENTS:
+- [[Single versus multiple commands][Single versus multiple commands]]
+- [[Nesting][Nesting]]
+  - [[Binding a Sub-Prefix][Binding a Sub-Prefix]]
+    - [[Nesting with multiple commands][Nesting with multiple commands]]
+  - [[Setting up another transient manually][Setting up another transient manually]]
+- [[Mixing Interactive][Mixing Interactive]]
+  - [[Early completion][Early completion]]
+- [[Pre-Commands Explained][Pre-Commands Explained]]
+  - [[Warning!][Warning!]]
+:END:
+
 
   Many transients call other transients.  This allows you to express similar
   behaviors as interactive commands that ask you for multiple arguments using
@@ -730,6 +747,10 @@ of =magit=.
     #+end_src
 
 **** TODO Errata
+     :PROPERTIES:
+     :ID:       e6f2ba1b-b67e-4bde-8aaf-d3decba915c4
+     :TOC: :ignore this
+     :END:
 
      This example should also work with the =transient--do-recurse= pre-command,
      but the child transient does not return.  There is a difference in the
@@ -883,11 +904,33 @@ of =magit=.
     [[Debugging][Debugging]]
 
 **** TODO Errata
+     :PROPERTIES:
+     :TOC:      :ignore this
+     :END:
 
      There's definitely some edge cases that are unnecessarily complex for the
      use case.  Think of how life was before =transient--do-recurse=.
 
 * Using & Managing States
+:PROPERTIES:
+:TOC:       :include descendants :depth 3 :local depth
+:END:
+:CONTENTS:
+- [[The Magic of Transient][The Magic of Transient]]
+- [[Infixes][Infixes]]
+  - [[Basic Infixes][Basic Infixes]]
+  - [[Reading Infix Values][Reading Infix Values]]
+- [[Scope][Scope]]
+- [[Prefix Value & History][Prefix Value & History]]
+- [[History Keys][History Keys]]
+  - [[Detangling with Initialization, Setting, and Saving][Detangling with Initialization, Setting, and Saving]]
+- [[Disabling Set / Save on a Suffix][Disabling Set / Save on a Suffix]]
+- [[Setting or Saving Every Time a Suffix is Used][Setting or Saving Every Time a Suffix is Used]]
+  - [[Sticky infix support][Sticky infix support]]
+  - [[Default Values][Default Values]]
+  - [[Readers][Readers]]
+- [[Lisp Variables][Lisp Variables]]
+:END:
 
   There are several ways to create state.  The [[*Nesting & Flow Control][flow control]] examples in the
   previous section mainly covered how to get from one command to the other.
@@ -1014,6 +1057,9 @@ of =magit=.
       hydrated suffix
 
 **** TODO The =transient-suffixes= option requires filtering
+     :PROPERTIES:
+     :TOC: :ignore this
+     :END:
 
      In my opinion the API should make it easer to get raw values from suffixes,
      but this is also a matter of custom infixes needing to serialize values
@@ -1089,6 +1135,9 @@ of =magit=.
    #+end_src
 
 *** TODO Errata with prefix arg (=C-u= universal argument).
+    :PROPERTIES:
+    :TOC:      :ignore this
+    :END:
 
     Key binding sequences, such as "wa" instead of single-key prefix bindings
     will unset the prefix argument (the old-school Emacs =C-u= prefix argument,
@@ -1436,6 +1485,22 @@ of =magit=.
    #+end_src
 
 * Controlling CLI's
+:PROPERTIES:
+:TOC:       :include descendants :depth 2 :local depth
+:END:
+:CONTENTS:
+- [[Reading arguments within suffixes][Reading arguments within suffixes]]
+- [[Switches & Arguments Again][Switches & Arguments Again]]
+  - [[Argument and Infix Macros][Argument and Infix Macros]]
+  - [[Choices][Choices]]
+  - [[Mutually Exclusive Switches][Mutually Exclusive Switches]]
+  - [[Incompatible Switches][Incompatible Switches]]
+  - [[Short Args][Short Args]]
+  - [[Choices from a function][Choices from a function]]
+  - [[multiple instances][multiple instances]]
+- [[Dispatching args into a process][Dispatching args into a process]]
+  - [[Cleanup Cowsay][Cleanup Cowsay]]
+:END:
 
   This section covers more usages of infixes, focused on creating better
   argument strings for CLI tools.
@@ -1448,7 +1513,7 @@ of =magit=.
    *Note:* these forms are generic for different prefixes, allowing you to mix
    and match suffixes within prefixes.
 
-** Switches & Arguments
+** Switches & Arguments Again
 
    The shorthand forms in =transient-define-prefix= are heavily influenced by
    the CLI style switches and arguments that transient was built to
@@ -1778,16 +1843,27 @@ of =magit=.
 
   #+end_src
 
-*** TODO
+*** TODO Cleanup Cowsay
 
     Clean up cowsay example.  Check for binary before attempting to run it.
 
 * Controlling Visibility
+:PROPERTIES:
+:TOC:       :include descendants :depth 3 :local depth
+:END:
+:CONTENTS:
+- [[Visibility Predicates][Visibility Predicates]]
+- [[Inapt (Temporarily Unavailable)][Inapt (Temporarily Unavailable)]]
+  - [[Documentation in manual missing][Documentation in manual missing]]
+- [[Levels][Levels]]
+  - [[Defining group & suffix levels][Defining group & suffix levels]]
+  - [[Using the Levels UI][Using the Levels UI]]
+:END:
 
   At times, you need a prefix to show or hide certain options depending on the
   context.
 
-** Predicates
+** Visibility Predicates
 
    Simple [[https://magit.vc/manual/transient/Predicate-Slots.html#Predicate-Slots][predicates]] at the group or element level exist to hide parts of the
    transient when they wouldn't be useful at all in the situation.
@@ -1981,6 +2057,17 @@ of =magit=.
 
 
 * Advanced
+:PROPERTIES:
+:TOC:       :include descendants :depth 3 :local depth
+:END:
+:CONTENTS:
+- [[Dynamically generating layouts][Dynamically generating layouts]]
+  - [[Correction in manual][Correction in manual]]
+- [[Using prefix scope in children][Using prefix scope in children]]
+  - [[Obtaining Missing Scope][Obtaining Missing Scope]]
+- [[Custom Infix Types][Custom Infix Types]]
+  - [[Reading custom infix values][Reading custom infix values]]
+:END:
 
   The previous sections are designed to go breadth-first so that you can get
   core ideas first. The following examples expand on combinations of several
@@ -2336,6 +2423,10 @@ of =magit=.
     #+end_src
 
 *** TODO Errata
+    :PROPERTIES:
+    :ID:       2ca7838b-1215-4f8b-985b-8ebac41dd980
+    :TOC: :ignore this
+    :END:
 
     Modifying the very outer group doesn't quite work.  It's probably a
     degenrate layout object, meaning setting a description doesn't cause it to
@@ -2347,6 +2438,9 @@ of =magit=.
     triggering a redraw without even more hacking & state manipulation.
 
 * Appendixes
+:PROPERTIES:
+:TOC:       :include descendants :depth 1
+:END:
 
 ** EIEIO - OOP in Elisp
 
@@ -2702,6 +2796,9 @@ of =magit=.
   #+end_src
 
 * More Packaging
+  :PROPERTIES:
+  :TOC:      :ignore this
+  :END:
 
   The headers and footers for the tangled module.
 
@@ -2826,8 +2923,9 @@ of =magit=.
  #+end_src
 
 # Local Variables:
-# eval: (require 'org-make-toc)
-# before-save-hook: org-make-toc
+# eval: (ignore-errors (require 'org-make-toc))
+# before-save-hook: (when (featurep 'org-make-toc) (org-make-toc))
 # org-export-with-properties: ()
 # org-export-with-title: t
+# org-make-toc-link-type-fn: org-make-toc--link-entry-org
 # End:

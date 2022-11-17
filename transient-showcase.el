@@ -137,6 +137,40 @@
     :command ts--wave-override)]) ; we overrode what the suffix even does
 
 ;; (ts-wave-overridden)
+(transient-define-prefix ts-layout-descriptions ()
+  "Prefix with descriptions specified with slots."
+  ["Let's Give This Transient a Title\n" ; yes the newline works
+   ["Group One"
+    ("wo" "wave once" ts-suffix-wave)
+    ("wa" "wave again" ts-suffix-wave)]
+
+   ["Group Two"
+    ("ws" "wave some" ts-suffix-wave)
+    ("wb" "wave better" ts-suffix-wave)]]
+
+  ["Bad title" :description "Group of Groups"
+   ["Group Three"
+    ("k" "bad desc" ts-suffix-wave :description "key-value wins")
+    ("n" ts-suffix-wave :description "no desc necessary")]
+   [:description "Key Only Def"
+    ("wt" "wave too much" ts-suffix-wave)
+    ("we" "wave excessively" ts-suffix-wave)]])
+
+;; (ts-layout-descriptions)
+(transient-define-prefix ts-layout-dynamic-descriptions ()
+   "Prefix that generate descriptions dynamically when transient is shown."
+   ;; group using function-name to generate description
+   [:description current-time-string
+    ;; single suffix with dynamic description
+    ("wa" ts-suffix-wave
+     :description (lambda ()
+                    (format "Wave at %s" (current-time-string))))]
+   ;; group with anonymoous function generating description
+   [:description (lambda ()
+                   (format "Group %s" (org-id-new)))
+                 ("wu" "wave uniquely" ts-suffix-wave)])
+
+;; (ts-layout-dynamic-descriptions)
 (transient-define-prefix ts-layout-stacked ()
   "Prefix with layout that stacks groups on top of each other."
   ["Top Group" ("wt" "wave top" ts-suffix-wave)]
@@ -187,16 +221,6 @@
     ("br" "wave bottom-right" ts-suffix-wave)]])
 
 ;; (ts-layout-spaced-out)
-(transient-define-prefix ts-layout-explicit-classes ()
-  "Prefix with group class used to explicitly specify layout."
-  [:class transient-row "Row"
-          ("l" "wave left" ts-suffix-wave)
-          ("r" "wave right" ts-suffix-wave)]
-  [:class transient-column "Column"
-          ("t" "wave top" ts-suffix-wave)
-          ("b" "wave bottom" ts-suffix-wave)])
-
-;; (ts-layout-explicit-classes)
 (transient-define-prefix ts-layout-the-grid ()
   "Prefix with groups in a grid-like arrangement."
 
@@ -216,40 +240,16 @@
     ("rbb" "right bottom bottom\n" ts-suffix-wave)]])
 
 ;; (ts-layout-the-grid)
-(transient-define-prefix ts-layout-descriptions ()
-  "Prefix with descriptions specified with slots."
-  ["Let's Give This Transient a Title\n" ; yes the newline works
-   ["Group One"
-    ("wo" "wave once" ts-suffix-wave)
-    ("wa" "wave again" ts-suffix-wave)]
+(transient-define-prefix ts-layout-explicit-classes ()
+  "Prefix with group class used to explicitly specify layout."
+  [:class transient-row "Row"
+          ("l" "wave left" ts-suffix-wave)
+          ("r" "wave right" ts-suffix-wave)]
+  [:class transient-column "Column"
+          ("t" "wave top" ts-suffix-wave)
+          ("b" "wave bottom" ts-suffix-wave)])
 
-   ["Group Two"
-    ("ws" "wave some" ts-suffix-wave)
-    ("wb" "wave better" ts-suffix-wave)]]
-
-  ["Bad title" :description "Group of Groups"
-   ["Group Three"
-    ("k" "bad desc" ts-suffix-wave :description "key-value wins")
-    ("n" ts-suffix-wave :description "no desc necessary")]
-   [:description "Key Only Def"
-    ("wt" "wave too much" ts-suffix-wave)
-    ("we" "wave excessively" ts-suffix-wave)]])
-
-;; (ts-layout-descriptions)
-(transient-define-prefix ts-layout-dynamic-descriptions ()
-   "Prefix that generate descriptions dynamically when transient is shown."
-   ;; group using function-name to generate description
-   [:description current-time-string
-    ;; single suffix with dynamic description
-    ("wa" ts-suffix-wave
-     :description (lambda ()
-                    (format "Wave at %s" (current-time-string))))]
-   ;; group with anonymoous function generating description
-   [:description (lambda ()
-                   (format "Group %s" (org-id-new)))
-                 ("wu" "wave uniquely" ts-suffix-wave)])
-
-;; (ts-layout-dynamic-descriptions)
+;; (ts-layout-explicit-classes)
 (transient-define-prefix ts-stay-transient ()
   "Prefix where some suffixes do not exit."
   ["Exit or Not?"
