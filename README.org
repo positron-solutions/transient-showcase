@@ -1,6 +1,8 @@
 #+TITLE: Transient Showcase
 #+AUTHOR: Psionik K
-#+PROPERTY: header-args :results silent
+#+PROPERTY: header-args :results silent :comments link :file transient-showcase.el
+
+#+INCLUDE: "./package.org::#Package Header"
 
 Code examples for interactive explanations of [[https://github.com/magit/transient][transient]].
 
@@ -2479,7 +2481,7 @@ of =magit=.
 *** ts-suffix-wave Command
    
    #+name: wave-prelude
-   #+begin_src elisp :tangle yes
+   #+begin_src elisp
 
      (defun ts-suffix-wave ()
        "Wave at the user"
@@ -2586,6 +2588,8 @@ of =magit=.
     full-feature application.  Search the source for "transient" and you will
     find many prefixes, suffixes, and custom classes.  The smallest examples may
     be harder to find and most combine many behaviors at once.
+
+#+INCLUDE: "./package.org::#Package Footer"    
 
 # Local Variables:
 # eval: (require 'org-make-toc)
