@@ -2876,7 +2876,8 @@ of =magit=.
        ("lp" "spaced out" ts-layout-spaced-out :transient t)
        ("le" "explicit class" ts-layout-explicit-classes :transient t)
        ("ld" "descriptions" ts-layout-descriptions :transient t)
-       ("lD" "dynamic descriptions" ts-layout-dynamic-descriptions :transient t)]
+       ;; padded description to sc
+       ("lD" "dynamic descriptions        " ts-layout-dynamic-descriptions :transient t)]
 
       ["Nesting & Flow Control"
        ("fs" "stay transient" ts-stay-transient :transient t)
@@ -2884,9 +2885,9 @@ of =magit=.
        ("fr" "sub-prefix with return" ts-simple-parent-with-return :transient t)
        ("fm" "manual setup in suffix" ts-parent-with-setup-suffix :transient t)
        ("fi" "mixing interactive" ts-interactive-basic :transient t)
-       ("fe" "early completion" ts-simple-messager :transient t)]
+       ("fe" "early completion" ts-simple-messager :transient t)]]
 
-      ["Managing State"
+      [["Managing State" ; padded right group
        ("sb" "a bunch of infixes" ts-basic-infixes :transient t)
        ("sc" "using scope (accepts prefix)" ts-scope :transient t)
        ("sn" "set & save / snowcones" ts-snowcone-eater :transient t)
@@ -2897,17 +2898,18 @@ of =magit=.
        ("sf" "enforcing inputs" ts-enforcing-inputs :transient t)
        ("sl" "lisp variables" ts-lisp-variable :transient t)]
 
-      ["CLI arguments"
+     ["CLI arguments"
        ("cb" "basic arguments" ts-switches-and-arguments :transient t)
        ("cm" "random-init infix" ts-maybe-on :transient t)
        ("cc" "basic choices" ts-animal-choices :transient t)
        ("ce" "exclusive switches" ts-exclusive-switches :transient t)
        ("ci" "incompatible switches" ts-incompatible :transient t)
        ("co" "completions for choices" ts-choices-with-completions :transient t)
-       ("cc"  "cowsay cli wrapper" ts-cowsay :transient t)]
+       ("cc"  "cowsay cli wrapper" ts-cowsay :transient t)]]
 
-      ["Visibility"
-       ("vp" "predicates" ts-visibility-predicates :transient t)
+      [["Visibility"
+        ;; padded description to sc
+       ("vp" "predicates                  " ts-visibility-predicates :transient t)
        ("vi" "inapt (not suitable)" ts-inapt-parent :transient t)
        ("vl" "levels" ts-levels-and-visibility :transient t)]
 
