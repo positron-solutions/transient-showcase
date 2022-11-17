@@ -1,0 +1,22 @@
+#+TITLE: Conributing
+#+AUTHOR: Psionik K
+
+There's a lot of ways something could have gone wrong while tangling the README
+into the package.
+
+There are TODO's within the document.  Some are notes to add support to
+transient.  Errata in particular is where something seems possibly broken,
+missing, or unnecessarily weird.
+
+Spot something that seems inconsistent, unclear, or an example where the
+behavior is just odd?  Please file an issue.  If you can fix it, please submit a
+PR or patch suggestion in your issue.
+
+Want to add a new example?  Welcome.  PR please.
+
+All changes must:
+
+- Don't break =org-babel-execute-source-block=
+- Don't break compile or tangle for the package
+- Don't break the TOC
+- Include DCO sign-off in your changes
