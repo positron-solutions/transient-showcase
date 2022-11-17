@@ -89,7 +89,6 @@
 (ts--define-waver "definitely")
 (ts--define-waver "eventually")
 (ts--define-waver "hidden")
-(ts--define-waver "surely")
 
 
 (transient-define-suffix ts-suffix-print-args (prefix-arg)
@@ -611,7 +610,7 @@ This command can be called from it's parent, `ts-snowcone-eater' or independentl
 (transient-define-prefix ts-animal-choices ()
   "Prefix demonstrating selecting animals from choices."
   ["Arguments"
-   ("-a" "--animals=" ts--animals-argument)
+   ("-a" "--animals=" ts--animals-argument)]
   ["Show Args"
    ("s" "show arguments" ts-suffix-print-args)])
 
@@ -654,16 +653,70 @@ This command can be called from it's parent, `ts-snowcone-eater' or independentl
    ("s" "show arguments" ts-suffix-print-args)])
 
 ;; (ts-incompatible)
-(defvar ts-busy nil "Are we busy?")
-
-(defun ts--busy-p () "Are we busy?" ts-busy)
-
-(transient-define-suffix ts--toggle-busy ()
-  "Toggle busy"
+(defun ts--quit-cowsay ()
+  "Kill the cowsay buffer and exit"
   (interactive)
-  (setf ts-busy (not ts-busy))
-  (message (propertize (format "busy: %s" ts-busy)
-                       'face 'success)))
+  (kill-buffer "*cowsay*"))
+
+(defun ts--cowsay-buffer-exists-p ()
+  (not (equal (get-buffer "*cowsay*") nil)))
+
+(transient-define-suffix ts--cowsay-clear-buffer (&optional buffer)
+  "Delete the *cowsay* buffer.  Optional BUFFER name."
+  :transient 'transient--do-call
+  :if 'ts--cowsay-buffer-exists-p
+  (interactive) ; todo look at "b" interactive code
+
+  (save-excursion
+    (let ((buffer (or buffer "*cowsay*")))
+      (set-buffer buffer)
+      (delete-region 1 (+ 1 (buffer-size))))))
+
+(transient-define-suffix ts--cowsay (&optional args)
+  "Run cowsay"
+  (interactive (list (transient-args transient-current-command)))
+  (let* ((buffer "*cowsay*")
+         ;; TODO ugly
+         (cowmsg (if args (transient-arg-value "--message=" args) nil))
+         (cowmsg (if cowmsg (list cowmsg) nil))
+         (args (if args
+                   (seq-filter
+                    (lambda (s) (not (string-prefix-p "--message=" s))) args)
+                 nil))
+         (args (if args
+                   (if cowmsg
+                       (append args cowmsg)
+                     args)
+                 cowmsg)))
+
+    (when (ts--cowsay-buffer-exists-p)
+      (ts--cowsay-clear-buffer))
+    (apply #'call-process "cowsay" nil buffer nil args)
+    (switch-to-buffer buffer)))
+
+(transient-define-prefix ts-cowsay ()
+  "Say things with animals!"
+
+  ; only one kind of eyes is meaningful at a time
+  :incompatible '(("-b" "-g" "-p" "-s" "-t" "-w" "-y"))
+
+  ["Message"
+   ("m" "message" "--message=" :always-read t)] ; always-read, so clear by entering empty string
+  [["Built-in Eyes"
+    ("b" "borg" "-b")
+    ("g" "greedy" "-g")
+    ("p" "paranoid" "-p")
+    ("s" "stoned" "-s")
+    ("t" "tired" "-t")
+    ("w" "wired" "-w")
+    ("y" "youthful" "-y")]
+   ["Actions"
+    ("c" "cowsay" ts--cowsay :transient transient--do-call)
+    ""
+    ("d" "delete buffer" ts--cowsay-clear-buffer)
+    ("q" "quit" ts--quit-cowsay)]])
+
+;; (ts-cowsay)
 (transient-define-prefix ts-visibility-predicates ()
   "Prefix with visibility predicates.
 Try opening this prefix in buffers with modes deriving from different
@@ -794,7 +847,7 @@ When this is called in layouts, it's the transient being layed out"
      ;; so let's call it in that case.  Note, the description may be
      ;; designed for one point in the transient's lifecycle but we could
      ;; call it in a different one, causing its behavior to change.
-     ((functionp description) (#'apply description))
+     ((functionp description) (apply description))
      (t description))))
 
 ;; We repeat the read using a lisp expression from `read-from-minibuffer' to get
@@ -836,7 +889,7 @@ When this is called in layouts, it's the transient being layed out"
          (value (car (alist-get key prefix-value))) ; car?
          (value-object (transient-get-suffix (oref transient--prefix command) value)))
     (oset obj value value)
-    (oset obj value-object value-object))))
+    (oset obj value-object value-object)))
 
 (cl-defmethod transient-infix-set ((obj ts-child-infix) value)
   "When the `value' is updated, update the `value-object' as well."
@@ -902,21 +955,17 @@ Show either the child's description or a default if no child is selected."
    "Update the description of of the selected child."
    (interactive)
    (let* ((args (transient-args transient-current-command))
-
-          (msg-args (message "args: %s" args))
           (description (transient-arg-value "--description=" args))
-
           ;; This is the part where we read the other infix
-          (pos (car (cdr (assoc 'ts--inception-child-infix args))))
-
-          (layout-child (transient-get-suffix 'ts-inception-update pos)))
+          (loc (car (cdr (assoc 'ts--inception-child-infix args))))
+          (layout-child (transient-get-suffix 'ts-inception-update loc)))
      (cond
-      ;; Once again, do different bodies based on what we found at the layout position.
+      ;; Once again, do different bodies based on what we found at the layout locition.
       ((or (listp layout-child) ; child
           (vectorp layout-child) ; group
           (stringp layout-child)) ; string child
        (if (stringp layout-child)
-           (transient-replace-suffix 'ts-inception-update pos description) ; plain-text child
+           (transient-replace-suffix 'ts-inception-update loc description) ; plain-text child
          (plist-put (elt layout-child 2) :description description)))
       (t (message (propertize (format
                                "Don't know how to modify whatever is at: %s"
@@ -981,7 +1030,7 @@ control such as replacing or exiting."
     ("sp" "history key / ping-pong" ts-ping :transient t)
     ("sg" "always forget / goldfish" ts-goldfish :transient t)
     ("se" "always remember / elephant" ts-elephant :transient t)
-    ("sd" "default values" ts-default-values :tranient t)
+    ("sd" "default values" ts-default-values :transient t)
     ("sf" "enforcing inputs" ts-enforcing-inputs :transient t)
     ("sl" "lisp variables" ts-lisp-variable :transient t)]
 

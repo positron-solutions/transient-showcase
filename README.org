@@ -396,6 +396,7 @@ of =magit=.
 
    If you begin a group vector with a string, you get a group heading.  Groups
    also support some [[https://magit.vc/manual/transient/Group-Specifications.html#Group-Specifications][properties]].  The [[elisp:(describe-function transient-group)][group class]] also has a lot of information.
+
 ** Layouts
 
    The default behavior treats groups a little differently depending on how they
@@ -1540,7 +1541,7 @@ of =magit=.
      (transient-define-prefix ts-animal-choices ()
        "Prefix demonstrating selecting animals from choices."
        ["Arguments"
-        ("-a" "--animals=" ts--animals-argument)
+        ("-a" "--animals=" ts--animals-argument)]
        ["Show Args"
         ("s" "show arguments" ts-suffix-print-args)])
 
@@ -1708,7 +1709,7 @@ of =magit=.
 
    - The predicate needs to be exists & not empty (but doesn't matter yet)
 
-  #+begin_src elisp
+  #+begin_src elisp :tangle transient-showcase.el
 
     (defun ts--quit-cowsay ()
       "Kill the cowsay buffer and exit"
@@ -1792,7 +1793,7 @@ of =magit=.
    transient when they wouldn't be useful at all in the situation.
 
    #+name: predicates-prelude
-   #+begin_src elisp :hidden yes :tangle transient-showcase.el
+   #+begin_src elisp :hidden yes :tangle no
 
      (defvar ts-busy nil "Are we busy?")
 
@@ -2160,7 +2161,7 @@ of =magit=.
           ;; so let's call it in that case.  Note, the description may be
           ;; designed for one point in the transient's lifecycle but we could
           ;; call it in a different one, causing its behavior to change.
-          ((functionp description) (#'apply description))
+          ((functionp description) (apply description))
           (t description))))
 
      ;; We repeat the read using a lisp expression from `read-from-minibuffer' to get
@@ -2202,7 +2203,7 @@ of =magit=.
               (value (car (alist-get key prefix-value))) ; car?
               (value-object (transient-get-suffix (oref transient--prefix command) value)))
          (oset obj value value)
-         (oset obj value-object value-object))))
+         (oset obj value-object value-object)))
 
      (cl-defmethod transient-infix-set ((obj ts-child-infix) value)
        "When the `value' is updated, update the `value-object' as well."
@@ -2287,21 +2288,17 @@ of =magit=.
          "Update the description of of the selected child."
          (interactive)
          (let* ((args (transient-args transient-current-command))
-
-                (msg-args (message "args: %s" args))
                 (description (transient-arg-value "--description=" args))
-
                 ;; This is the part where we read the other infix
-                (pos (car (cdr (assoc 'ts--inception-child-infix args))))
-
-                (layout-child (transient-get-suffix 'ts-inception-update pos)))
+                (loc (car (cdr (assoc 'ts--inception-child-infix args))))
+                (layout-child (transient-get-suffix 'ts-inception-update loc)))
            (cond
-            ;; Once again, do different bodies based on what we found at the layout position.
+            ;; Once again, do different bodies based on what we found at the layout locition.
             ((or (listp layout-child) ; child
                 (vectorp layout-child) ; group
                 (stringp layout-child)) ; string child
              (if (stringp layout-child)
-                 (transient-replace-suffix 'ts-inception-update pos description) ; plain-text child
+                 (transient-replace-suffix 'ts-inception-update loc description) ; plain-text child
                (plist-put (elt layout-child 2) :description description)))
             (t (message (propertize (format
                                      "Don't know how to modify whatever is at: %s"
@@ -2593,7 +2590,7 @@ of =magit=.
 *** ts-suffix-wave Command
 
    #+name: wave-prelude
-   #+begin_src elisp
+   #+begin_src elisp :tangle no
 
      (defun ts-suffix-wave ()
        "Wave at the user"
@@ -2605,7 +2602,7 @@ of =magit=.
 *** ts-suffix-show-level
 
    #+name: show-level-prelude
-   #+begin_src elisp
+   #+begin_src elisp :tangle no
 
      (transient-define-suffix ts-suffix-show-level ()
        "Show the current transient's level."
@@ -2618,7 +2615,7 @@ of =magit=.
 *** ts--define-waver
 
    #+name: levels-prelude
-   #+begin_src elisp
+   #+begin_src elisp :tangle no
 
      ;; Because command names are used to store and lookup child levels, we have
      ;; define a macro to generate unqiquely named wavers.  See #153 at
@@ -2638,7 +2635,6 @@ of =magit=.
      (ts--define-waver "definitely")
      (ts--define-waver "eventually")
      (ts--define-waver "hidden")
-     (ts--define-waver "surely")
 
      #+end_src
 
@@ -2648,7 +2644,7 @@ of =magit=.
    scope, and any universal argument (=C-u 4= etc).
 
    #+name: print-args-prelude
-   #+begin_src elisp
+   #+begin_src elisp :tangle no
 
      (transient-define-suffix ts-suffix-print-args (prefix-arg)
        "Report the universal argument, prefix's scope, and infix values."
@@ -2800,7 +2796,7 @@ of =magit=.
        ("sp" "history key / ping-pong" ts-ping :transient t)
        ("sg" "always forget / goldfish" ts-goldfish :transient t)
        ("se" "always remember / elephant" ts-elephant :transient t)
-       ("sd" "default values" ts-default-values :tranient t)
+       ("sd" "default values" ts-default-values :transient t)
        ("sf" "enforcing inputs" ts-enforcing-inputs :transient t)
        ("sl" "lisp variables" ts-lisp-variable :transient t)]
 
