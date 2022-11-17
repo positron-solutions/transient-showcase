@@ -607,7 +607,7 @@ of =magit=.
 *** TODO Errata
 
     *Note*, the uuid is generated on every key input.  Layout updates are fun.
-    It should also work when changing descriptions in the layout via hackery.
+    It does not also work when changing descriptions in the layout via hackery.
     凸( ` ﾛ ´ )凸
 
 * Nesting & Flow Control
@@ -2712,7 +2712,7 @@ of =magit=.
 ** Package Header
 
  #+name: package-header
- #+begin_src elisp tangle: transient-showcase.el
+ #+begin_src elisp tangle: no :eval never
    ;;; transient-showcase.el --- transient features & behavior showcase -*- lexical-binding: t; -*-
 
    ;; Copyright (C) 2022 Positron Solutions
@@ -2764,11 +2764,10 @@ of =magit=.
 
 ** Package Footer
 
-   This block includes the showcase transient.  The block does not run because it
-   requires every example from the README's org in order to run.
+   This block includes the showcase transient.
 
  #+name: package-footer
- #+begin_src elisp :tangle transient-showcase.el
+ #+begin_src elisp :tangle no :eval never
 
    (transient-define-prefix ts-showcase ()
      "A launcher for a currated selection of examples.
