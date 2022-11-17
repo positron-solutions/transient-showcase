@@ -239,7 +239,7 @@ of =magit=.
     layout.  Very specific control over layouts also uses these forms.
 
     #+begin_src elisp :tangle no
-      ;; slots that can be set in children in layouts
+      ;; slots & methods that can be set / overridden in children
       (describe-function transient-child)
     #+end_src
 
@@ -248,7 +248,7 @@ of =magit=.
     a quick way to look at the methods.
 
     #+begin_src elisp :tangle no
-      ;; slots & methods that can be overridden in suffixes
+      ;; slots & methods that can be set / overridden in suffixes
       (describe-function transient-suffix)
     #+end_src
 
@@ -263,7 +263,7 @@ of =magit=.
    #+begin_src elisp :tangle no :var _=wave-prelude
 
      (transient-define-prefix ts-wave ()
-       "Wave at the user"
+       "Prefix that waves at the user"
        [("w" "wave" ts-suffix-wave)]) ; ts-suffix-wave is a simple command from wave-prelude
 
      ;; (ts-wave)
@@ -287,7 +287,7 @@ of =magit=.
    #+begin_src elisp :tangle no :var _=levels-prelude
 
      (transient-define-prefix ts-wave-keyword-args ()
-       "Wave at the user"
+       "Prefix that waves at the user persistently."
        [("e" "wave eventually & stay" ts--wave-eventually :transient t)
         ("s" "wave surely & leave" ts--wave-surely :transient nil)])
 
@@ -309,7 +309,7 @@ of =magit=.
    #+begin_src elisp :tangle yes
      
      (transient-define-suffix ts-suffix-wave-macroed ()
-       "Macro-defined suffix that waves."
+       "Prefix that waves with macro-defined suffix."
        :transient t
        :key "T"
        :description "wave from macro definition"
@@ -322,7 +322,7 @@ of =magit=.
      ;; ts-suffix-wave-suffix defined above
 
      (transient-define-prefix ts-wave-macro-defined ()
-       "Wave using a macro-defined suffix"
+       "Prefix to wave using a macro-defined suffix"
        [(ts-suffix-wave-macroed)]) ; note, information moved from prefix to the suffix.
 
      ;; (ts-wave-macro-defined)
@@ -345,7 +345,7 @@ of =magit=.
        (message "This suffix was overridden.  I am what remains."))
 
      (transient-define-prefix ts-wave-overridden ()
-       "Wave with overridden suffix behavior"
+       "Prefix that waves with overridden suffix behavior"
        [(ts-suffix-wave-macroed
          :transient nil
          :key "O"
@@ -396,6 +396,7 @@ of =magit=.
        ["Bottom Group" ("wb" "wave bottom" ts-suffix-wave)])
 
      ;; (ts-layout-stacked)
+
    #+end_src
 
 *** Groups side by side
@@ -403,12 +404,14 @@ of =magit=.
     Use a vector of vectors for columns.
 
    #+begin_src elisp :tangle yes :var _=wave-prelude             
+
      (transient-define-prefix ts-layout-columns ()
        "Prefix with side-by-side layout."
        [["Left Group" ("wl" "wave left" ts-suffix-wave)]
         ["Right Group" ("wr" "wave right" ts-suffix-wave)]])
 
      ;; (ts-layout-columns)
+
    #+end_src
 
 *** Group on top of groups side by side
@@ -418,7 +421,7 @@ of =magit=.
    #+begin_src elisp :tangle yes :var _=wave-prelude                  
 
      (transient-define-prefix ts-layout-stacked-columns ()
-       "Wave at the user"
+       "Prefix with stacked columns layout."
        ["Top Group"
         ("wt" "wave top" ts-suffix-wave)]
 
@@ -428,6 +431,7 @@ of =magit=.
          ("wr" "wave right" ts-suffix-wave)]])
 
      ;; (ts-layout-stacked-columns)
+
    #+end_src
 
    *Note: Groups can have groups or suffixes, but not both.  You can't mix
@@ -442,19 +446,22 @@ of =magit=.
    #+begin_src elisp :tangle yes :var _=wave-prelude                  
 
      (transient-define-prefix ts-layout-spaced-out ()
-       "Prefix with side-by-side layout."
+       "Prefix lots of spacing for users to space out at."
        ["" ; cannot add another empty string because it will mix suffixes with groups
         ["Left Group"
          ""
          ("wl" "wave left" ts-suffix-wave)
          ("L" "wave lefter" ts-suffix-wave)
          ""
-         ("bl" "wave bottom-left" ts-suffix-wave)]
+         ("bl" "wave bottom-left" ts-suffix-wave)
+         ("z" "zone\n" zone)] ; the newline does pad
 
         [[]] ; empty vector will do nothing
 
         [""] ; vector with just empty line has no effect
-        
+
+        ["\n"] ; vector with just newline will pad
+
         ["Right Group"
          ""
          ("wr" "wave right" ts-suffix-wave)
@@ -463,6 +470,7 @@ of =magit=.
          ("br" "wave bottom-right" ts-suffix-wave)]])
 
      ;; (ts-layout-spaced-out)
+
    #+end_src
 
 ** Manually setting group class
@@ -473,7 +481,7 @@ of =magit=.
    #+begin_src elisp :tangle yes :var _=wave-prelude             
 
      (transient-define-prefix ts-layout-explicit-classes ()
-       "Prefix with group class used to explicitly specify layout ."
+       "Prefix with group class used to explicitly specify layout."
        [:class transient-row "Row"
                ("l" "wave left" ts-suffix-wave)
                ("r" "wave right" ts-suffix-wave)]
@@ -484,6 +492,38 @@ of =magit=.
      ;; (ts-layout-explicit-classes)
 
    #+end_src
+
+** A Grid
+
+   So, you put columns into rows that are in columns and stuff like that.  This
+   can be achieved with or without explicit column settings.
+
+   #+begin_src elisp :tangle yes :var _=wave-prelude
+
+     (transient-define-prefix ts-layout-the-grid ()
+       "Prefix with groups in a grid-like arrangement."
+
+       [:description "The Grid\n" ; must use slot or macro is confused
+        ["Left Column" ; note, no newline
+         ("ltt" "left top top" ts-suffix-wave)
+         ("ltb" "left top bottom" ts-suffix-wave)
+         ""
+         ("lbt" "left bottom top" ts-suffix-wave)
+         ("lbb" "left bottom bottom" ts-suffix-wave)] ; note, no newline
+
+        ["Right Column\n"
+         ("rtt" "right top top" ts-suffix-wave)
+         ("rtb" "right top bottom" ts-suffix-wave)
+         ""
+         ("rbt" "right bottom top" ts-suffix-wave)
+         ("rbb" "right bottom bottom\n" ts-suffix-wave)]])
+
+     ;; (ts-layout-the-grid)
+
+   #+end_src
+
+   *Note*, only =transient-columns=, not =transient-column= can act as a group
+   of groups.
 
 ** Descriptions
 
@@ -497,9 +537,10 @@ of =magit=.
 
    #+begin_src elisp :tangle yes :var _=wave-prelude                       
 
-     (transient-define-prefix ts-wave-descriptively ()
-       "Wave at the user"
-       [["Group One"
+     (transient-define-prefix ts-layout-descriptions ()
+       "Prefix with descriptions specified with slots."
+       ["Let's Give This Transient a Title\n" ; yes the newline works
+        ["Group One"
          ("wo" "wave once" ts-suffix-wave)
          ("wa" "wave again" ts-suffix-wave)]
 
@@ -515,7 +556,8 @@ of =magit=.
          ("wt" "wave too much" ts-suffix-wave)
          ("we" "wave excessively" ts-suffix-wave)]])
 
-     ;; (ts-wave-descriptively)
+     ;; (ts-layout-descriptions)
+
    #+end_src
 
 *** Dynamic Descriptions
@@ -526,8 +568,8 @@ of =magit=.
 
    #+begin_src elisp :tangle yes :var _=wave-prelude                            
 
-      (transient-define-prefix ts-wave-dynamic-labels ()
-        "Generate labels dynamically when transient is shown."
+      (transient-define-prefix ts-layout-dynamic-descriptions ()
+        "Prefix that generate descriptions dynamically when transient is shown."
         ;; group using function-name to generate description
         [:description current-time-string
          ;; single suffix with dynamic description      
@@ -539,7 +581,8 @@ of =magit=.
                         (format "Group %s" (org-id-new)))
                       ("wu" "wave uniquely" ts-suffix-wave)])
 
-     ;; (ts-wave-dynamic-labels)
+     ;; (ts-layout-dynamic-descriptions)
+
    #+end_src
 
 *** TODO Errata
@@ -566,7 +609,7 @@ of =magit=.
    #+begin_src elisp :tangle yes :var _=wave-prelude __=ts-wave-overridden
 
      (transient-define-prefix ts-stay-transient ()
-       "Some suffixes do not exit."
+       "Prefix where some suffixes do not exit."
        ["Exit or Not?"
 
         ;; this suffix will not exit after calling sub-prefix
@@ -574,6 +617,7 @@ of =magit=.
         ("ws" "wave & stay" ts-wave :transient t)])
 
      ;; (ts-stay-transient)
+
    #+end_src
 
    *Note*, if =ts-wave= was used in both exit & stay, the =:transient= slot
@@ -595,16 +639,17 @@ of =magit=.
     #+name: simple-parent-child
     #+begin_src elisp :tangle yes :var _=wave-prelude
 
-      (transient-define-prefix ts-simple-child ()
+      (transient-define-prefix ts--simple-child ()
         ["Simple Child"
          ("wc" "wave childishly" ts-suffix-wave)])
 
       (transient-define-prefix ts-simple-parent ()
+        "Prefix that calls a child prefix."
         ["Simple Parent"
          ("w" "wave parentally" ts-suffix-wave)
-         ("c" "become child" ts-simple-child)])
+         ("b" "become child" ts--simple-child)])
 
-      ;; (ts-simple-child)
+      ;; (ts-simple--child)
       ;; (ts-simple-parent)
 
     #+end_src
@@ -617,9 +662,10 @@ of =magit=.
     #+begin_src elisp :tangle yes :var _=wave-prelude __=simple-parent-child
 
       (transient-define-prefix ts-simple-parent-with-return ()
+        "Prefix with a child prefix that returns."
         ["Parent With Return"
          ("w" "wave parentally" ts-suffix-wave)
-         ("r" "become child with return" ts-simple-child :transient t)])
+         ("b" "become child with return" ts-simple-child :transient t)])
 
       ;; Child does not "return" when called independently
       ;; (ts-simple-child)
@@ -648,6 +694,7 @@ of =magit=.
         (transient-setup 'ts-simple-child))
 
       (transient-define-prefix ts-parent-with-setup-suffix ()
+        "Prefix with a suffix that calls `transient-setup'."
         ["Simple Parent"
          ("wp" "wave parentally" ts-suffix-wave :transient t) ; remain transient
 
@@ -691,6 +738,7 @@ of =magit=.
        (message "You selected: %s" buffer-name))
 
      (transient-define-prefix ts-interactive-basic ()
+       "Prefix with interactive user input."
        ["Interactive Command Suffixes"
         ("s" "enter string" ts--suffix-interactive-string)
         ("b" "select buffer" ts--suffix-interactive-buffer-name)])
@@ -726,7 +774,7 @@ of =magit=.
                              'face 'success)))
 
       (transient-define-prefix ts-complex-messager ()
-        "Complex messager, unless `ts--complex' is nil."
+        "Prefix that sends complex messages, unles `ts--complex' is nil."
         ["Send Complex Messages"
          ("s" "snow people"
           (lambda () (interactive)
@@ -748,7 +796,7 @@ of =magit=.
           (message "Simple and boring!")))
 
       (transient-define-prefix ts-simple-messager ()
-        "Sends messages, optionally switching to complex messages!"
+        "Prefix that toggles child behavior!"
         [["Send Message"
           ;; using `transient--do-recurse' causes suffixes in ts-child to perform
           ;; `transient--do-return' so that we come back to this transient.
@@ -857,12 +905,12 @@ of =magit=.
 
    #+begin_src elisp :tangle no
 
-     (let ((input (Sub-Prefix (Prefix) interactive))
+     (let ((input (Sub-Prefix (Prefix) (Interactive)))
            (infix (Infix))
-       (suffix state infix)
-       (suffix state infix)))
+       (suffix input infix)
+       (suffix input infix)))
 
-    #+end_src
+   #+end_src
 
    With history, you can remember lots of these states.  This allows the user to
    quickly fire off lots of mostly completed partial expressions.  They are
@@ -874,7 +922,7 @@ of =magit=.
    user input, they ultimately have the same capabilities, but if you /think/ in
    terms of partially constructed elisp expressions, you can do more than if the
    user has to enter in contextless commands over and over or write more
-   commands and ad-hoc manage their own state.
+   commands while managing their own state in ad-hoc fashion.
 
    Transient's UI also provides greater awareness to the user of the current
    state.  This makes it easier for the user to achieve the greater complexity
@@ -906,7 +954,7 @@ of =magit=.
        :choices '("grape" "orange" "cherry" "lime"))
 
      (transient-define-prefix ts-basic-infixes ()
-       "This transient just shows off many typical infix types."
+       "Prefix that just shows off many typical infix types."
        ["Infixes"
 
         ;; from macro
@@ -915,6 +963,7 @@ of =magit=.
         ;; shorthand definitions
         ("-b" "switch with shortarg" ("-w" "--switch-short")) ; with :short-arg != :key
         ("-s" "switch" "--switch")
+        ( "n" "no switch" "still works")
         ("-a" "argument" "--argument=" :prompt "Let's argue because: ")
 
         ;; a bit of inline EIEIO in our shorthand
@@ -927,6 +976,7 @@ of =magit=.
         ("s" "show arguments" ts-suffix-print-args)])
 
      ;; (ts-basic-infixes)
+
    #+end_src
 
 *** Reading Infix Values   
@@ -994,7 +1044,7 @@ of =magit=.
        (transient-setup transient-current-command nil nil :scope new-scope))
 
      (transient-define-prefix ts-scope (scope)
-       "Message with the object at a location"
+       "Prefix demonstrating use of scope."
 
        ;; note!  this is a location where we definitely had to use
        ;; `transient--prefix' or get the transient object from the ts-scope symbol.
@@ -1015,6 +1065,7 @@ of =magit=.
      ;; Then r to read
      ;; ... and so on
      ;; C-g to exit
+
    #+end_src
 
 *** TODO Errata with prefix arg (=C-u= universal argument).
@@ -1069,7 +1120,7 @@ of =magit=.
         (message "I ate a %s flavored snowcone with %s on top!" flavor topping)))
 
     (transient-define-prefix ts-snowcone-eater ()
-      "Eat a flavored snowcone!"
+      "Prefix demonstrating set & save infix persistence."
 
       ;; This prefix has a default value that ts-suffix-eat-snowcone can see
       ;; even before the prefix has been called.
@@ -1140,7 +1191,7 @@ of =magit=.
   #+begin_src elisp :tangle yes :var _=print-args-prelude
 
     (transient-define-prefix ts-ping ()
-      "Ping thing pong."
+      "Prefix demonstrating history sharing."
 
       :history-key 'non-unique-name
 
@@ -1150,10 +1201,10 @@ of =magit=.
        ("a" "print args" ts-suffix-print-args :transient nil)])
 
     (transient-define-prefix ts-pong ()
-      "Pong the ping."
+      "Prefix demonstrating history sharing."
 
       :history-key 'non-unique-name
-      
+
       ["Pong"
        ("-g" "game" "--game=")
        ("p" "pong the ping" ts-ping)
@@ -1168,6 +1219,7 @@ of =magit=.
     ;; 5.  p to switch to the ts-pong transient
     ;; 6.  C-x p to load the previous history, see the old value from ts-ping???
     ;; 7. Note that ts-pong uses the same history as ts-ping!
+
   #+end_src
 
 *** Detangling with Initialization, Setting, and Saving
@@ -1269,6 +1321,100 @@ of =magit=.
     rapidly enough that both setting every time and saving are equally
     inconvenient.  Using =transient-set= is kind of brute-ish.
 
+*** Default Values
+
+    Every transient prefix has a value.  It's a list.  You can set it to create
+    defaults for switches and arguments.
+
+   #+begin_src elisp :tangle yes :var _=print-args-prelude
+
+     (transient-define-prefix ts-default-values ()
+       "A prefix with a default value."
+
+       :value '("--toggle" "--value=5")
+
+       ["Arguments"
+        ("t" "toggle" "--toggle")
+        ("v" "value" "--value=" :prompt "an integer: ")]
+
+       ["Show Args"
+        ("s" "show arguments" ts-suffix-print-args)])
+
+     ;; (ts-default-values)
+
+   #+end_src
+
+   *Note*, after setting or saving a value on this transient using the =C-x=
+   menu, the next time the transient is set up, it will have a different
+   value. If you want the default to return, use =transient-reset= in your
+   suffix.
+
+*** Readers
+
+    Readers are the mechanism to provide completions and to enforce input
+    validity of infixes.
+
+   #+begin_src elisp :tangle yes :var _=print-args-prelude
+
+     (transient-define-prefix ts-enforcing-inputs ()
+       "A prefix with enforced input type."
+
+       ["Arguments"
+        ("v" "value" "--value=" :prompt "an integer: " :reader transient-read-number-N+)]
+
+       ["Show Args"
+        ("s" "show arguments" ts-suffix-print-args)])
+
+     ;; (ts-enforcing-inputs)
+
+   #+end_src
+
+   Setting the reader can be used to enforce rules of valid input.  See
+   [[id:0c3f2271-98e0-4db4-b95b-e31975bcbb5e][Advanced/Custom Infix Types]] for
+   an example of writing a custom reader that validates input and assigning
+   that reader via the class method instead of the =:reader= slot.
+
+** Lisp Variables
+
+   Lisp variables are currently at an experimental support level.  They way they
+   work is to report and set the value of a lisp symbol variable.  Because they
+   aren't necessarilly intended to be printed as crude CLI arguments, they *DO
+   NOT* appear in =(transient-args 'prefix)= but this is fine because you can
+   just use the variable.
+
+   Customizing this class can be useful when working with objects and functions
+   that exist entirely in elisp.
+
+   #+begin_src elisp :tangle yes :var _=wave-prelude
+
+     (defvar ts--position '(0 0) "A transient prefix location")
+
+       (transient-define-infix ts--pos-infix ()
+         "A location, key, or command symbol"
+         :class 'transient-lisp-variable
+         :transient t
+         :prompt "An expression such as (0 0), \"p\", nil, 'ts--msg-pos: "
+         :variable 'ts--position)
+
+       (transient-define-suffix ts--msg-pos ()
+         "Message the element at location"
+         :transient 'transient--do-call
+         (interactive) 
+         ;; lisp variables are not sent in the usual (transient-args) list.
+         ;; Just read `ts--position' directly.
+         (let ((suffix (transient-get-suffix transient-current-command ts--position)))
+           (message "%s" (oref suffix description))))
+
+       (transient-define-prefix ts-lisp-variable ()
+         "A prefix that updates and uses a lisp variable."
+         ["Location Printing"
+          [("p" "position" ts--pos-infix)]
+          [("m" "message" ts--msg-pos)]])
+
+       ;; (ts-lisp-variable)
+
+   #+end_src
+
 * Controlling CLI's
 
   This section covers more usages of infixes, focused on creating better
@@ -1304,7 +1450,7 @@ of =magit=.
    #+begin_src elisp :tangle yes :var _=print-args-prelude
 
      (transient-define-prefix ts-switches-and-arguments (arg)
-       "Wave at the user"
+       "A prefix with switch and argument examples."
        [["Arguments"
          ("-s" "switch" "--switch")
          ("-a" "argument" "--argument=")
@@ -1321,43 +1467,15 @@ of =magit=.
         ("s" "show arguments" ts-suffix-print-args)]) ; use to analyze the switch values
 
      ;; (ts-switches-and-arguments)
+
    #+end_src
 
-*** Default Values
+*** Argument and Infix Macros
 
-    Every transient prefix has a value.  It's a list.  You can set it to create
-    defaults for switches and arguments.
-
-   #+begin_src elisp
-     (transient-define-prefix ts-wave ()
-       "Wave at the user"
-
-       :value '("--toggle" "--value=default")
-
-       ["Arguments"
-        ("-s" "switch" "--switch")
-        ("-a" "argument" "--argument=")
-        ("t" "toggle" "--toggle")
-        ;; If you actually need to enforce values, set the :reader slot with
-        ;; `transient-read-number-N+' etc
-        ("v" "value" "--value=" :prompt "\"default\" or an integer: ")]
-
-       ["Commands"
-        ("ws" "wave some" ts-suffix-wave)
-        ("wb" "wave better" ts-suffix-wave)])
-
-     ;; (ts-wave)
-   #+end_src
-
-   *Note*, after setting or saving a value on this transient using the =C-x=
-   menu, the next time the transient is set up, it will have a different value.
-
-*** Argument and Switch Macros
-
-   If you need to fine-tune a switch, use =transient-define-infix=.  Likewise,
-   use =transient-define-argument= for fine-tuning an argument.  The class
-   definitions can be used as a reference while the [[https://magit.vc/manual/transient/Suffix-Slots.html#Slots-of-transient_002dinfix][manual]] provides more
-   explanation.
+   If you need to fine-tune a switch (boolean infix), use
+   =transient-define-infix=.  Likewise, use =transient-define-argument= for
+   fine-tuning an argument.  The class definitions can be used as a reference
+   while the [[https://magit.vc/manual/transient/Suffix-Slots.html#Slots-of-transient_002dinfix][manual]] provides more explanation.
 
    #+begin_src elisp :tangle yes :var _=print-args-prelude
 
@@ -1369,8 +1487,9 @@ of =magit=.
        :init-value (lambda (obj)
                      (oset obj value                   
                            (eq 0 (random 2))))) ; write t with 50% probability
+
      (transient-define-prefix ts-maybe-on ()
-       "A randomly intializing switch."
+       "A prefix with a randomly intializing switch."
        ["Arguments"
         (ts--random-init-infix)]
        ["Show Args"
@@ -1381,7 +1500,6 @@ of =magit=.
      ;; ...
      ;; Run the command a few times to see the random initialization of `ts--random-init-infix'
      ;; It will only take more than ten tries for one in a thousand users.  Good luck.
-
 
    #+end_src
 
@@ -1401,7 +1519,7 @@ of =magit=.
        :choices '("fox" "kitten" "peregrine" "otter"))
 
      (transient-define-prefix ts-animal-choices ()
-       "Select animal"
+       "Prefix demonstrating selecting animals from choices."
        ["Arguments"
         ("-a" "--animals=" ts--animals-argument)
        ["Show Args"
@@ -1419,7 +1537,7 @@ of =magit=.
    #+begin_src elisp :tangle no :var _=print-args-prelude
 
      (transient-define-prefix ts-animal-choices-shorthand ()
-       "Select animals from choices"
+       "Prefix demonstrating the shorthand style of defining choices."
        ["Arguments"
         ("-a" "Animal" "--animal=" :choices ("fox" "kitten" "peregrine" "otter"))]
        ["Show Args"
@@ -1451,7 +1569,7 @@ of =magit=.
        :choices '("grape" "orange" "cherry" "lime"))
 
      (transient-define-prefix ts-exclusive-switches ()
-       "Eat a flavored snowcone!"
+       "Prefix demonstrating exclusive switches."
        :value '("--orange-snowcone")
 
        ["Arguments"
@@ -1460,6 +1578,7 @@ of =magit=.
         ("s" "show arguments" ts-suffix-print-args)])
 
      ;; (ts-exclusive-switches)
+
    #+end_src
 
 *** Incompatible Switches
@@ -1474,6 +1593,7 @@ of =magit=.
    #+begin_src elisp :tangle yes :var  _=print-args-prelude    
 
      (transient-define-prefix ts-incompatible ()
+       "Prefix demonstrating incompatible switches."
        ;; update your transient version if you experience #129 / #155
        :incompatible '(("--switch" "--value=")
                        ("--switch" "--toggle" "--flip")
@@ -1513,6 +1633,8 @@ of =magit=.
     *This section is incomplete.  While it runs, it's likely not demonstrating a
     full understanding of completions in Emacs.*
 
+    Also the history is likely used in completions if done correctly.
+
    #+begin_src elisp :tangle no :var  _=print-args-prelude
 
      (defun ts--animal-choices (complete-me filter-p completion-type)
@@ -1528,7 +1650,7 @@ of =magit=.
          '("ant" "peregrine" "zebra")))
 
      (transient-define-prefix ts-choices-with-completions ()
-       "Select animal"
+       "Prefix with completions for choices."
        ["Arguments"
         ("-a" "Animal" "--animal="
          :always-read t ; don't allow unsetting, just read a new value
@@ -1537,12 +1659,14 @@ of =magit=.
         ("s" "show arguments" ts-suffix-print-args)])
 
      ;; (ts-choices-with-completions)
+
    #+end_src
 
 *** TODO multiple instances
 
     Switches and arguments that can be used multiple times are supported.
-    Example needs to be written.
+    Example needs to be written.  This is useful for CLI wrapping or perhaps
+    situations where a command accepts multiple levels of the same setting.
 
 ** Dispatching args into a process
 
@@ -1638,46 +1762,6 @@ of =magit=.
 
     Clean up cowsay example.  Check for binary before attempting to run it.
    
-** Lisp Variables
-
-   Lisp variables are currently at an experimental support level.  They way they
-   work is to report and set the value of a lisp symbol variable.  Because they
-   aren't necessarilly intended to be printed as crude CLI arguments, they *DO
-   NOT* appear in =(transient-args 'prefix)= but this is fine because you can
-   just use the variable.
-
-   Customizing this class can be useful when working with objects and functions
-   that exist entirely in elisp.
-
-   #+begin_src elisp :tangle yes :var _=wave-prelude
-
-     (defvar ts--position '(0 0) "A transient prefix location")
-
-       (transient-define-infix ts--pos-infix ()
-         "A location, key, or command symbol"
-         :class 'transient-lisp-variable
-         :transient t
-         :prompt "An expression such as (0 0), \"p\", nil, 'ts--msg-pos: "
-         :variable 'ts--position)
-
-       (transient-define-suffix ts--msg-pos ()
-         "Message the element at location"
-         :transient 'transient--do-call
-         (interactive) 
-         ;; lisp variables are not sent in the usual (transient-args) list.
-         ;; Just read `ts--position' directly.
-         (let ((suffix (transient-get-suffix transient-current-command ts--position)))
-           (message "%s" (oref suffix description))))
-
-       (transient-define-prefix ts-msg-location ()
-         "Message with the object at a location"
-         ["Location Printing"
-          [("p" "position" ts--pos-infix)]
-          [("m" "message" ts--msg-pos)]])
-
-       ;; (ts-msg-location)
-   #+end_src
-
 * Controlling Visibility
 
   At times, you need a prefix to show or hide certain options depending on the
@@ -1702,45 +1786,46 @@ of =magit=.
        (message (propertize (format "busy: %s" busy)
                             'face 'success)))
 
-     #+end_src
+   #+end_src
 
    Open the following example in buffers with different modes (or change modes
    manually) to see the different effects of the mode predicates.
 
-     #+begin_src elisp :tangle yes :var _=predicates-prelude
+   #+begin_src elisp :tangle yes :var _=predicates-prelude
 
-       ;; This block uses the predicates-prelude
+     (transient-define-prefix ts-visibility-predicates ()
+       "Prefix with visibility predicates.
+     Try opening this prefix in buffers with modes deriving from different
+     abstract major modes."
+       ["Empty Groups Not Displayed"
+        ;; in org mode for example, this group doesn't appear.
+        ("we" "wave elisp" ts-suffix-wave :if-mode emacs-lisp-mode)
+        ("wc" "wave in C" ts-suffix-wave :if-mode cc-mode)]
 
-       (transient-define-prefix ts-predicates ()
-         "Wave at the user"
-         ["Empty Groups Not Displayed"
-          ;; in org mode for example, this group doesn't appear.
-          ("we" "wave elisp" ts-suffix-wave :if-mode emacs-lisp-mode)
-          ("wc" "wave in C" ts-suffix-wave :if-mode cc-mode)]
+       ["Lists of Modes"
+        ("wm" "wave multiply" ts-suffix-wave :if-mode (dired-mode gnus-mode))]
 
-         ["Lists of Modes"
-          ("wm" "wave multiply" ts-suffix-wave :if-mode (dired-mode gnus-mode))]
+       [["Function Predicates"
+         ;; note, after toggling, the transient needs to be re-displayed for the
+         ;; predicate to take effect
+         ("b" "toggle busy" ts--toggle-busy)
+         ("bw" "wave busily" ts-suffix-wave :if ts--busy-p)]
 
-         [["Function Predicates"
-           ;; note, after toggling, the transient needs to be re-displayed for the
-           ;; predicate to take effect
-           ("b" "toggle busy" ts--toggle-busy)
-           ("bw" "wave busily" ts-suffix-wave :if ts--busy-p)]
+        ["Programming Actions"
+         :if-derived prog-mode
+         ("pw" "wave programishly" ts-suffix-wave)
+         ("pe" "wave in elisp" ts-suffix-wave :if emacs-lisp-mode)]
+        ["Special Mode Actions"
+         :if-derived special-mode
+         ("sw" "wave specially" ts-suffix-wave)
+         ("sd" "wave dired" ts-suffix-wave :if-mode dired-mode)]
+        ["Text Mode Actions"
+         :if-derived text-mode
+         ("tw" "wave textually" ts-suffix-wave)
+         ("to" "wave org-modeishly" ts-suffix-wave :if-mode org-mode)]])
 
-          ["Programming Actions"
-           :if-derived prog-mode
-           ("pw" "wave programishly" ts-suffix-wave)
-           ("pe" "wave in elisp" ts-suffix-wave :if emacs-lisp-mode)]
-          ["Special Mode Actions"
-           :if-derived special-mode
-           ("sw" "wave specially" ts-suffix-wave)
-           ("sd" "wave dired" ts-suffix-wave :if-mode dired-mode)]
-          ["Text Mode Actions"
-           :if-derived text-mode
-           ("tw" "wave textually" ts-suffix-wave)
-           ("to" "wave org-modeishly" ts-suffix-wave :if-mode org-mode)]])
+     ;; (ts-visibility-predicates)
 
-       ;; (ts-predicates)
    #+end_src
 
 ** Inapt (Temporarily Unavailable)
@@ -1769,6 +1854,7 @@ of =magit=.
      ;; override them to the `transient--do-return' value for :transient slot so
      ;; that they return back to the parent.
      (transient-define-prefix ts--inapt-children ()
+       "Prefix with children using inapt predicates."
        ["Inapt Predicates Child"
         ("s" "switched" ts--wave-surely
          :transient transient--do-return
@@ -1786,13 +1872,14 @@ of =magit=.
          (transient-setup 'ts--inapt-children nil nil :scope (if scope t nil))))
 
      (transient-define-prefix ts-inapt-parent ()
-       "Inapt Predicates Parent"
+       "Prefix that configures child with inapt predicates."
 
        [("-s" "switch" "--switch")
         ("a" "show arguments" ts-suffix-print-args)
         ("c" "launch child prefix" ts--inapt-children :transient transient--do-recurse)])
 
      ;; (ts-inapt-parent)
+
    #+end_src
 
 ***  TODO Documentation in manual missing
@@ -1833,10 +1920,9 @@ of =magit=.
    provide them, but tell the user in your README to set higher levels.
      
      #+begin_src elisp :tangle yes :var _=levels-prelude :var _=show-level-suffix
-       ;; This block uses levels-prelude
 
        (transient-define-prefix ts-levels-and-visibility ()
-         "Wave at the user with configurable suffix visibility."
+         "Prefix with visibility levels for hiding rarely used commands."
 
          [["Setting the Current Level"
            ;; this binding is normally not displayed.  The value of
@@ -1859,6 +1945,7 @@ of =magit=.
              ("we" "wave eventually" ts--wave-eventually)]])
 
        ;; (ts-levels-and-visibility)
+
    #+end_src
 
 **** Using the Levels UI   
@@ -1899,7 +1986,7 @@ of =magit=.
    #+begin_src elisp :tangle yes
 
      (transient-define-prefix ts-generated-child ()
-       "A prefix that uses `setup-children' to generate single child."
+       "Prefix that uses `setup-children' to generate single child."
 
        ["Replace this child"
         ;; Let's override the group's method
@@ -1931,7 +2018,7 @@ of =magit=.
    #+begin_src elisp :tangle no
 
      (transient-define-prefix ts-generated-group ()
-       "A prefix that uses `setup-children' to generate a group."
+       "Prefix that uses `setup-children' to generate a group."
 
        ["Replace this child"
         ;; Let's override the group's method
@@ -2007,6 +2094,9 @@ of =magit=.
     slot.
 
 ** Custom Infix Types
+   :PROPERTIES:
+   :ID:       0c3f2271-98e0-4db4-b95b-e31975bcbb5e
+   :END:
 
    Not everything is a string or boolean.  You may want to represent complex
    objects in your transint infixes.  If your objects can be rehydrated from
@@ -2132,7 +2222,7 @@ of =magit=.
 
      ;; All set!  This transient just tests our or new toy.
      (transient-define-prefix ts-inception ()
-       "Pick a suffix, any suffix"
+       "Prefix that picks a suffix from its own layout."
 
        [["Pick a suffix"
          ("-s" "just a switch" "--switch") ; makes history value structure apparent
@@ -2155,6 +2245,7 @@ of =magit=.
      ;; Save the infix, re-evaluate the prefix, and open the prefix again
      ;; Try flipping through history
      ;; Now do think of doing things like this with org ids, magit-sections, buffers etc.
+
     #+end_src
 
     This is a difficult example, but once you understand the pieces, you can
@@ -2200,7 +2291,7 @@ of =magit=.
            (transient-setup transient-current-command)))
 
       (transient-define-prefix ts-inception-update ()
-        "Pick a suffix, any suffix, and modify it!"
+        "Prefix that picks and updates its own suffix."
 
         [["Pick a suffix"
           ("c" "child" ts--inception-child-infix)]
@@ -2224,6 +2315,7 @@ of =magit=.
       ;; Using a transient to modify a transient (⊃｡•́‿•̀｡)⊃━✿✿✿✿✿✿
       ;; Try to rename a group, such as (0 0)
       ;; Rename the very outer group, (0)
+
     #+end_src
 
 *** TODO Errata
