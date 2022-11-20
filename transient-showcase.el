@@ -269,16 +269,16 @@
    ("w" "wave parentally" ts-suffix-wave)
    ("b" "become child" ts--simple-child)])
 
-;; (ts-simple--child)
+;; (ts--simple-child)
 ;; (ts-simple-parent)
 (transient-define-prefix ts-simple-parent-with-return ()
   "Prefix with a child prefix that returns."
   ["Parent With Return"
    ("w" "wave parentally" ts-suffix-wave)
-   ("b" "become child with return" ts-simple-child :transient t)])
+   ("b" "become child with return" ts--simple-child :transient t)])
 
 ;; Child does not "return" when called independently
-;; (ts-simple-child)
+;; (ts--simple-child)
 ;; (ts-simple-parent-with-return)
 (transient-define-suffix ts-suffix-setup-child ()
   "A suffix that uses `transient-setup' to manually load another transient."
@@ -287,7 +287,7 @@
   ;; command that the actual work to set up the transient will occur.
   ;; This is an implementation detail because it depends if we are calling
   ;; `transient-setup' while already transient or not.
-  (transient-setup 'ts-simple-child))
+  (transient-setup 'ts--simple-child))
 
 (transient-define-prefix ts-parent-with-setup-suffix ()
   "Prefix with a suffix that calls `transient-setup'."
