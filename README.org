@@ -165,8 +165,8 @@ of =magit=.
 
 *** Conceptual similarity to Emacs prefix arguments
 
-    *Setting [[https://emacsdocs.org/docs/emacs/Prefix-Keymaps][prefix arguments]] with =universal-argument= (=C-u=) is a distinct, separate
-    behavior that is part of Emacs.*
+    *Setting [[https://emacsdocs.org/docs/emacs/Prefix-Keymaps][prefix arguments]] with =universal-argument= (=C-u=) is a distinct,
+    separate behavior that is part of Emacs.*
 
     With prefix arguments, you "call" commands with extra arguments, like you
     would a function.
@@ -227,17 +227,18 @@ of =magit=.
 
   You can declare the same behavior 3-4 ways
 
-  - Shorthand forms within =transient-define-prefix= macro allow shorthand binding
-    of suffixes & commands or creation of infixes directly within the layout
-    definition.
+  - Shorthand forms within =transient-define-prefix= macro allow shorthand
+    binding of suffixes & commands or creation of infixes directly within the
+    layout definition.
 
   - Macros for suffixes and infix definition streamline defining commands while
     also defining how they will behave in a layout.
 
   - Keyword arguments ~(:foo val1 :bar val2)~ are interpreted by the macros and
-    used to set slots (OOP attributes) on prefix, group, and suffix objects.  Similar
-    forms for declaring suffixes can be used to modify them when declaring a
-    layout.  Very specific control over layouts also uses these forms.
+    used to set slots (OOP attributes) on prefix, group, and suffix objects.
+    Similar forms for declaring suffixes can be used to modify them when
+    declaring a layout.  Very specific control over layouts also uses these
+    forms.
 
     #+begin_src elisp :tangle no
       ;; slots & methods that can be set / overridden in children
@@ -686,7 +687,7 @@ of =magit=.
          ("w" "wave parentally" ts-suffix-wave)
          ("b" "become child" ts--simple-child)])
 
-      ;; (ts-simple--child)
+      ;; (ts--simple-child)
       ;; (ts-simple-parent)
 
     #+end_src
@@ -702,10 +703,10 @@ of =magit=.
         "Prefix with a child prefix that returns."
         ["Parent With Return"
          ("w" "wave parentally" ts-suffix-wave)
-         ("b" "become child with return" ts-simple-child :transient t)])
+         ("b" "become child with return" ts--simple-child :transient t)])
 
       ;; Child does not "return" when called independently
-      ;; (ts-simple-child)
+      ;; (ts--simple-child)
       ;; (ts-simple-parent-with-return)
 
     #+end_src
@@ -728,7 +729,7 @@ of =magit=.
         ;; command that the actual work to set up the transient will occur.
         ;; This is an implementation detail because it depends if we are calling
         ;; `transient-setup' while already transient or not.
-        (transient-setup 'ts-simple-child))
+        (transient-setup 'ts--simple-child))
 
       (transient-define-prefix ts-parent-with-setup-suffix ()
         "Prefix with a suffix that calls `transient-setup'."
@@ -1147,7 +1148,8 @@ of =magit=.
 
 ** Prefix Value & History
 
-   Briefly, there are three locations for state you need to be aware of for this section:
+   Briefly, there are three locations for state you need to be aware of for this
+   section:
 
    - Each transient's prefix object has a =:value= that is updated by
      =transient-set= and =transient-save=
@@ -1161,10 +1163,10 @@ of =magit=.
      prefixes).  These are never used unless calling =transient-history-prev=
      and =transient-history-next=.
 
-   We can get this as a list of strings for any
-   prefix by calling =transient-args= on =transient-current-command= in the
-   suffix's interactive form.  If you know the command you want the value of, you
-   can use it's symbol instead of =transient-current-command=.
+   We can get this as a list of strings for any prefix by calling
+   =transient-args= on =transient-current-command= in the suffix's interactive
+   form.  If you know the command you want the value of, you can use it's symbol
+   instead of =transient-current-command=.
 
   This is related to history keys.  If you set the arguments and then save them
   using (=C-x s=) for the command =transient-save=, not only will the transient
