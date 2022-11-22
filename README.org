@@ -1003,9 +1003,9 @@ of =magit=.
 *** Basic Infixes
 
     Infix classes built-in all descend from =transient-infix= and can be seen
-    clearly in the =eieio-class-browser=.  View their slots and documentaiton
-    with ~(describe-class transient-infix)~ etc.  Here you can see what most
-    infixes look like and how they behave.
+    clearly in the =eieio-browse=.  View their slots and documentaiton with
+    ~(describe-class transient-infix)~ etc.  Here you can see what most infixes
+    look like and how they behave.
 
    #+begin_src elisp :tangle transient-showcase.el :var  _=print-args-prelude
 
@@ -2513,7 +2513,7 @@ of =magit=.
 
     #+begin_src elisp :tangle no :results replace
 
-      (eieio-class-browser) ; shows all known classes and their ancestry
+      (eieio-browse) ; shows all known classes and their ancestry
 
       ;;     +--transient-child
       ;;     |    +--transient-group
