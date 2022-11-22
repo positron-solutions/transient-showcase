@@ -1441,9 +1441,9 @@ of =magit=.
    #+end_src
 
    Setting the reader can be used to enforce rules of valid input.  See
-   [[id:0c3f2271-98e0-4db4-b95b-e31975bcbb5e][Advanced/Custom Infix Types]] for
-   an example of writing a custom reader that validates input and assigning
-   that reader via the class method instead of the =:reader= slot.
+   [[id:0c3f2271-98e0-4db4-b95b-e31975bcbb5e][Advanced/Custom Infix Types]] for an example of writing a custom reader that
+   validates input and assigning that reader via the class method instead of the
+   =:reader= slot.
 
 ** Lisp Variables
 
@@ -2167,9 +2167,6 @@ of =magit=.
    the prefix during layout.
 
 *** TODO Correction in manual
-
-    - There is a =transient--parse-child= but not a =transient-parse-child=
-      function.
 
     - These functions do mostly the same job.  Why do we need to specify a
       prefix for =transient-parse-suffixes=, for scope etc?
