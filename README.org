@@ -10,12 +10,18 @@ of =magit=.
 
 * How to use
 
+  There are two ways:
+
   - Open this file in Emacs and run examples as literate org.
   - Install the package to run commands and read their source.  Start with the
     =ts-showcase= command.
 
+** Using as literate org document
+
   If you open this file in Emacs, it will switch to Org mode and you can run
   individual source blocks with =org-babel-execute-src-blk= on the block.
+
+** Using as an installable package
 
   If you install the package, you can read source for each example with the
   normal.  =describe-function= command.  All commands are under =ts-*= prefix.
@@ -23,9 +29,27 @@ of =magit=.
   =ts--suffix-*=.  They will come in handly when you are developing new
   applications.
 
-  While this file is also the README for this repository, it's not intended to be used
-  copy-paste.  Many links will only open in Emacs.  Some definitions are
-  included by refrence from [[*Preludes][Preludes]]
+  Installations for straight and elpaca:
+
+  #+begin_src elisp
+
+    ;; using straight use-package with custom recipe
+    (straight-use-package
+     '(transient-showcase
+       :type git :host github :repo "positron-solutions/transient-showcase")
+     :demand t)
+
+    ;; using elpaca (recommended to add a hash for reproducibility)
+    (elpaca-use-package
+     (example :host github
+              :repo "positron-solutions/transient-showcase")
+     :demand t)
+
+  #+end_src
+
+  *Note* While this file is also the README for this repository, it's not
+  intended to be used copy-paste.  Many links will only open in Emacs.  Some
+  definitions are included by refrence from [[*Preludes][Preludes]]
 
 ** Packaging
    :PROPERTIES:
