@@ -2924,8 +2924,7 @@ of =magit=.
  #+end_src
 
 # Local Variables:
-# eval: (ignore-errors (require 'org-make-toc))
-# before-save-hook: (when (featurep 'org-make-toc) (org-make-toc))
+# before-save-hook: (when (require 'org-make-toc nil t) (org-make-toc))
 # org-export-with-properties: ()
 # org-export-with-title: t
 # org-make-toc-link-type-fn: org-make-toc--link-entry-org
