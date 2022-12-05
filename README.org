@@ -76,6 +76,7 @@ of =magit=.
 :TOC:      :include siblings :depth 2
 :END:
 :CONTENTS:
+- [[Contents][Contents]]
 - [[Terminology][Terminology]]
   - [[Prefixes and Suffixes][Prefixes and Suffixes]]
   - [[Nesting Prefixes][Nesting Prefixes]]
@@ -125,6 +126,7 @@ of =magit=.
   - [[Preludes][Preludes]]
   - [[Essential Elisp][Essential Elisp]]
 - [[Further Reading][Further Reading]]
+- [[More Packaging][More Packaging]]
   - [[Package Header][Package Header]]
   - [[Package Footer][Package Footer]]
 :END:
@@ -378,6 +380,7 @@ of =magit=.
 :CONTENTS:
 - [[Descriptions][Descriptions]]
   - [[Dynamic Descriptions][Dynamic Descriptions]]
+  - [[Errata][Errata]]
 - [[Layouts][Layouts]]
   - [[Groups one on top of the other][Groups one on top of the other]]
   - [[Groups side by side][Groups side by side]]
@@ -624,10 +627,12 @@ of =magit=.
   - [[Binding a Sub-Prefix][Binding a Sub-Prefix]]
     - [[Nesting with multiple commands][Nesting with multiple commands]]
   - [[Setting up another transient manually][Setting up another transient manually]]
+    - [[Errata][Errata]]
 - [[Mixing Interactive][Mixing Interactive]]
   - [[Early completion][Early completion]]
 - [[Pre-Commands Explained][Pre-Commands Explained]]
   - [[Warning!][Warning!]]
+    - [[Errata][Errata]]
 :END:
 
 
@@ -921,7 +926,9 @@ of =magit=.
 - [[Infixes][Infixes]]
   - [[Basic Infixes][Basic Infixes]]
   - [[Reading Infix Values][Reading Infix Values]]
+    - [[The =transient-suffixes= option requires filtering][The transient-suffixes option requires filtering]]
 - [[Scope][Scope]]
+  - [[Errata with prefix arg (=C-u= universal argument).][Errata with prefix arg (C-u universal argument).]]
 - [[Prefix Value & History][Prefix Value & History]]
 - [[History Keys][History Keys]]
   - [[Detangling with Initialization, Setting, and Saving][Detangling with Initialization, Setting, and Saving]]
@@ -2069,6 +2076,7 @@ of =magit=.
   - [[Obtaining Missing Scope][Obtaining Missing Scope]]
 - [[Custom Infix Types][Custom Infix Types]]
   - [[Reading custom infix values][Reading custom infix values]]
+  - [[Errata][Errata]]
 :END:
 
   The previous sections are designed to go breadth-first so that you can get
