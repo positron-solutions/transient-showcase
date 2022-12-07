@@ -1746,26 +1746,36 @@ of =magit=.
     Shortarg cannot be used for exclusion excluding other options (prefix
     =:incompatible=) or setting default values (prefix =:value=).
 
-*** TODO Choices from a function
+*** Choices from a function
 
-    *This section is incomplete.  While it runs, it's likely not demonstrating a
-    full understanding of completions in Emacs.*
+    See =transient-infix-read= for actual code.  This method uses the prefix's
+    history and then delecates to =completing-read= or
+    =completing-read-multiple=.  The =:choices= key coresponds to the
+    =COLLECTION= argument passed to completing reads.
 
-    Also the history is likely used in completions if done correctly.
+    *Note*, using a function for completions can appear to require a daunting
+    amount of behavior if you read the manul [[info:elisp#Programmed
+    Completion][section on programmed completions]].  If you however just return
+    a list of options, even when FLAG is not t, everything seems just fine.
 
    #+begin_src elisp :tangle no :var  _=print-args-prelude
 
-     (defun ts--animal-choices (complete-me filter-p completion-type)
+     (defun ts--animal-choices (complete-me predicate flag)
        ;; complete-me: whatever the user has typed so far
-       ;; filter-p: function you should use to filter candidates (only nil seen so far)
-       ;; completion-type: t on first input and (metadata . alist) thereafter
-       ;;
-       ;; Documentation is from Emacs.  This is not transient-specific behavior
-       ;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Programmed-Completion.html
+       ;; predicate: function you should use to filter candidates (only nil seen so far)
+       ;; flag: request for metadata (which can be disrespected)
 
-       (if (eq 0 (random 2))
-           '("fox" "kitten" "otter")
-         '("ant" "peregrine" "zebra")))
+       ;; if you want to respect metadata requests, here's what the form might
+       ;; look like, but no behavior was observed.
+       (if (eq flag 'metadata)
+           '(metadata . '((annotation-function . (lambda (c) "an annotation"))))
+
+         ;; when not handling a metadata request from completions, use some
+         ;; logic to generate the choices, possibly based on input or some time
+         ;; / context sensitive process.  FLAG will be `t' when these are reqeusted.
+         (if (eq 0 (random 2))
+             '("fox" "kitten" "otter")
+           '("ant" "peregrine" "zebra"))))
 
      (transient-define-prefix ts-choices-with-completions ()
        "Prefix with completions for choices."
