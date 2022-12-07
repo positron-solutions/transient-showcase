@@ -1022,7 +1022,7 @@ control such as replacing or exiting."
     ("fr" "sub-prefix with return" ts-simple-parent-with-return :transient t)
     ("fm" "manual setup in suffix" ts-parent-with-setup-suffix :transient t)
     ("fi" "mixing interactive" ts-interactive-basic :transient t)
-    ("fe" "early completion" ts-simple-messager :transient t)]]
+    ("fe" "early return" ts-simple-messager :transient t)]]
 
    [["Managing State" ; padded right group
     ("sb" "a bunch of infixes" ts-basic-infixes :transient t)

@@ -653,7 +653,7 @@ of =magit=.
   - [[Setting up another transient manually][Setting up another transient manually]]
     - [[Errata][Errata]]
 - [[Mixing Interactive][Mixing Interactive]]
-  - [[Early completion][Early completion]]
+  - [[Early return][Early return]]
 - [[Pre-Commands Explained][Pre-Commands Explained]]
   - [[Warning!][Warning!]]
     - [[Errata][Errata]]
@@ -818,7 +818,7 @@ of =magit=.
 
    #+end_src
 
-*** Early completion
+*** Early return
 
     Sometimes you can complete your work without asking the user for more input.
     In the custom body for a prefix, if you decline to call =transient-setup=,
@@ -826,7 +826,7 @@ of =magit=.
 
     Below is a nested transient.
 
-    - The body form of the nested child can complete early without loading a new transient
+    - The body form of the nested child can return early without loading a new transient
     - The parent uses =transient--do-recurse= to make it's child "return" to it
     - The "radiations" command in the child explicitly overrides this, using
       =transient--do-exit= so that it /does not/ return to the parent
@@ -861,7 +861,7 @@ of =magit=.
 
         (interactive)
         ;; The command body either sets up the transient or simply returns
-        ;; This is the "early completion" we're talking about.
+        ;; This is the "early return" we're talking about.
         (if ts--complex
             (transient-setup 'ts-complex-messager)
           (message "Simple and boring!")))
@@ -2916,7 +2916,7 @@ of =magit=.
        ("fr" "sub-prefix with return" ts-simple-parent-with-return :transient t)
        ("fm" "manual setup in suffix" ts-parent-with-setup-suffix :transient t)
        ("fi" "mixing interactive" ts-interactive-basic :transient t)
-       ("fe" "early completion" ts-simple-messager :transient t)]]
+       ("fe" "early return" ts-simple-messager :transient t)]]
 
       [["Managing State" ; padded right group
        ("sb" "a bunch of infixes" ts-basic-infixes :transient t)
