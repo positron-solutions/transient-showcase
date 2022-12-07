@@ -2,7 +2,6 @@
 
 ;; Copyright (C) 2022 Positron Solutions
 
-
 ;; Author: Psionik K <73710933+psionic-k@users.noreply.github.com>
 ;; Keywords: convenience
 ;; Version: 0.1.0
