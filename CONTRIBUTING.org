@@ -20,3 +20,131 @@ All changes must:
 - Don't break compile or tangle for the package
 - Don't break the TOC
 - Include DCO sign-off in your changes
+- GPG sign your commits
+
+* Licensing, Developer Certificate of Origin
+
+  This project is distributed with a Developer Certificate of Origin.  By adding
+  a sign-off notice and GPG signature to each commit, you will provide means to
+  authenticate your sign-off later strengthening your attestations stated in the
+  DCO, upholding the overall integrity of the license coverage over the project.
+
+** License
+
+   This project is GPL3 licensed and a copy is distributed in the file, [[./COPYING][COPYING]].
+
+** Developer Certificate of Origin (DCO)
+
+   A [[./DCO][copy of the DCO]] is distributed with this project.  Read its text to
+   understand the significance of configuring for sign-off.
+
+*** Sign-off
+
+    A sign-off means adding a "trailer" to your commit that looks like the
+    following:
+
+    #+begin_src
+    Signed-off-by: Random J Developer <random@developer.example.org>
+    #+end_src
+
+*** GPG signature
+
+    A GPG signed commit shows that the owner of the private key submitted the
+    changes.  Wherever signatures are recorded in chains, they can demonstrate
+    participation in changes elsewhere and awareness of what the submitter is
+    participating in.  Corroborating user's signature accross a history of works
+    strengthens that user's attestation provided by DCO sign-off.
+
+*** User setup for submitting changes
+
+    Follow these instructions before you get ready to submit a pull-request.
+
+    Refer to the [[https://docs.github.com/en/authentication/managing-commit-signature-verification/signing-commits][Github signing commits]] instructions to set up your git client
+    to add GPG signatures.  File issues if you run into Emacs-specific problems.
+
+    Because signing is intended to be a conscious process, please remember to
+    read and understand the [[./DCO][Developer Certificate of Origin]] before confinguring
+    your client to automatically sign-off on commits.
+
+**** Automatically add sign-off
+
+     In magit, set the =-s= switch.  Use =C-x C-s= (=transient-save=) to
+     preserve this switch on future uses.  (Note, this is not per-project).You
+     can also set the signature flag this way.
+
+**** Automatic GPG signing with per-project keys
+
+    In order to specify which projects you intend to sign with which keys, you
+    will want to configure your git client using path-specific configurations.
+
+    Configuing git for this can be done with the following directory structure:
+
+    #+begin_src
+    /home/rjdeveloper/
+    ├── .gitconfig
+    └── .gitconfig.d
+        ├── sco-linux-projects.conf
+        ├── other-projects.conf
+        └── gpg-signing-projects.conf
+    #+end_src
+
+    In your root config, ~.gitconfig~, add an =includeIf= directive that will
+    load the configuration you use for projects you intend to GPG sign commits
+    for.
+
+    #+begin_src
+    [includeIf "gitdir:/home/rjdeveloper/**/gpg-signing/**/.git"]
+      path = "~/.gitconfig.d/gpg-signing-projects.conf"
+    #+end_src
+
+    In the ~gpg-signing-projects.conf~ add your GPG signing configuration from
+    earlier.  =sign= adds the GPG signature automatically.  File an issue if you
+    need help with multiple GPG homes or other configurations.
+
+    #+begin_src
+    [user]
+      name = "Random J Developer"
+      email = "random@developer.example.org"
+      signingkey = "5FF0EBDC623B3AD4"
+
+    [commit]
+      sign = true
+      gpgSign = true
+    #+end_src
+
+**** Manually signing & adding sign-off
+
+    If you don't like these configurations and want to individually indicate you
+    have read and intend to apply the DCO to your changes, these commands are
+    equivalent:
+
+    #+begin_src bash
+      git commit -s -S --message "I don't like using .gitconfig"
+
+      # To clean up a commit
+      git commit --amend -s -S --no-message
+
+      # Combine with rebase to sign / sign-off multiple existing commits
+      git rebase -i
+    #+end_src
+
+* Footnote on FSF and Emacs Core Licensing
+
+Free Software Foundation (FSF) frequently requires copyright assignment on all
+code that goes into Emacs core. Many GNU projects have since switched to using a
+Developer Certificate of Origin.  DCO sign-off is a practice accepted by git,
+GCC, and the [[https://wiki.linuxfoundation.org/dco][Linux Kernel]].
+
+Doing DCO sign-off is not the same as copyright assignment, and serves a
+slightly different purpose.  DCO sign-off is an attestation from the submitter
+stating that they have sufficient direct or transitive authority make their
+submission under the terms of the license of the recieving project.  Copyright
+assignment serves a more offensive role in the case of GPL non-compliance,
+giving FSF alone legal standing.  If you don't care about FSF being able to sue
+people, the DCO should suffice.
+
+Using the DCO *may* make it easier for code in your project to be included in
+Emacs core later.  Regardless of FSF's ongoing position on use of DCO's, by
+requiring DCO sign-off and GPG signature, you can be assured that changes
+submitted to a code base you control are strongly attested to be covered by the
+license you chose.
