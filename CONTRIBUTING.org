@@ -130,21 +130,22 @@ All changes must:
 
 * Footnote on FSF and Emacs Core Licensing
 
-Free Software Foundation (FSF) frequently requires copyright assignment on all
-code that goes into Emacs core. Many GNU projects have since switched to using a
-Developer Certificate of Origin.  DCO sign-off is a practice accepted by git,
-GCC, and the [[https://wiki.linuxfoundation.org/dco][Linux Kernel]].
+  Free Software Foundation (FSF) frequently requires copyright assignment on all
+  code that goes into Emacs core. Many GNU projects have since switched to using
+  a Developer Certificate of Origin.  DCO sign-off is a practice accepted by
+  git, GCC, and the [[https://wiki.linuxfoundation.org/dco][Linux Kernel]].
 
-Doing DCO sign-off is not the same as copyright assignment, and serves a
-slightly different purpose.  DCO sign-off is an attestation from the submitter
-stating that they have sufficient direct or transitive authority make their
-submission under the terms of the license of the recieving project.  Copyright
-assignment serves a more offensive role in the case of GPL non-compliance,
-giving FSF alone legal standing.  If you don't care about FSF being able to sue
-people, the DCO should suffice.
+  Doing DCO sign-off is not the same as copyright assignment, and serves a
+  slightly different purpose.  DCO sign-off is an attestation from the submitter
+  stating that they have sufficient direct or transitive authority make their
+  submission under the terms of the license of the recieving project.  Copyright
+  assignment serves a more offensive role in the case of GPL non-compliance,
+  giving FSF alone legal standing.  If you don't care about FSF being able to
+  sue people, the DCO should suffice.
 
-Using the DCO *may* make it easier for code in your project to be included in
-Emacs core later.  Regardless of FSF's ongoing position on use of DCO's, by
-requiring DCO sign-off and GPG signature, you can be assured that changes
-submitted to a code base you control are strongly attested to be covered by the
-license you chose.
+  Using the DCO *may* make it easier for code in your project to be included in
+  Emacs core later.  *It is the intent of this choice to steer FSF towards
+  DCO-like solutions in order to accelerate code flow into Emacs.* Regardless of
+  FSF's ongoing position on use of DCO's, by requiring DCO sign-off and GPG
+  signature, you can be assured that changes submitted to a code base you
+  control are strongly attested to be covered by the license you chose.
