@@ -2958,7 +2958,7 @@ of =magit=.
  #+end_src
 
 # Local Variables:
-# before-save-hook: (when (require 'org-make-toc nil t) (org-make-toc))
+# before-save-hook: (lambda () (when (require 'org-make-toc nil t) (org-make-toc)))
 # org-export-with-properties: ()
 # org-export-with-title: t
 # org-make-toc-link-type-fn: org-make-toc--link-entry-org
