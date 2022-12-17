@@ -706,6 +706,34 @@ This command can be called from it's parent, `ts-snowcone-eater' or independentl
    ("s" "show arguments" ts-suffix-print-args)])
 
 ;; (ts-incompatible)
+(defun ts--animal-choices (_complete-me _predicate flag)
+  "Programmed completion for animal choice.
+_COMPLETE-ME: whatever the user has typed so far
+_PREDICATE: function you should use to filter candidates (only nil seen so far)
+FLAG: request for metadata (which can be disrespected)"
+
+  ;; if you want to respect metadata requests, here's what the form might
+  ;; look like, but no behavior was observed.
+  (if (eq flag 'metadata)
+      '(metadata . '((annotation-function . (lambda (c) "an annotation"))))
+
+    ;; when not handling a metadata request from completions, use some
+    ;; logic to generate the choices, possibly based on input or some time
+    ;; / context sensitive process.  FLAG will be `t' when these are reqeusted.
+    (if (eq 0 (random 2))
+        '("fox" "kitten" "otter")
+      '("ant" "peregrine" "zebra"))))
+
+(transient-define-prefix ts-choices-with-completions ()
+  "Prefix with completions for choices."
+  ["Arguments"
+   ("-a" "Animal" "--animal="
+    :always-read t ; don't allow unsetting, just read a new value
+    :choices ts--animal-choices)]
+  ["Show Args"
+   ("s" "show arguments" ts-suffix-print-args)])
+
+;; (ts-choices-with-completions)
 (defun ts--quit-cowsay ()
   "Kill the cowsay buffer and exit."
   (interactive)

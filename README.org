@@ -1756,7 +1756,7 @@ of =magit=.
     Completion][section on programmed completions]].  If you however just return
     a list of options, even when FLAG is not t, everything seems just fine.
 
-   #+begin_src elisp :tangle no :var  _=print-args-prelude
+   #+begin_src elisp :tangle transient-showcase.el :var  _=print-args-prelude
 
      (defun ts--animal-choices (complete-me predicate flag)
        ;; complete-me: whatever the user has typed so far
