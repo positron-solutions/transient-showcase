@@ -91,14 +91,14 @@
 (ts--define-waver "hidden")
 
 
-(transient-define-suffix ts-suffix-print-args (prefix-arg)
+(transient-define-suffix ts-suffix-print-args (the-prefix-arg)
   "Report the PREFIX-ARG, prefix's scope, and infix values."
   :transient 'transient--do-call
   (interactive "P")
   (let ((args (transient-args (oref transient-current-prefix command)))
         (scope (oref transient-current-prefix scope)))
     (message "prefix-arg: %s \nprefix's scope value: %s \ntransient-args: %s"
-             prefix-arg scope args)))
+             the-prefix-arg scope args)))
 
 ;; ts-suffix-print-args command is incidentally created
 (transient-define-prefix ts-hello ()

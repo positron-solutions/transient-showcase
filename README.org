@@ -1758,10 +1758,11 @@ of =magit=.
 
    #+begin_src elisp :tangle transient-showcase.el :var  _=print-args-prelude
 
-     (defun ts--animal-choices (complete-me predicate flag)
-       ;; complete-me: whatever the user has typed so far
-       ;; predicate: function you should use to filter candidates (only nil seen so far)
-       ;; flag: request for metadata (which can be disrespected)
+     (defun ts--animal-choices (_complete-me _predicate flag)
+       "Programmed completion for animal choice.
+     _COMPLETE-ME: whatever the user has typed so far
+     _PREDICATE: function you should use to filter candidates (only nil seen so far)
+     FLAG: request for metadata (which can be disrespected)"       
 
        ;; if you want to respect metadata requests, here's what the form might
        ;; look like, but no behavior was observed.
@@ -2779,14 +2780,14 @@ of =magit=.
    #+name: print-args-prelude
    #+begin_src elisp :tangle no
 
-     (transient-define-suffix ts-suffix-print-args (prefix-arg)
+     (transient-define-suffix ts-suffix-print-args (the-prefix-arg)
        "Report the PREFIX-ARG, prefix's scope, and infix values."
        :transient 'transient--do-call
        (interactive "P")
        (let ((args (transient-args (oref transient-current-prefix command)))
              (scope (oref transient-current-prefix scope)))
          (message "prefix-arg: %s \nprefix's scope value: %s \ntransient-args: %s"
-                  prefix-arg scope args)))
+                  the-prefix-arg scope args)))
 
      ;; ts-suffix-print-args command is incidentally created
 
