@@ -1,0 +1,89 @@
+# Copyright (C) 2022 Positron Solutions
+
+# Permission is hereby granted, free of charge, to any person obtaining a copy of
+# this software and associated documentation files (the "Software"), to deal in
+# the Software without restriction, including without limitation the rights to
+# use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+# the Software, and to permit persons to whom the Software is furnished to do so,
+# subject to the following conditions:
+
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+# FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+# COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+# IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+# CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+name: CI
+
+on: # trigger this workflow on
+  push:
+    branches: [ $default-branch ] # pushes to the default branch
+  pull_request:
+    paths-ignore: ['README.org']
+    # or every pull request, from any branch to any branch
+
+  workflow_dispatch:
+    # Allows you to run this workflow manually from the Actions tab
+
+jobs:
+  continuous-integration: # just a job name
+
+    # Run on every OS and Emacsen
+    # Some steps specify their own logic!
+    strategy:
+      matrix:
+        os: [ ubuntu-latest ]
+        emacsPkg: [ emacs, emacsGit ]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v3.2.0
+      - uses: cachix/install-nix-action@v18
+        with:
+          extra_nix_config: |
+            access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
+      - uses: cachix/cachix-action@v12
+        with:
+          # This CACHIX_AUTH_TOKEN & CACHIX_CACHE_NAME are secrets you must set
+          # in your repository settings
+          name: ${{ secrets.CACHIX_CACHE_NAME }}
+          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+          extraPullNames: nix-community # look for pre-built binaries from upstream
+          # Some paths may confuse cachix.  Add them with a pipe to the pushFilter
+          pushFilter: "(.drv.chroot$)"
+
+      # Linting the package is less useful on multiple version.  Modify the
+      # logic if you wish to expand lint coverage.
+      - name: lint package
+        if: matrix.emacsPkg == 'emacs'
+        run: |
+          eval "$(nix print-dev-env \
+          --override-input nixpkgs github:nixos/nixpkgs/release-22.11 \
+          --update-input emacs-overlay \
+          .#${{ matrix.emacsPkg }})"
+
+          emacs --script .github/run-shim.el -- lint
+
+      # Tangle the package so we can load the result
+      - name: tangle package
+        run: |
+          eval "$(nix print-dev-env \
+          --override-input nixpkgs github:nixos/nixpkgs/release-22.11 \
+          --update-input emacs-overlay \
+          .#${{ matrix.emacsPkg }})"
+
+          emacs --script .github/run-shim.el -- tangle
+
+      # Load the package to basically see if it evaluates cleanly
+      - name: load package
+        run: |
+          eval "$(nix print-dev-env \
+          --override-input nixpkgs github:nixos/nixpkgs/release-22.11 \
+          --update-input emacs-overlay \
+          .#${{ matrix.emacsPkg }})"
+
+          emacs --script .github/run-shim.el -- load

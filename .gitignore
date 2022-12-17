@@ -1,0 +1,5 @@
+.direnv/
+**.elc
+**.el~
+**/*autoloads.el
+**trash

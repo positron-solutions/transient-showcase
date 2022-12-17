@@ -22,6 +22,22 @@ All changes must:
 - Include DCO sign-off in your changes
 - GPG sign your commits
 
+* Reproducing CI
+
+  CI will tangle the README, load the package, and then try to run
+  =ts-showcase=.  It will also byte compile lint the package.
+
+  The run-shim.el file is a small ad-hoc elisp script.  You can reproduce its
+  three commands almost identically like so:
+
+  #+begin_src shell eval: never
+
+   emacs --quick --script .github/run-shim.el -- tangle
+   emacs --quick --script .github/run-shim.el -- load
+   emacs --quick --script .github/run-shim.el -- lint
+
+  #+end_src
+
 * Licensing, Developer Certificate of Origin
 
   This project is distributed with a Developer Certificate of Origin.  By adding
