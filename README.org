@@ -34,15 +34,14 @@ of =magit=.
   #+begin_src elisp
 
     ;; using straight use-package with custom recipe
-    (straight-use-package
-     '(transient-showcase
-       :type git :host github :repo "positron-solutions/transient-showcase")
-     :demand t)
+    (use-package transient-showcase
+      :straight '(transient-showcase
+                  :type git :host github :repo "positron-solutions/transient-showcase"))    
 
     ;; using elpaca (recommended to add a hash for reproducibility)
     (elpaca-use-package
-     (example :host github
-              :repo "positron-solutions/transient-showcase")
+     (transient-showcase :host github
+                         :repo "positron-solutions/transient-showcase")
      :demand t)
 
   #+end_src
