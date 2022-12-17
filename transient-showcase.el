@@ -325,6 +325,52 @@
    ("b" "select buffer" ts--suffix-interactive-buffer-name)])
 
 ;; (ts-interactive-basic)
+(defvar ts--complex nil "Show complex menu or not.")
+
+(transient-define-suffix ts--toggle-complex ()
+  "Toggle `ts--complex'."
+  :transient t
+  :description (lambda () (format "toggle complex: %s" ts--complex))
+  (interactive)
+  (setf ts--complex (not ts--complex))
+  (message (propertize (concat "Complexity set to: "
+                               (if ts--complex "true" "false"))
+                       'face 'success)))
+
+(transient-define-prefix ts-complex-messager ()
+  "Prefix that sends complex messages, unles `ts--complex' is nil."
+  ["Send Complex Messages"
+   ("s" "snow people"
+    (lambda () (interactive)
+      (message (propertize "snow people! ☃" 'face 'success))))
+   ("k" "kitty cats"
+    (lambda () (interactive)
+      (message (propertize "🐈 kitty cats! 🐈" 'face 'success))))
+   ("r" "radiations"
+    (lambda () (interactive)
+      (message (propertize "Oh no! radiation! ☢" 'face 'success)))
+    ;; radiation is dangerous!
+    :transient transient--do-exit)]
+
+  (interactive)
+  ;; The command body either sets up the transient or simply returns
+  ;; This is the "early return" we're talking about.
+  (if ts--complex
+      (transient-setup 'ts-complex-messager)
+    (message "Simple and boring!")))
+
+(transient-define-prefix ts-simple-messager ()
+  "Prefix that toggles child behavior!"
+  [["Send Message"
+    ;; using `transient--do-recurse' causes suffixes in ts-child to perform
+    ;; `transient--do-return' so that we come back to this transient.
+    ("m" "message" ts-complex-messager :transient transient--do-recurse)]
+   ["Toggle Complexity"
+    ("t" ts--toggle-complex)]])
+
+;; (ts-simple-messager)
+;; does not "return" when called independently
+;; (ts-complex-messager)
 ;; infix defined with a macro
 (transient-define-argument ts--exclusive-switches ()
   "This is a specialized infix for only selecting one of several values."

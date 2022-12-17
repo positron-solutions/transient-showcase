@@ -830,7 +830,7 @@ of =magit=.
     - The "radiations" command in the child explicitly overrides this, using
       =transient--do-exit= so that it /does not/ return to the parent
 
-    #+begin_src elisp :tangle true
+    #+begin_src elisp :tangle transient-showcase.el
 
       (defvar ts--complex nil "Show complex menu or not.")
 
