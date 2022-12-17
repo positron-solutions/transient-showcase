@@ -37,7 +37,7 @@
 ;;
 ;; M-x transient-showcase contains most of the prefixes and can be bound for
 ;; use as a quick reference.  Just use transient's help for each command to
-;; see the source. C-h <suffix key>.
+;; see the source.  C-h <suffix key>.
 ;;
 
 ;;; Code:
@@ -46,7 +46,7 @@
 
 
 (defun ts-suffix-wave ()
-  "Wave at the user"
+  "Wave at the user."
   (interactive)
   (message "Waves at the user at: %s." (current-time-string)))
 
@@ -74,7 +74,7 @@
 ;; define a macro to generate unqiquely named wavers.  See #153 at
 ;; https://github.com/magit/transient/issues/153
 (defmacro ts--define-waver (name)
-  "Define a new suffix named ts--wave-NAME"
+  "Define a new suffix with NAME ts--wave-NAME."
   `(transient-define-suffix ,(intern (format "ts--wave-%s" name)) ()
      ,(format "Wave at the user %s" name)
      :transient t
@@ -91,13 +91,15 @@
 
 
 (transient-define-suffix ts-suffix-print-args (prefix-arg)
-  "Report the universal argument, prefix's scope, and infix values."
+  "Report the PREFIX-ARG, prefix's scope, and infix values."
   :transient 'transient--do-call
   (interactive "P")
   (let ((args (transient-args (oref transient-current-prefix command)))
         (scope (oref transient-current-prefix scope)))
     (message "prefix-arg: %s \nprefix's scope value: %s \ntransient-args: %s"
              prefix-arg scope args)))
+
+;; ts-suffix-print-args command is incidentally created
 (transient-define-prefix ts-hello ()
   "Prefix that is minimal and uses an anonymous command suffix."
   [("s" "call suffix"
@@ -115,10 +117,15 @@
   :description "wave from macro definition"
   (interactive)
   (message "Waves from a macro definition at: %s" (current-time-string)))
+
+;; Suffix definition creates a command
+;; (ts-suffix-wave-macroed)
+;; Because that's where the suffix object is stored
+;; (get 'ts-suffix-wave-macroed 'transient--suffix)
 ;; ts-suffix-wave-suffix defined above
 
 (transient-define-prefix ts-wave-macro-defined ()
-  "Prefix to wave using a macro-defined suffix"
+  "Prefix to wave using a macro-defined suffix."
   [(ts-suffix-wave-macroed)]) ; note, information moved from prefix to the suffix.
 
 ;; (ts-wave-macro-defined)
@@ -128,7 +135,7 @@
   (message "This suffix was overridden.  I am what remains."))
 
 (transient-define-prefix ts-wave-overridden ()
-  "Prefix that waves with overridden suffix behavior"
+  "Prefix that waves with overridden suffix behavior."
   [(ts-suffix-wave-macroed
     :transient nil
     :key "O"
@@ -535,17 +542,17 @@ This command can be called from it's parent, `ts-snowcone-eater' or independentl
    ("s" "show arguments" ts-suffix-print-args)])
 
 ;; (ts-enforcing-inputs)
-(defvar ts--position '(0 0) "A transient prefix location")
+(defvar ts--position '(0 0) "A transient prefix location.")
 
   (transient-define-infix ts--pos-infix ()
-    "A location, key, or command symbol"
+    "A location, key, or command symbol."
     :class 'transient-lisp-variable
     :transient t
     :prompt "An expression such as (0 0), \"p\", nil, 'ts--msg-pos: "
     :variable 'ts--position)
 
   (transient-define-suffix ts--msg-pos ()
-    "Message the element at location"
+    "Message the element at location."
     :transient 'transient--do-call
     (interactive)
     ;; lisp variables are not sent in the usual (transient-args) list.
@@ -579,7 +586,7 @@ This command can be called from it's parent, `ts-snowcone-eater' or independentl
 
 ;; (ts-switches-and-arguments)
 (transient-define-infix ts--random-init-infix ()
-  "Switch on and off"
+  "Switch on and off."
   :argument "--switch"
   :shortarg "-s" ; will be used for :key when key is not set
   :description "switch"
@@ -600,7 +607,7 @@ This command can be called from it's parent, `ts-snowcone-eater' or independentl
 ;; Run the command a few times to see the random initialization of `ts--random-init-infix'
 ;; It will only take more than ten tries for one in a thousand users.  Good luck.
 (transient-define-argument ts--animals-argument ()
-  "Animal picker"
+  "Animal picker."
   :argument "--animals="
   ; :multi-value t ; multi-value can be set to --animals=fox,otter,kitten etc
   :class 'transient-option
@@ -615,7 +622,7 @@ This command can be called from it's parent, `ts-snowcone-eater' or independentl
 
 ;; (ts-animal-choices)
 (transient-define-argument ts--snowcone-flavor ()
-  :description "Flavor of snowcone"
+  :description "Flavor of snowcone."
   :class 'transient-switches
   :key "f"
   :argument-format "--%s-snowcone"
@@ -653,11 +660,12 @@ This command can be called from it's parent, `ts-snowcone-eater' or independentl
 
 ;; (ts-incompatible)
 (defun ts--quit-cowsay ()
-  "Kill the cowsay buffer and exit"
+  "Kill the cowsay buffer and exit."
   (interactive)
   (kill-buffer "*cowsay*"))
 
 (defun ts--cowsay-buffer-exists-p ()
+  "Visibility predicate."
   (not (equal (get-buffer "*cowsay*") nil)))
 
 (transient-define-suffix ts--cowsay-clear-buffer (&optional buffer)
@@ -672,7 +680,7 @@ This command can be called from it's parent, `ts-snowcone-eater' or independentl
       (delete-region 1 (+ 1 (buffer-size))))))
 
 (transient-define-suffix ts--cowsay (&optional args)
-  "Run cowsay"
+  "Run cowsay."
   (interactive (list (transient-args transient-current-command)))
   (let* ((buffer "*cowsay*")
          ;; TODO ugly
@@ -749,7 +757,7 @@ abstract major modes."
 
 ;; (ts-visibility-predicates)
 (defun ts--child-scope-p ()
-  "Returns the scope of the current transient.
+  "Return the scope of the current transient.
 When this is called in layouts, it's the transient being layed out"
   (let ((scope (oref transient--prefix scope)))
     (message "The scope is: %s" scope)
@@ -1041,7 +1049,7 @@ control such as replacing or exiting."
     ("ce" "exclusive switches" ts-exclusive-switches :transient t)
     ("ci" "incompatible switches" ts-incompatible :transient t)
     ("co" "completions for choices" ts-choices-with-completions :transient t)
-    ("cc"  "cowsay cli wrapper" ts-cowsay :transient t)]]
+    ("cc" "cowsay cli wrapper" ts-cowsay :transient t)]]
 
    [["Visibility"
      ;; padded description to sc
