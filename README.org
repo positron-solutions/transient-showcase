@@ -2165,7 +2165,7 @@ of =magit=.
 
    The same thing, but parsing an entire group spec:
 
-   #+begin_src elisp :tangle no
+   #+begin_src elisp :tangle transient-showcase.el
 
      (transient-define-prefix ts-generated-group ()
        "Prefix that uses `setup-children' to generate a group."

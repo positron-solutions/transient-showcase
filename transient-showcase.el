@@ -911,6 +911,26 @@ When this is called in layouts, it's the transient being layed out"
                                (message "You should replace me!")))])
 
 ;; (ts-generated-child)
+(transient-define-prefix ts-generated-group ()
+  "Prefix that uses `setup-children' to generate a group."
+
+  ["Replace this child"
+   ;; Let's override the group's method
+   :setup-children
+   (lambda (_) ; we don't care about the stupid suffix
+
+     ;; the result of parsing here will be a group
+     (transient-parse-suffixes
+      transient--prefix
+      ["Group Name" ("r" "replacement" (lambda ()
+                                         (interactive)
+                                         (message "okay!")))]))
+
+   ("s" "haha stupid suffix" (lambda ()
+                               (interactive)
+                               (message "You should replace me!")))])
+
+;; (ts-generated-group)
 ;; The children we will be picking can be of several forms.  The
 ;; transient--layout symbol property of a prefix is a vector of vectors, lists,
 ;; and strings.  It's not the actual eieio types or we would use
