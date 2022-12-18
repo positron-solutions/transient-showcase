@@ -5,7 +5,7 @@
 ;; Author: Psionik K <73710933+psionic-k@users.noreply.github.com>
 ;; Keywords: convenience
 ;; Version: 0.1.0
-;; Package-Requires: ((emacs "28.1") org-id)
+;; Package-Requires: ((emacs "28.1"))
 ;; Homepage: http://github.com/positron-solutions/transient-showcase
 
 ;;; License notice:
