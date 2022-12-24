@@ -1,6 +1,27 @@
 #+TITLE: Conributing
 #+AUTHOR: Psionik K
 
+* Contents
+:PROPERTIES:
+:TOC:      :include siblings :ignore this
+:END:
+:CONTENTS:
+- [[#development][Development]]
+- [[#reproducing-ci][Reproducing CI]]
+  - [[#lint-and-byte-compile-code][Lint and byte-compile code]]
+  - [[#loading-and-re-loading-your-package][Loading and re-loading your package]]
+    - [[#manual-loading--reloading][Manual Loading & Reloading]]
+- [[#license][License]]
+- [[#developer-certificate-of-origin-dco][Developer Certificate of Origin (DCO)]]
+  - [[#sign-off][Sign-off]]
+  - [[#gpg-signature][GPG signature]]
+  - [[#user-setup-for-submitting-changes][User setup for submitting changes]]
+    - [[#automatically-add-sign-off][Automatically add sign-off]]
+    - [[#automatic-gpg-signing-with-per-project-keys][Automatic GPG signing with per-project keys]]
+    - [[#manually-signing--adding-sign-off][Manually signing & adding sign-off]]
+- [[#maintaining-nixpkgs-versions][Maintaining nixpkgs versions]]
+:END:
+
 There's a lot of ways something could have gone wrong while tangling the README
 into the package.
 
@@ -22,10 +43,26 @@ All changes must:
 - Include DCO sign-off in your changes
 - GPG sign your commits
 
+* Development
+
+  This repository was created with [[https://github.com/positron-solutions/elisp-repo-kit/][elisp-repo-kit]].  You can use it to streamline
+  development workflows.
+
 * Reproducing CI
 
   CI will tangle the README, load the package, and then try to run
   =ts-showcase=.  It will also byte compile lint the package.
+
+  If you cannot reproduce a failure (or success) on CI, then you may want to
+  switch to using [[https://nixos.org/download.html][nix]] to get a reprodicible toolchain so you can further develop
+  with frozen versions from the nix [[https://nixos.wiki/wiki/Flakes][flake's]] flake.lock.
+
+  #+begin_src shell
+
+    nix develop .github# # loads the devShells.default from flake.nix
+    cd .github && direnv allow # same as above with file watching
+
+  #+end_src
 
   The run-shim.el file is a small ad-hoc elisp script.  You can reproduce its
   three commands almost identically like so:
@@ -38,57 +75,97 @@ All changes must:
 
   #+end_src
 
-* Licensing, Developer Certificate of Origin
+** Lint and byte-compile code
+
+   This package uses [[https://github.com/gonewest818/elisp-lint][elisp-lint]] to detect issues with byte compiling, package
+   format, code structure and others.  This is run after tangling the new
+   package.
+
+   The configuration is found inside [[.github/run-shim.el][.github/run-shim.el]].  The CI run is invoked
+   inside of [[.github/workflows/ci.yml][ci.yml]] using Emacs in script mode.  Most of the configuration is in
+   the run shim.
+
+   You can run the lints manually almost the same as running tests.
+
+   #+begin_src bash
+
+     nix develop .github#
+     # nix develop .github#emacs28
+     # nix develop .github#emacsGit
+     emacs --script .github/run-shim.el -- lint
+
+   #+end_src
+
+** Loading and re-loading your package
+
+   Run =erk-reload-package= in one of your project files.  All features
+   in the /lisp directory will be re-compiled and loaded appropriately.
+
+   *Note*, during reloading, unloading the current module is forced.  If other
+   packages you use depend on the project feature, results may be unpredicatable.
+   This is one reason batch style testing can be preferred.
+
+*** Manual Loading & Reloading
+
+    To manually unload, run built-in command ~unload-feature~ and select your
+    package name. If you do not unload, reloading has no effect and you will see
+    stale behavior.
+
+    Next, add the package to your load-path and then require it or, more
+    directly, call =emacs-lisp-byte-compile-and-load= or
+    =emacs-lisp-native-compile-and-load=.
+
+* License
+
+  This project is GPL3 licensed and a copy is distributed in the file, [[./COPYING][COPYING]].
+
+* Developer Certificate of Origin (DCO)
 
   This project is distributed with a Developer Certificate of Origin.  By adding
   a sign-off notice and GPG signature to each commit, you will provide means to
   authenticate your sign-off later strengthening your attestations stated in the
   DCO, upholding the overall integrity of the license coverage over the project.
 
-** License
+  A [[./DCO][copy of the DCO]] is distributed with this project.  Read its text to
+  understand the significance of configuring for sign-off.
 
-   This project is GPL3 licensed and a copy is distributed in the file, [[./COPYING][COPYING]].
+** Sign-off
 
-** Developer Certificate of Origin (DCO)
+   A sign-off means adding a "trailer" to your commit that looks like the
+   following:
 
-   A [[./DCO][copy of the DCO]] is distributed with this project.  Read its text to
-   understand the significance of configuring for sign-off.
+   #+begin_src
 
-*** Sign-off
+   Signed-off-by: Random J Developer <random@developer.example.org>
 
-    A sign-off means adding a "trailer" to your commit that looks like the
-    following:
+   #+end_src
 
-    #+begin_src
-    Signed-off-by: Random J Developer <random@developer.example.org>
-    #+end_src
+** GPG signature
 
-*** GPG signature
+   A GPG signed commit shows that the owner of the private key submitted the
+   changes.  Wherever signatures are recorded in chains, they can demonstrate
+   participation in changes elsewhere and awareness of what the submitter is
+   participating in.  Corroborating user's signature accross a history of works
+   strengthens that user's attestation provided by DCO sign-off.
 
-    A GPG signed commit shows that the owner of the private key submitted the
-    changes.  Wherever signatures are recorded in chains, they can demonstrate
-    participation in changes elsewhere and awareness of what the submitter is
-    participating in.  Corroborating user's signature accross a history of works
-    strengthens that user's attestation provided by DCO sign-off.
+** User setup for submitting changes
 
-*** User setup for submitting changes
+   Follow these instructions before you get ready to submit a pull-request.
 
-    Follow these instructions before you get ready to submit a pull-request.
+   Refer to the [[https://docs.github.com/en/authentication/managing-commit-signature-verification/signing-commits][Github signing commits]] instructions to set up your git client
+   to add GPG signatures.  File issues if you run into Emacs-specific problems.
 
-    Refer to the [[https://docs.github.com/en/authentication/managing-commit-signature-verification/signing-commits][Github signing commits]] instructions to set up your git client
-    to add GPG signatures.  File issues if you run into Emacs-specific problems.
+   Because signing is intended to be a conscious process, please remember to
+   read and understand the [[./DCO][Developer Certificate of Origin]] before confinguring
+   your client to automatically sign-off on commits.
 
-    Because signing is intended to be a conscious process, please remember to
-    read and understand the [[./DCO][Developer Certificate of Origin]] before confinguring
-    your client to automatically sign-off on commits.
+*** Automatically add sign-off
 
-**** Automatically add sign-off
+    In magit, set the =-s= switch.  Use =C-x C-s= (=transient-save=) to
+    preserve this switch on future uses.  (Note, this is not per-project).You
+    can also set the signature flag this way.
 
-     In magit, set the =-s= switch.  Use =C-x C-s= (=transient-save=) to
-     preserve this switch on future uses.  (Note, this is not per-project).You
-     can also set the signature flag this way.
-
-**** Automatic GPG signing with per-project keys
+*** Automatic GPG signing with per-project keys
 
     In order to specify which projects you intend to sign with which keys, you
     will want to configure your git client using path-specific configurations.
@@ -96,12 +173,14 @@ All changes must:
     Configuing git for this can be done with the following directory structure:
 
     #+begin_src
-    /home/rjdeveloper/
-    ├── .gitconfig
-    └── .gitconfig.d
-        ├── sco-linux-projects.conf
-        ├── other-projects.conf
-        └── gpg-signing-projects.conf
+
+   /home/rjdeveloper/
+   ├── .gitconfig
+   └── .gitconfig.d
+       ├── sco-linux-projects.conf
+       ├── other-projects.conf
+       └── gpg-signing-projects.conf
+
     #+end_src
 
     In your root config, ~.gitconfig~, add an =includeIf= directive that will
@@ -109,8 +188,10 @@ All changes must:
     for.
 
     #+begin_src
-    [includeIf "gitdir:/home/rjdeveloper/**/gpg-signing/**/.git"]
-      path = "~/.gitconfig.d/gpg-signing-projects.conf"
+
+   [includeIf "gitdir:/home/rjdeveloper/**/gpg-signing/**/.git"]
+     path = "~/.gitconfig.d/gpg-signing-projects.conf"
+
     #+end_src
 
     In the ~gpg-signing-projects.conf~ add your GPG signing configuration from
@@ -118,17 +199,19 @@ All changes must:
     need help with multiple GPG homes or other configurations.
 
     #+begin_src
-    [user]
-      name = "Random J Developer"
-      email = "random@developer.example.org"
-      signingkey = "5FF0EBDC623B3AD4"
 
-    [commit]
-      sign = true
-      gpgSign = true
+   [user]
+     name = "Random J Developer"
+     email = "random@developer.example.org"
+     signingkey = "5FF0EBDC623B3AD4"
+
+   [commit]
+     sign = true
+     gpgSign = true
+
     #+end_src
 
-**** Manually signing & adding sign-off
+*** Manually signing & adding sign-off
 
     If you don't like these configurations and want to individually indicate you
     have read and intend to apply the DCO to your changes, these commands are
@@ -144,24 +227,13 @@ All changes must:
       git rebase -i
     #+end_src
 
-* Footnote on FSF and Emacs Core Licensing
+* Maintaining nixpkgs versions
 
-  Free Software Foundation (FSF) frequently requires copyright assignment on all
-  code that goes into Emacs core. Many GNU projects have since switched to using
-  a Developer Certificate of Origin.  DCO sign-off is a practice accepted by
-  git, GCC, and the [[https://wiki.linuxfoundation.org/dco][Linux Kernel]].
-
-  Doing DCO sign-off is not the same as copyright assignment, and serves a
-  slightly different purpose.  DCO sign-off is an attestation from the submitter
-  stating that they have sufficient direct or transitive authority make their
-  submission under the terms of the license of the recieving project.  Copyright
-  assignment serves a more offensive role in the case of GPL non-compliance,
-  giving FSF alone legal standing.  If you don't care about FSF being able to
-  sue people, the DCO should suffice.
-
-  Using the DCO *may* make it easier for code in your project to be included in
-  Emacs core later.  *It is the intent of this choice to steer FSF towards
-  DCO-like solutions in order to accelerate code flow into Emacs.* Regardless of
-  FSF's ongoing position on use of DCO's, by requiring DCO sign-off and GPG
-  signature, you can be assured that changes submitted to a code base you
-  control are strongly attested to be covered by the license you chose.
+  Nixpkgs has a new release about every six months.  You can check their [[https://github.com/NixOS/nixpkgs/branches][branches]]
+  and [[https://github.com/NixOS/nixpkgs/tags][tags]] to see what's current.  To get updated dependencies from MELPA, it's
+  necessary to update the emacs-overlay with =nix flake lock --update-input
+  emacs-overlay=.  You can also specify revs and branches if you need to roll
+  back. There is a make shortcut: =make flake-update= MacOS tends to get a little
+  less test emphasis, and so =nixpkgs-darwin-<version>= branches exist and are
+  required to pass more Darwin tests before merging.  This is more stable if you
+  are on MacOS. =nixpkgs-unstable= or =master= are your other less common options.
