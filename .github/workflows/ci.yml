@@ -64,7 +64,7 @@ jobs:
           eval "$(nix print-dev-env \
           --override-input nixpkgs github:nixos/nixpkgs/release-22.11 \
           --update-input emacs-overlay \
-          .#${{ matrix.emacsPkg }})"
+          .github#${{ matrix.emacsPkg }})"
 
           emacs --script .github/run-shim.el -- lint
 
@@ -74,7 +74,7 @@ jobs:
           eval "$(nix print-dev-env \
           --override-input nixpkgs github:nixos/nixpkgs/release-22.11 \
           --update-input emacs-overlay \
-          .#${{ matrix.emacsPkg }})"
+          .github#${{ matrix.emacsPkg }})"
 
           emacs --script .github/run-shim.el -- tangle
 
@@ -84,6 +84,6 @@ jobs:
           eval "$(nix print-dev-env \
           --override-input nixpkgs github:nixos/nixpkgs/release-22.11 \
           --update-input emacs-overlay \
-          .#${{ matrix.emacsPkg }})"
+          .github#${{ matrix.emacsPkg }})"
 
           emacs --script .github/run-shim.el -- load
