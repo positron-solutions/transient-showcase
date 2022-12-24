@@ -738,7 +738,7 @@ This command can be called from it's parent, `ts-snowcone-eater' or independentl
   "Programmed completion for animal choice.
 _COMPLETE-ME: whatever the user has typed so far
 _PREDICATE: function you should use to filter candidates (only nil seen so far)
-FLAG: request for metadata (which can be disrespected)"       
+FLAG: request for metadata (which can be disrespected)"
 
   ;; if you want to respect metadata requests, here's what the form might
   ;; look like, but no behavior was observed.
