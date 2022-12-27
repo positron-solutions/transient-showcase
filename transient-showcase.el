@@ -52,7 +52,7 @@
 (defun ts--busy-p () "Are we busy?" ts-busy)
 
 (transient-define-suffix ts--toggle-busy ()
-  "Toggle busy"
+  "Toggle busy."
   (interactive)
   (setf ts-busy (not ts-busy))
   (message (propertize (format "busy: %s" ts-busy)
@@ -971,7 +971,8 @@ When this is called in layouts, it's the transient being layed out"
 ;; and strings.  It's not the actual eieio types or we would use
 ;; `transient-format-description' to just ask them for the descriptions.
 (defun ts--layout-child-desc (layout-child)
-  "Get the description from a transient layout vector or list."
+  "Get the description from LAYOUT-CHILD.
+LAYOUT-CHILD is a transient layout vector or list."
   (let ((description
          (cond
           ((vectorp layout-child) (or (plist-get (aref layout-child 2) :description) "<group, no desc>")) ; group
@@ -991,7 +992,8 @@ When this is called in layouts, it's the transient being layed out"
 ;; the LOC key for `transient-get-suffix' until we get a valid result.  This
 ;; ensures we don't store an invalid LOC.
 (defun ts-child-infix--reader (prompt initial-input history)
-  "Read a location and check that it exists within the current transient."
+  "Read a location and check that it exists within the current transient.
+PROMPT, INITIAL-INPUT, and HISTORY are forwarded to `read-from-minibuffer'."
   (let ((command (oref transient--prefix command))
         (success nil))
     (while (not success)
@@ -999,9 +1001,11 @@ When this is called in layouts, it's the transient being layed out"
              (child (ignore-errors (transient-get-suffix command loc))))
         (if child (setq success loc)
           (message (propertize
-            (format
-             "Location could not be found in prefix %s"
-             command) 'face 'error)) (sit-for 3))))
+                    (format
+                     "Location could not be found in prefix %s"
+                     command)
+                    'face 'error))
+          (sit-for 3))))
     success))
 
 ;; Inherit from variable abstract class
@@ -1020,7 +1024,7 @@ When this is called in layouts, it's the transient being layed out"
 ;; suffix based on the prefix's value, but it does support a lot of
 ;; behaviors.
 (cl-defmethod transient-init-value ((obj ts-child-infix))
-  "Set the value and object-value using the prefix's value."
+  "Set the `value' and `value-object' slots using the prefix's value."
   (let* ((prefix-value (oref transient--prefix value))
          (key (oref obj command))
          (value (car (alist-get key prefix-value))) ; car?
@@ -1029,7 +1033,8 @@ When this is called in layouts, it's the transient being layed out"
     (oset obj value-object value-object)))
 
 (cl-defmethod transient-infix-set ((obj ts-child-infix) value)
-  "When the `value' is updated, update the `value-object' as well."
+  "Update `value' slot to VALUE.
+Update `value-object' slot to the value corresponding to VALUE."
   (let* ((command (oref transient--prefix command))
          (child (ignore-errors (transient-get-suffix command value))))
     (oset obj value-object child)
