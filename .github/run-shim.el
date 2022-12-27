@@ -56,7 +56,7 @@
      (org-babel-tangle-file (expand-file-name "README.org")))
     ("load"
      (require 'transient-showcase)
-     (ts-showcase))
+     (tsc-showcase))
     ("lint"
      (run-shim-lint-package))
     (_

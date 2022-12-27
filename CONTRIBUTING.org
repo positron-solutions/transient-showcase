@@ -51,7 +51,7 @@ All changes must:
 * Reproducing CI
 
   CI will tangle the README, load the package, and then try to run
-  =ts-showcase=.  It will also byte compile lint the package.
+  =tsc-showcase=.  It will also byte compile lint the package.
 
   If you cannot reproduce a failure (or success) on CI, then you may want to
   switch to using [[https://nixos.org/download.html][nix]] to get a reprodicible toolchain so you can further develop
