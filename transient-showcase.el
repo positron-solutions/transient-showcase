@@ -30,9 +30,9 @@
 ;; if you just want to quickly browse through the examples and see their
 ;; source code.
 ;;
-;; M-x transient-showcase contains most of the prefixes and can be bound for
-;; use as a quick reference.  Just use transient's help for each command to
-;; see the source.  C-h <suffix key>.
+;; M-x tsc-showcase contains most of the prefixes and can be bound for
+;; use as a quick reference.  Just use transient's help for each
+;; command to see the source.  C-h <suffix key>.
 ;;
 
 ;;; Code:
