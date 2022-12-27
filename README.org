@@ -998,10 +998,10 @@ of =magit=.
 
    #+begin_src elisp :tangle no :eval never
 
-     (let ((input (Sub-Prefix (Prefix) (Interactive)))
-           (infix (Infix))
+     (let ((input (Sub-Prefix (Prefix (Interactive))))
+           (infix (Infix)))
        (suffix input infix)
-       (suffix input infix)))
+       (suffix input infix))
 
    #+end_src
 
