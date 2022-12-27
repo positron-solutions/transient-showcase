@@ -408,7 +408,7 @@
    ("-a" "argument" "--argument=" :prompt "Let's argue because: ")
 
    ;; a bit of inline EIEIO in our shorthand
-   ("-n" "never empty" "--non-null=" :always-read t
+   ("-n" "never empty" "--non-null=" :always-read t  :allow-empty nil
     :init-value (lambda (obj) (oset obj value "better-than-nothing")))
 
    ("-c" "choices" "--choice=" :choices (foo bar baz))]
