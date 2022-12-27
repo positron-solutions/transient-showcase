@@ -41,25 +41,25 @@
 (require 'org-id)
 
 
-(defun ts-suffix-wave ()
+(defun tsc-suffix-wave ()
   "Wave at the user."
   (interactive)
   (message "Waves at the user at: %s." (current-time-string)))
 
 
-(defvar ts-busy nil "Are we busy?")
+(defvar tsc-busy nil "Are we busy?")
 
-(defun ts--busy-p () "Are we busy?" ts-busy)
+(defun tsc--busy-p () "Are we busy?" tsc-busy)
 
-(transient-define-suffix ts--toggle-busy ()
+(transient-define-suffix tsc--toggle-busy ()
   "Toggle busy."
   (interactive)
-  (setf ts-busy (not ts-busy))
-  (message (propertize (format "busy: %s" ts-busy)
+  (setf tsc-busy (not tsc-busy))
+  (message (propertize (format "busy: %s" tsc-busy)
                        'face 'success)))
 
 
-(transient-define-suffix ts-suffix-show-level ()
+(transient-define-suffix tsc-suffix-show-level ()
   "Show the current transient's level."
   :transient t
   (interactive)
@@ -69,24 +69,24 @@
 ;; Because command names are used to store and lookup child levels, we have
 ;; define a macro to generate unqiquely named wavers.  See #153 at
 ;; https://github.com/magit/transient/issues/153
-(defmacro ts--define-waver (name)
-  "Define a new suffix with NAME ts--wave-NAME."
-  `(transient-define-suffix ,(intern (format "ts--wave-%s" name)) ()
+(defmacro tsc--define-waver (name)
+  "Define a new suffix with NAME tsc--wave-NAME."
+  `(transient-define-suffix ,(intern (format "tsc--wave-%s" name)) ()
      ,(format "Wave at the user %s" name)
      :transient t
      (interactive)
      (message (format "Waves at %s" (current-time-string)))))
 
 ;; Each form results in a unique suffix definition.
-(ts--define-waver "surely")
-(ts--define-waver "normally")
-(ts--define-waver "non-essentially")
-(ts--define-waver "definitely")
-(ts--define-waver "eventually")
-(ts--define-waver "hidden")
+(tsc--define-waver "surely")
+(tsc--define-waver "normally")
+(tsc--define-waver "non-essentially")
+(tsc--define-waver "definitely")
+(tsc--define-waver "eventually")
+(tsc--define-waver "hidden")
 
 
-(transient-define-suffix ts-suffix-print-args (the-prefix-arg)
+(transient-define-suffix tsc-suffix-print-args (the-prefix-arg)
   "Report the PREFIX-ARG, prefix's scope, and infix values."
   :transient 'transient--do-call
   (interactive "P")
@@ -95,20 +95,20 @@
     (message "prefix-arg: %s \nprefix's scope value: %s \ntransient-args: %s"
              the-prefix-arg scope args)))
 
-;; ts-suffix-print-args command is incidentally created
+;; tsc-suffix-print-args command is incidentally created
 
-(transient-define-prefix ts-hello ()
+(transient-define-prefix tsc-hello ()
   "Prefix that is minimal and uses an anonymous command suffix."
   [("s" "call suffix"
     (lambda ()
       (interactive)
       (message "Called a suffix")))])
 
-;; First, use M-x org-babel-execute-src-blk to cause `ts-hello' to be defined
+;; First, use M-x org-babel-execute-src-blk to cause `tsc-hello' to be defined
 ;; Second, M-x `eval-last-sexp' with your point at the end of the line below
-;; (ts-hello)
+;; (tsc-hello)
 
-(transient-define-suffix ts-suffix-wave-macroed ()
+(transient-define-suffix tsc-suffix-wave-macroed ()
   "Prefix that waves with macro-defined suffix."
   :transient t
   :key "T"
@@ -117,104 +117,104 @@
   (message "Waves from a macro definition at: %s" (current-time-string)))
 
 ;; Suffix definition creates a command
-;; (ts-suffix-wave-macroed)
+;; (tsc-suffix-wave-macroed)
 ;; Because that's where the suffix object is stored
-;; (get 'ts-suffix-wave-macroed 'transient--suffix)
+;; (get 'tsc-suffix-wave-macroed 'transient--suffix)
 
-;; ts-suffix-wave-suffix defined above
+;; tsc-suffix-wave-suffix defined above
 
-(transient-define-prefix ts-wave-macro-defined ()
+(transient-define-prefix tsc-wave-macro-defined ()
   "Prefix to wave using a macro-defined suffix."
-  [(ts-suffix-wave-macroed)]) ; note, information moved from prefix to the suffix.
+  [(tsc-suffix-wave-macroed)]) ; note, information moved from prefix to the suffix.
 
-;; (ts-wave-macro-defined)
+;; (tsc-wave-macro-defined)
 
-(defun ts--wave-override ()
+(defun tsc--wave-override ()
   "Vanilla command used to override suffix's commands."
   (interactive)
   (message "This suffix was overridden.  I am what remains."))
 
-(transient-define-prefix ts-wave-overridden ()
+(transient-define-prefix tsc-wave-overridden ()
   "Prefix that waves with overridden suffix behavior."
-  [(ts-suffix-wave-macroed
+  [(tsc-suffix-wave-macroed
     :transient nil
     :key "O"
     :description "wave overridingly"
-    :command ts--wave-override)]) ; we overrode what the suffix even does
+    :command tsc--wave-override)]) ; we overrode what the suffix even does
 
-;; (ts-wave-overridden)
+;; (tsc-wave-overridden)
 
-(transient-define-prefix ts-layout-descriptions ()
+(transient-define-prefix tsc-layout-descriptions ()
   "Prefix with descriptions specified with slots."
   ["Let's Give This Transient a Title\n" ; yes the newline works
    ["Group One"
-    ("wo" "wave once" ts-suffix-wave)
-    ("wa" "wave again" ts-suffix-wave)]
+    ("wo" "wave once" tsc-suffix-wave)
+    ("wa" "wave again" tsc-suffix-wave)]
 
    ["Group Two"
-    ("ws" "wave some" ts-suffix-wave)
-    ("wb" "wave better" ts-suffix-wave)]]
+    ("ws" "wave some" tsc-suffix-wave)
+    ("wb" "wave better" tsc-suffix-wave)]]
 
   ["Bad title" :description "Group of Groups"
    ["Group Three"
-    ("k" "bad desc" ts-suffix-wave :description "key-value wins")
-    ("n" ts-suffix-wave :description "no desc necessary")]
+    ("k" "bad desc" tsc-suffix-wave :description "key-value wins")
+    ("n" tsc-suffix-wave :description "no desc necessary")]
    [:description "Key Only Def"
-    ("wt" "wave too much" ts-suffix-wave)
-    ("we" "wave excessively" ts-suffix-wave)]])
+    ("wt" "wave too much" tsc-suffix-wave)
+    ("we" "wave excessively" tsc-suffix-wave)]])
 
-;; (ts-layout-descriptions)
+;; (tsc-layout-descriptions)
 
-(transient-define-prefix ts-layout-dynamic-descriptions ()
+(transient-define-prefix tsc-layout-dynamic-descriptions ()
    "Prefix that generate descriptions dynamically when transient is shown."
    ;; group using function-name to generate description
    [:description current-time-string
     ;; single suffix with dynamic description
-    ("wa" ts-suffix-wave
+    ("wa" tsc-suffix-wave
      :description (lambda ()
                     (format "Wave at %s" (current-time-string))))]
    ;; group with anonymoous function generating description
    [:description (lambda ()
                    (format "Group %s" (org-id-new)))
-                 ("wu" "wave uniquely" ts-suffix-wave)])
+                 ("wu" "wave uniquely" tsc-suffix-wave)])
 
-;; (ts-layout-dynamic-descriptions)
+;; (tsc-layout-dynamic-descriptions)
 
-(transient-define-prefix ts-layout-stacked ()
+(transient-define-prefix tsc-layout-stacked ()
   "Prefix with layout that stacks groups on top of each other."
-  ["Top Group" ("wt" "wave top" ts-suffix-wave)]
-  ["Bottom Group" ("wb" "wave bottom" ts-suffix-wave)])
+  ["Top Group" ("wt" "wave top" tsc-suffix-wave)]
+  ["Bottom Group" ("wb" "wave bottom" tsc-suffix-wave)])
 
-;; (ts-layout-stacked)
+;; (tsc-layout-stacked)
 
-(transient-define-prefix ts-layout-columns ()
+(transient-define-prefix tsc-layout-columns ()
   "Prefix with side-by-side layout."
-  [["Left Group" ("wl" "wave left" ts-suffix-wave)]
-   ["Right Group" ("wr" "wave right" ts-suffix-wave)]])
+  [["Left Group" ("wl" "wave left" tsc-suffix-wave)]
+   ["Right Group" ("wr" "wave right" tsc-suffix-wave)]])
 
-;; (ts-layout-columns)
+;; (tsc-layout-columns)
 
-(transient-define-prefix ts-layout-stacked-columns ()
+(transient-define-prefix tsc-layout-stacked-columns ()
   "Prefix with stacked columns layout."
   ["Top Group"
-   ("wt" "wave top" ts-suffix-wave)]
+   ("wt" "wave top" tsc-suffix-wave)]
 
   [["Left Group"
-    ("wl" "wave left" ts-suffix-wave)]
+    ("wl" "wave left" tsc-suffix-wave)]
    ["Right Group"
-    ("wr" "wave right" ts-suffix-wave)]])
+    ("wr" "wave right" tsc-suffix-wave)]])
 
-;; (ts-layout-stacked-columns)
+;; (tsc-layout-stacked-columns)
 
-(transient-define-prefix ts-layout-spaced-out ()
+(transient-define-prefix tsc-layout-spaced-out ()
   "Prefix lots of spacing for users to space out at."
   ["" ; cannot add another empty string because it will mix suffixes with groups
    ["Left Group"
     ""
-    ("wl" "wave left" ts-suffix-wave)
-    ("L" "wave lefter" ts-suffix-wave)
+    ("wl" "wave left" tsc-suffix-wave)
+    ("L" "wave lefter" tsc-suffix-wave)
     ""
-    ("bl" "wave bottom-left" ts-suffix-wave)
+    ("bl" "wave bottom-left" tsc-suffix-wave)
     ("z" "zone\n" zone)] ; the newline does pad
 
    [[]] ; empty vector will do nothing
@@ -227,132 +227,132 @@
 
    ["Right Group"
     ""
-    ("wr" "wave right" ts-suffix-wave)
-    ("R" "wave righter" ts-suffix-wave)
+    ("wr" "wave right" tsc-suffix-wave)
+    ("R" "wave righter" tsc-suffix-wave)
     ""
-    ("br" "wave bottom-right" ts-suffix-wave)]])
+    ("br" "wave bottom-right" tsc-suffix-wave)]])
 
-;; (ts-layout-spaced-out)
+;; (tsc-layout-spaced-out)
 
-(transient-define-prefix ts-layout-the-grid ()
+(transient-define-prefix tsc-layout-the-grid ()
   "Prefix with groups in a grid-like arrangement."
 
   [:description "The Grid\n" ; must use slot or macro is confused
    ["Left Column" ; note, no newline
-    ("ltt" "left top top" ts-suffix-wave)
-    ("ltb" "left top bottom" ts-suffix-wave)
+    ("ltt" "left top top" tsc-suffix-wave)
+    ("ltb" "left top bottom" tsc-suffix-wave)
     ""
-    ("lbt" "left bottom top" ts-suffix-wave)
-    ("lbb" "left bottom bottom" ts-suffix-wave)] ; note, no newline
+    ("lbt" "left bottom top" tsc-suffix-wave)
+    ("lbb" "left bottom bottom" tsc-suffix-wave)] ; note, no newline
 
    ["Right Column\n"
-    ("rtt" "right top top" ts-suffix-wave)
-    ("rtb" "right top bottom" ts-suffix-wave)
+    ("rtt" "right top top" tsc-suffix-wave)
+    ("rtb" "right top bottom" tsc-suffix-wave)
     ""
-    ("rbt" "right bottom top" ts-suffix-wave)
-    ("rbb" "right bottom bottom\n" ts-suffix-wave)]])
+    ("rbt" "right bottom top" tsc-suffix-wave)
+    ("rbb" "right bottom bottom\n" tsc-suffix-wave)]])
 
-;; (ts-layout-the-grid)
+;; (tsc-layout-the-grid)
 
-(transient-define-prefix ts-layout-explicit-classes ()
+(transient-define-prefix tsc-layout-explicit-classes ()
   "Prefix with group class used to explicitly specify layout."
   [:class transient-row "Row"
-          ("l" "wave left" ts-suffix-wave)
-          ("r" "wave right" ts-suffix-wave)]
+          ("l" "wave left" tsc-suffix-wave)
+          ("r" "wave right" tsc-suffix-wave)]
   [:class transient-column "Column"
-          ("t" "wave top" ts-suffix-wave)
-          ("b" "wave bottom" ts-suffix-wave)])
+          ("t" "wave top" tsc-suffix-wave)
+          ("b" "wave bottom" tsc-suffix-wave)])
 
-;; (ts-layout-explicit-classes)
+;; (tsc-layout-explicit-classes)
 
-(transient-define-prefix ts-stay-transient ()
+(transient-define-prefix tsc-stay-transient ()
   "Prefix where some suffixes do not exit."
   ["Exit or Not?"
 
    ;; this suffix will not exit after calling sub-prefix
-   ("we" "wave & exit" ts-wave-overridden)
-   ("ws" "wave & stay" ts-wave :transient t)])
+   ("we" "wave & exit" tsc-wave-overridden)
+   ("ws" "wave & stay" tsc-wave :transient t)])
 
-;; (ts-stay-transient)
+;; (tsc-stay-transient)
 
-(transient-define-prefix ts--simple-child ()
+(transient-define-prefix tsc--simple-child ()
   ["Simple Child"
-   ("wc" "wave childishly" ts-suffix-wave)])
+   ("wc" "wave childishly" tsc-suffix-wave)])
 
-(transient-define-prefix ts-simple-parent ()
+(transient-define-prefix tsc-simple-parent ()
   "Prefix that calls a child prefix."
   ["Simple Parent"
-   ("w" "wave parentally" ts-suffix-wave)
-   ("b" "become child" ts--simple-child)])
+   ("w" "wave parentally" tsc-suffix-wave)
+   ("b" "become child" tsc--simple-child)])
 
-;; (ts--simple-child)
-;; (ts-simple-parent)
+;; (tsc--simple-child)
+;; (tsc-simple-parent)
 
-(transient-define-prefix ts-simple-parent-with-return ()
+(transient-define-prefix tsc-simple-parent-with-return ()
   "Prefix with a child prefix that returns."
   ["Parent With Return"
-   ("w" "wave parentally" ts-suffix-wave)
-   ("b" "become child with return" ts--simple-child :transient t)])
+   ("w" "wave parentally" tsc-suffix-wave)
+   ("b" "become child with return" tsc--simple-child :transient t)])
 
 ;; Child does not "return" when called independently
-;; (ts--simple-child)
-;; (ts-simple-parent-with-return)
+;; (tsc--simple-child)
+;; (tsc-simple-parent-with-return)
 
-(transient-define-suffix ts-suffix-setup-child ()
+(transient-define-suffix tsc-suffix-setup-child ()
   "A suffix that uses `transient-setup' to manually load another transient."
   (interactive)
   ;; note that it's usually during the post-command side of calling the
   ;; command that the actual work to set up the transient will occur.
   ;; This is an implementation detail because it depends if we are calling
   ;; `transient-setup' while already transient or not.
-  (transient-setup 'ts--simple-child))
+  (transient-setup 'tsc--simple-child))
 
-(transient-define-prefix ts-parent-with-setup-suffix ()
+(transient-define-prefix tsc-parent-with-setup-suffix ()
   "Prefix with a suffix that calls `transient-setup'."
   ["Simple Parent"
-   ("wp" "wave parentally" ts-suffix-wave :transient t) ; remain transient
+   ("wp" "wave parentally" tsc-suffix-wave :transient t) ; remain transient
 
    ;; You may need to specify a different pre-command (the :transient) key
    ;; because we need to clean up this transient or create some conditions
    ;; to trigger the following transient correctly.  This example will
    ;; work with `transient--do-replace' or no custom pre-command
 
-   ("bc" "become child" ts-suffix-setup-child :transient transient--do-replace)])
+   ("bc" "become child" tsc-suffix-setup-child :transient transient--do-replace)])
 
-;; (ts-parent-with-setup-suffix)
+;; (tsc-parent-with-setup-suffix)
 
-(transient-define-suffix ts--suffix-interactive-string (user-input)
+(transient-define-suffix tsc--suffix-interactive-string (user-input)
   "An interactive suffix that obtains string input from the user."
   (interactive "sPlease just tell me what you want!: ")
   (message "I think you want: %s" user-input))
 
-(transient-define-suffix ts--suffix-interactive-buffer-name (buffer-name)
+(transient-define-suffix tsc--suffix-interactive-buffer-name (buffer-name)
   "An interactive suffix that obtains a buffer name from the user."
   (interactive "b")
   (message "You selected: %s" buffer-name))
 
-(transient-define-prefix ts-interactive-basic ()
+(transient-define-prefix tsc-interactive-basic ()
   "Prefix with interactive user input."
   ["Interactive Command Suffixes"
-   ("s" "enter string" ts--suffix-interactive-string)
-   ("b" "select buffer" ts--suffix-interactive-buffer-name)])
+   ("s" "enter string" tsc--suffix-interactive-string)
+   ("b" "select buffer" tsc--suffix-interactive-buffer-name)])
 
-;; (ts-interactive-basic)
+;; (tsc-interactive-basic)
 
-(defvar ts--complex nil "Show complex menu or not.")
+(defvar tsc--complex nil "Show complex menu or not.")
 
-(transient-define-suffix ts--toggle-complex ()
-  "Toggle `ts--complex'."
+(transient-define-suffix tsc--toggle-complex ()
+  "Toggle `tsc--complex'."
   :transient t
-  :description (lambda () (format "toggle complex: %s" ts--complex))
+  :description (lambda () (format "toggle complex: %s" tsc--complex))
   (interactive)
-  (setf ts--complex (not ts--complex))
+  (setf tsc--complex (not tsc--complex))
   (message (propertize (concat "Complexity set to: "
-                               (if ts--complex "true" "false"))
+                               (if tsc--complex "true" "false"))
                        'face 'success)))
 
-(transient-define-prefix ts-complex-messager ()
-  "Prefix that sends complex messages, unles `ts--complex' is nil."
+(transient-define-prefix tsc-complex-messager ()
+  "Prefix that sends complex messages, unles `tsc--complex' is nil."
   ["Send Complex Messages"
    ("s" "snow people"
     (lambda () (interactive)
@@ -369,37 +369,37 @@
   (interactive)
   ;; The command body either sets up the transient or simply returns
   ;; This is the "early return" we're talking about.
-  (if ts--complex
-      (transient-setup 'ts-complex-messager)
+  (if tsc--complex
+      (transient-setup 'tsc-complex-messager)
     (message "Simple and boring!")))
 
-(transient-define-prefix ts-simple-messager ()
+(transient-define-prefix tsc-simple-messager ()
   "Prefix that toggles child behavior!"
   [["Send Message"
-    ;; using `transient--do-recurse' causes suffixes in ts-child to perform
+    ;; using `transient--do-recurse' causes suffixes in tsc-child to perform
     ;; `transient--do-return' so that we come back to this transient.
-    ("m" "message" ts-complex-messager :transient transient--do-recurse)]
+    ("m" "message" tsc-complex-messager :transient transient--do-recurse)]
    ["Toggle Complexity"
-    ("t" ts--toggle-complex)]])
+    ("t" tsc--toggle-complex)]])
 
-;; (ts-simple-messager)
+;; (tsc-simple-messager)
 ;; does not "return" when called independently
-;; (ts-complex-messager)
+;; (tsc-complex-messager)
 
 ;; infix defined with a macro
-(transient-define-argument ts--exclusive-switches ()
+(transient-define-argument tsc--exclusive-switches ()
   "This is a specialized infix for only selecting one of several values."
   :class 'transient-switches
   :argument-format "--%s-snowcone"
   :argument-regexp "\\(--\\(grape\\|orange\\|cherry\\|lime\\)-snowcone\\)"
   :choices '("grape" "orange" "cherry" "lime"))
 
-(transient-define-prefix ts-basic-infixes ()
+(transient-define-prefix tsc-basic-infixes ()
   "Prefix that just shows off many typical infix types."
   ["Infixes"
 
    ;; from macro
-   ("-e" "exclusive switches" ts--exclusive-switches)
+   ("-e" "exclusive switches" tsc--exclusive-switches)
 
    ;; shorthand definitions
    ("-b" "switch with shortarg" ("-w" "--switch-short")) ; with :short-arg != :key
@@ -414,18 +414,18 @@
    ("-c" "choices" "--choice=" :choices (foo bar baz))]
 
   ["Show Args"
-   ("s" "show arguments" ts-suffix-print-args)])
+   ("s" "show arguments" tsc-suffix-print-args)])
 
-;; (ts-basic-infixes)
+;; (tsc-basic-infixes)
 
-(transient-define-suffix ts--read-prefix-scope ()
+(transient-define-suffix tsc--read-prefix-scope ()
   "Read the scope of the prefix."
   :transient 'transient--do-call
   (interactive)
   (let ((scope (oref transient-current-prefix scope)))
     (message "scope: %s" scope)))
 
-(transient-define-suffix ts--double-scope-re-enter ()
+(transient-define-suffix tsc--double-scope-re-enter ()
   "Re-enter the current prefix with double the scope."
   ;; :transient 'transient--do-replace ; builds up the stack
   :transient 'transient--do-exit
@@ -436,7 +436,7 @@
       (message (propertize (format "scope was non-numeric! %s" scope) 'face 'warning))
       (transient-setup transient-current-command))))
 
-(transient-define-suffix ts--update-scope-with-prefix-re-enter (new-scope)
+(transient-define-suffix tsc--update-scope-with-prefix-re-enter (new-scope)
   "Re-enter the prefix with double the scope."
   ;; :transient 'transient--do-replace ; builds up the stack
   :transient 'transient--do-exit ; do not build up the stack
@@ -444,36 +444,36 @@
   (message "universal arg: %s" new-scope)
   (transient-setup transient-current-command nil nil :scope new-scope))
 
-(transient-define-prefix ts-scope (scope)
+(transient-define-prefix tsc-scope (scope)
   "Prefix demonstrating use of scope."
 
   ;; note!  this is a location where we definitely had to use
-  ;; `transient--prefix' or get the transient object from the ts-scope symbol.
+  ;; `transient--prefix' or get the transient object from the tsc-scope symbol.
   ;; `transient-current-prefix' is not correct here!
   [:description (lambda () (format "Scope: %s" (oref transient--prefix scope)))
-   [("r" "read scope" ts--read-prefix-scope)
-    ("d" "double scope" ts--double-scope-re-enter)
-    ("o" "update scope (use prefix argument)" ts--update-scope-with-prefix-re-enter)]]
+   [("r" "read scope" tsc--read-prefix-scope)
+    ("d" "double scope" tsc--double-scope-re-enter)
+    ("o" "update scope (use prefix argument)" tsc--update-scope-with-prefix-re-enter)]]
   (interactive "P")
-  (transient-setup 'ts-scope nil nil :scope scope))
+  (transient-setup 'tsc-scope nil nil :scope scope))
 
 ;; Setting an interactive argument for `eval-last-sexp' is a little different
-;; (let ((current-prefix-arg 4)) (call-interactively 'ts-scope))
+;; (let ((current-prefix-arg 4)) (call-interactively 'tsc-scope))
 
-;; (ts-scope)
+;; (tsc-scope)
 ;; Then press "C-u 4 o" to update the scope
 ;; Then d to double
 ;; Then r to read
 ;; ... and so on
 ;; C-g to exit
 
-(transient-define-suffix ts-suffix-eat-snowcone (args)
+(transient-define-suffix tsc-suffix-eat-snowcone (args)
   "Eat the snowcone!
-This command can be called from it's parent, `ts-snowcone-eater' or independently."
+This command can be called from it's parent, `tsc-snowcone-eater' or independently."
   :transient t
   ;; you can use the interactive form of a command to obtain a default value
   ;; from the user etc if the one obtained from the parent is invalid.
-  (interactive (list (transient-args 'ts-snowcone-eater)))
+  (interactive (list (transient-args 'tsc-snowcone-eater)))
 
   ;; `transient-arg-value' can (with varying success) pick out individual
   ;; values from the results of `transient-args'.
@@ -482,10 +482,10 @@ This command can be called from it's parent, `ts-snowcone-eater' or independentl
         (flavor (transient-arg-value "--flavor=" args)))
     (message "I ate a %s flavored snowcone with %s on top!" flavor topping)))
 
-(transient-define-prefix ts-snowcone-eater ()
+(transient-define-prefix tsc-snowcone-eater ()
   "Prefix demonstrating set & save infix persistence."
 
-  ;; This prefix has a default value that ts-suffix-eat-snowcone can see
+  ;; This prefix has a default value that tsc-suffix-eat-snowcone can see
   ;; even before the prefix has been called.
   :value '("--topping=fruit" "--flavor=cherry")
 
@@ -506,53 +506,53 @@ This command can be called from it's parent, `ts-snowcone-eater' or independentl
     (lambda () (interactive) (message "reset!") (transient-reset)) :transient t)]
 
   ["Actions"
-   ("m" "message arguments" ts-suffix-print-args)
-   ("e" "eat snowcone" ts-suffix-eat-snowcone)])
+   ("m" "message arguments" tsc-suffix-print-args)
+   ("e" "eat snowcone" tsc-suffix-eat-snowcone)])
 
 ;; First call will use the transient's default value
-;; M-x ts-suffix-eat-snowcone or `eval-last-sexp' below
-;; (call-interactively 'ts-suffix-eat-snowcone)
-;; (ts-snowcone-eater)
+;; M-x tsc-suffix-eat-snowcone or `eval-last-sexp' below
+;; (call-interactively 'tsc-suffix-eat-snowcone)
+;; (tsc-snowcone-eater)
 ;; Eat some snowcones with different flavors
 ;; ...
 ;; ...
 ;; ...
 ;; Now save the value and exit the transient.
 ;; When you call the suffix independently, it can still read the saved values!
-;; M-x ts-suffix-eat-snowcone or `eval-last-sexp' below
-;; (call-interactively 'ts-suffix-eat-snowcone)
+;; M-x tsc-suffix-eat-snowcone or `eval-last-sexp' below
+;; (call-interactively 'tsc-suffix-eat-snowcone)
 
-(transient-define-prefix ts-ping ()
+(transient-define-prefix tsc-ping ()
   "Prefix demonstrating history sharing."
 
   :history-key 'non-unique-name
 
   ["Ping"
    ("-g" "game" "--game=")
-   ("p" "ping the pong" ts-pong)
-   ("a" "print args" ts-suffix-print-args :transient nil)])
+   ("p" "ping the pong" tsc-pong)
+   ("a" "print args" tsc-suffix-print-args :transient nil)])
 
-(transient-define-prefix ts-pong ()
+(transient-define-prefix tsc-pong ()
   "Prefix demonstrating history sharing."
 
   :history-key 'non-unique-name
 
   ["Pong"
    ("-g" "game" "--game=")
-   ("p" "pong the ping" ts-ping)
-   ("a" "print args" ts-suffix-print-args :transient nil)])
+   ("p" "pong the ping" tsc-ping)
+   ("a" "print args" tsc-suffix-print-args :transient nil)])
 
-;; (ts-ping)
+;; (tsc-ping)
 ;; Okay here's where it gets weird
 ;; 1.  Set the value of game to something and remember it
 ;; 2.  Press a to print the args
-;; 3.  Re-open ts-ping.
+;; 3.  Re-open tsc-ping.
 ;; 4.  C-x p to load the previous history, see the old value?
-;; 5.  p to switch to the ts-pong transient
-;; 6.  C-x p to load the previous history, see the old value from ts-ping???
-;; 7. Note that ts-pong uses the same history as ts-ping!
+;; 5.  p to switch to the tsc-pong transient
+;; 6.  C-x p to load the previous history, see the old value from tsc-ping???
+;; 7. Note that tsc-pong uses the same history as tsc-ping!
 
-(transient-define-prefix ts-goldfish ()
+(transient-define-prefix tsc-goldfish ()
   "A prefix that cannot remember anything."
   ["Goldfish"
    ("-r" "rememeber" "--i-remember="
@@ -560,11 +560,11 @@ This command can be called from it's parent, `ts-snowcone-eater' or independentl
     :always-read t ; infix always asks for new value
     ;; overriding the method to provide a starting value
     :init-value (lambda (obj) (oset obj value "nothing")))
-   ("a" "print args" ts-suffix-print-args :transient nil)])
+   ("a" "print args" tsc-suffix-print-args :transient nil)])
 
-;; (ts-goldfish)
+;; (tsc-goldfish)
 
-(transient-define-suffix ts-suffix-remember-and-wave ()
+(transient-define-suffix tsc-suffix-remember-and-wave ()
   "Wave, and force the prefix to set it's saveable infix values."
   (interactive)
 
@@ -576,17 +576,17 @@ This command can be called from it's parent, `ts-snowcone-eater' or independentl
 
   (message "Waves at user at: %s.  You will never be forgotten." (current-time-string)))
 
-(transient-define-prefix ts-elephant ()
+(transient-define-prefix tsc-elephant ()
   "A prefix that always remembers its infixes."
   ["Elephant"
    ("-r" "rememeber" "--i-remember="
     :always-read t)
-   ("w" "remember and wave" ts-suffix-remember-and-wave)
-   ("a" "print args (skips remembering)" ts-suffix-print-args :transient nil)])
+   ("w" "remember and wave" tsc-suffix-remember-and-wave)
+   ("a" "print args (skips remembering)" tsc-suffix-print-args :transient nil)])
 
-;; (ts-elephant)
+;; (tsc-elephant)
 
-(transient-define-prefix ts-default-values ()
+(transient-define-prefix tsc-default-values ()
   "A prefix with a default value."
 
   :value '("--toggle" "--value=5")
@@ -596,48 +596,48 @@ This command can be called from it's parent, `ts-snowcone-eater' or independentl
    ("v" "value" "--value=" :prompt "an integer: ")]
 
   ["Show Args"
-   ("s" "show arguments" ts-suffix-print-args)])
+   ("s" "show arguments" tsc-suffix-print-args)])
 
-;; (ts-default-values)
+;; (tsc-default-values)
 
-(transient-define-prefix ts-enforcing-inputs ()
+(transient-define-prefix tsc-enforcing-inputs ()
   "A prefix with enforced input type."
 
   ["Arguments"
    ("v" "value" "--value=" :prompt "an integer: " :reader transient-read-number-N+)]
 
   ["Show Args"
-   ("s" "show arguments" ts-suffix-print-args)])
+   ("s" "show arguments" tsc-suffix-print-args)])
 
-;; (ts-enforcing-inputs)
+;; (tsc-enforcing-inputs)
 
-(defvar ts--position '(0 0) "A transient prefix location.")
+(defvar tsc--position '(0 0) "A transient prefix location.")
 
-  (transient-define-infix ts--pos-infix ()
+  (transient-define-infix tsc--pos-infix ()
     "A location, key, or command symbol."
     :class 'transient-lisp-variable
     :transient t
-    :prompt "An expression such as (0 0), \"p\", nil, 'ts--msg-pos: "
-    :variable 'ts--position)
+    :prompt "An expression such as (0 0), \"p\", nil, 'tsc--msg-pos: "
+    :variable 'tsc--position)
 
-  (transient-define-suffix ts--msg-pos ()
+  (transient-define-suffix tsc--msg-pos ()
     "Message the element at location."
     :transient 'transient--do-call
     (interactive)
     ;; lisp variables are not sent in the usual (transient-args) list.
-    ;; Just read `ts--position' directly.
-    (let ((suffix (transient-get-suffix transient-current-command ts--position)))
+    ;; Just read `tsc--position' directly.
+    (let ((suffix (transient-get-suffix transient-current-command tsc--position)))
       (message "%s" (oref suffix description))))
 
-  (transient-define-prefix ts-lisp-variable ()
+  (transient-define-prefix tsc-lisp-variable ()
     "A prefix that updates and uses a lisp variable."
     ["Location Printing"
-     [("p" "position" ts--pos-infix)]
-     [("m" "message" ts--msg-pos)]])
+     [("p" "position" tsc--pos-infix)]
+     [("m" "message" tsc--msg-pos)]])
 
-  ;; (ts-lisp-variable)
+  ;; (tsc-lisp-variable)
 
-(transient-define-prefix ts-switches-and-arguments (arg)
+(transient-define-prefix tsc-switches-and-arguments (arg)
   "A prefix with switch and argument examples."
   [["Arguments"
     ("-s" "switch" "--switch")
@@ -651,12 +651,12 @@ This command can be called from it's parent, `ts-snowcone-eater' or independentl
     ("S" "inline shortarg switch" ("-n" "--inline-shortarg-switch"))]]
 
   ["Commands"
-   ("w" "wave some" ts-wave)
-   ("s" "show arguments" ts-suffix-print-args)]) ; use to analyze the switch values
+   ("w" "wave some" tsc-wave)
+   ("s" "show arguments" tsc-suffix-print-args)]) ; use to analyze the switch values
 
-;; (ts-switches-and-arguments)
+;; (tsc-switches-and-arguments)
 
-(transient-define-infix ts--random-init-infix ()
+(transient-define-infix tsc--random-init-infix ()
   "Switch on and off."
   :argument "--switch"
   :shortarg "-s" ; will be used for :key when key is not set
@@ -665,36 +665,36 @@ This command can be called from it's parent, `ts-snowcone-eater' or independentl
                 (oset obj value
                       (eq 0 (random 2))))) ; write t with 50% probability
 
-(transient-define-prefix ts-maybe-on ()
+(transient-define-prefix tsc-maybe-on ()
   "A prefix with a randomly intializing switch."
   ["Arguments"
-   (ts--random-init-infix)]
+   (tsc--random-init-infix)]
   ["Show Args"
-   ("s" "show arguments" ts-suffix-print-args)])
+   ("s" "show arguments" tsc-suffix-print-args)])
 
-;; (ts-maybe-on)
-;; (ts-maybe-on)
+;; (tsc-maybe-on)
+;; (tsc-maybe-on)
 ;; ...
-;; Run the command a few times to see the random initialization of `ts--random-init-infix'
+;; Run the command a few times to see the random initialization of `tsc--random-init-infix'
 ;; It will only take more than ten tries for one in a thousand users.  Good luck.
 
-(transient-define-argument ts--animals-argument ()
+(transient-define-argument tsc--animals-argument ()
   "Animal picker."
   :argument "--animals="
   ; :multi-value t ; multi-value can be set to --animals=fox,otter,kitten etc
   :class 'transient-option
   :choices '("fox" "kitten" "peregrine" "otter"))
 
-(transient-define-prefix ts-animal-choices ()
+(transient-define-prefix tsc-animal-choices ()
   "Prefix demonstrating selecting animals from choices."
   ["Arguments"
-   ("-a" "--animals=" ts--animals-argument)]
+   ("-a" "--animals=" tsc--animals-argument)]
   ["Show Args"
-   ("s" "show arguments" ts-suffix-print-args)])
+   ("s" "show arguments" tsc-suffix-print-args)])
 
-;; (ts-animal-choices)
+;; (tsc-animal-choices)
 
-(transient-define-argument ts--snowcone-flavor ()
+(transient-define-argument tsc--snowcone-flavor ()
   :description "Flavor of snowcone."
   :class 'transient-switches
   :key "f"
@@ -702,18 +702,18 @@ This command can be called from it's parent, `ts-snowcone-eater' or independentl
   :argument-regexp "\\(--\\(grape\\|orange\\|cherry\\|lime\\)-snowcone\\)"
   :choices '("grape" "orange" "cherry" "lime"))
 
-(transient-define-prefix ts-exclusive-switches ()
+(transient-define-prefix tsc-exclusive-switches ()
   "Prefix demonstrating exclusive switches."
   :value '("--orange-snowcone")
 
   ["Arguments"
-   (ts--snowcone-flavor)]
+   (tsc--snowcone-flavor)]
   ["Show Args"
-   ("s" "show arguments" ts-suffix-print-args)])
+   ("s" "show arguments" tsc-suffix-print-args)])
 
-;; (ts-exclusive-switches)
+;; (tsc-exclusive-switches)
 
-(transient-define-prefix ts-incompatible ()
+(transient-define-prefix tsc-incompatible ()
   "Prefix demonstrating incompatible switches."
   ;; update your transient version if you experience #129 / #155
   :incompatible '(("--switch" "--value=")
@@ -730,11 +730,11 @@ This command can be called from it's parent, `ts-snowcone-eater' or independentl
    ("C-a" "special arg" "--special-arg=")]
 
   ["Show Args"
-   ("s" "show arguments" ts-suffix-print-args)])
+   ("s" "show arguments" tsc-suffix-print-args)])
 
-;; (ts-incompatible)
+;; (tsc-incompatible)
 
-(defun ts--animal-choices (_complete-me _predicate flag)
+(defun tsc--animal-choices (_complete-me _predicate flag)
   "Programmed completion for animal choice.
 _COMPLETE-ME: whatever the user has typed so far
 _PREDICATE: function you should use to filter candidates (only nil seen so far)
@@ -752,30 +752,30 @@ FLAG: request for metadata (which can be disrespected)"
         '("fox" "kitten" "otter")
       '("ant" "peregrine" "zebra"))))
 
-(transient-define-prefix ts-choices-with-completions ()
+(transient-define-prefix tsc-choices-with-completions ()
   "Prefix with completions for choices."
   ["Arguments"
    ("-a" "Animal" "--animal="
     :always-read t ; don't allow unsetting, just read a new value
-    :choices ts--animal-choices)]
+    :choices tsc--animal-choices)]
   ["Show Args"
-   ("s" "show arguments" ts-suffix-print-args)])
+   ("s" "show arguments" tsc-suffix-print-args)])
 
-;; (ts-choices-with-completions)
+;; (tsc-choices-with-completions)
 
-(defun ts--quit-cowsay ()
+(defun tsc--quit-cowsay ()
   "Kill the cowsay buffer and exit."
   (interactive)
   (kill-buffer "*cowsay*"))
 
-(defun ts--cowsay-buffer-exists-p ()
+(defun tsc--cowsay-buffer-exists-p ()
   "Visibility predicate."
   (not (equal (get-buffer "*cowsay*") nil)))
 
-(transient-define-suffix ts--cowsay-clear-buffer (&optional buffer)
+(transient-define-suffix tsc--cowsay-clear-buffer (&optional buffer)
   "Delete the *cowsay* buffer.  Optional BUFFER name."
   :transient 'transient--do-call
-  :if 'ts--cowsay-buffer-exists-p
+  :if 'tsc--cowsay-buffer-exists-p
   (interactive) ; todo look at "b" interactive code
 
   (save-excursion
@@ -783,7 +783,7 @@ FLAG: request for metadata (which can be disrespected)"
       (set-buffer buffer)
       (delete-region 1 (+ 1 (buffer-size))))))
 
-(transient-define-suffix ts--cowsay (&optional args)
+(transient-define-suffix tsc--cowsay (&optional args)
   "Run cowsay."
   (interactive (list (transient-args transient-current-command)))
   (let* ((buffer "*cowsay*")
@@ -800,12 +800,12 @@ FLAG: request for metadata (which can be disrespected)"
                      args)
                  cowmsg)))
 
-    (when (ts--cowsay-buffer-exists-p)
-      (ts--cowsay-clear-buffer))
+    (when (tsc--cowsay-buffer-exists-p)
+      (tsc--cowsay-clear-buffer))
     (apply #'call-process "cowsay" nil buffer nil args)
     (switch-to-buffer buffer)))
 
-(transient-define-prefix ts-cowsay ()
+(transient-define-prefix tsc-cowsay ()
   "Say things with animals!"
 
   ; only one kind of eyes is meaningful at a time
@@ -822,47 +822,47 @@ FLAG: request for metadata (which can be disrespected)"
     ("w" "wired" "-w")
     ("y" "youthful" "-y")]
    ["Actions"
-    ("c" "cowsay" ts--cowsay :transient transient--do-call)
+    ("c" "cowsay" tsc--cowsay :transient transient--do-call)
     ""
-    ("d" "delete buffer" ts--cowsay-clear-buffer)
-    ("q" "quit" ts--quit-cowsay)]])
+    ("d" "delete buffer" tsc--cowsay-clear-buffer)
+    ("q" "quit" tsc--quit-cowsay)]])
 
-;; (ts-cowsay)
+;; (tsc-cowsay)
 
-(transient-define-prefix ts-visibility-predicates ()
+(transient-define-prefix tsc-visibility-predicates ()
   "Prefix with visibility predicates.
 Try opening this prefix in buffers with modes deriving from different
 abstract major modes."
   ["Empty Groups Not Displayed"
    ;; in org mode for example, this group doesn't appear.
-   ("we" "wave elisp" ts-suffix-wave :if-mode emacs-lisp-mode)
-   ("wc" "wave in C" ts-suffix-wave :if-mode cc-mode)]
+   ("we" "wave elisp" tsc-suffix-wave :if-mode emacs-lisp-mode)
+   ("wc" "wave in C" tsc-suffix-wave :if-mode cc-mode)]
 
   ["Lists of Modes"
-   ("wm" "wave multiply" ts-suffix-wave :if-mode (dired-mode gnus-mode))]
+   ("wm" "wave multiply" tsc-suffix-wave :if-mode (dired-mode gnus-mode))]
 
   [["Function Predicates"
     ;; note, after toggling, the transient needs to be re-displayed for the
     ;; predicate to take effect
-    ("b" "toggle busy" ts--toggle-busy)
-    ("bw" "wave busily" ts-suffix-wave :if ts--busy-p)]
+    ("b" "toggle busy" tsc--toggle-busy)
+    ("bw" "wave busily" tsc-suffix-wave :if tsc--busy-p)]
 
    ["Programming Actions"
     :if-derived prog-mode
-    ("pw" "wave programishly" ts-suffix-wave)
-    ("pe" "wave in elisp" ts-suffix-wave :if emacs-lisp-mode)]
+    ("pw" "wave programishly" tsc-suffix-wave)
+    ("pe" "wave in elisp" tsc-suffix-wave :if emacs-lisp-mode)]
    ["Special Mode Actions"
     :if-derived special-mode
-    ("sw" "wave specially" ts-suffix-wave)
-    ("sd" "wave dired" ts-suffix-wave :if-mode dired-mode)]
+    ("sw" "wave specially" tsc-suffix-wave)
+    ("sd" "wave dired" tsc-suffix-wave :if-mode dired-mode)]
    ["Text Mode Actions"
     :if-derived text-mode
-    ("tw" "wave textually" ts-suffix-wave)
-    ("to" "wave org-modeishly" ts-suffix-wave :if-mode org-mode)]])
+    ("tw" "wave textually" tsc-suffix-wave)
+    ("to" "wave org-modeishly" tsc-suffix-wave :if-mode org-mode)]])
 
-;; (ts-visibility-predicates)
+;; (tsc-visibility-predicates)
 
-(defun ts--child-scope-p ()
+(defun tsc--child-scope-p ()
   "Return the scope of the current transient.
 When this is called in layouts, it's the transient being layed out"
   (let ((scope (oref transient--prefix scope)))
@@ -872,59 +872,59 @@ When this is called in layouts, it's the transient being layed out"
 ;; the wave suffixes were :transient t as defined, so we need to manually
 ;; override them to the `transient--do-return' value for :transient slot so
 ;; that they return back to the parent.
-(transient-define-prefix ts--inapt-children ()
+(transient-define-prefix tsc--inapt-children ()
   "Prefix with children using inapt predicates."
   ["Inapt Predicates Child"
-   ("s" "switched" ts--wave-surely
+   ("s" "switched" tsc--wave-surely
     :transient transient--do-return
-    :if ts--child-scope-p)
-   ("u" "unswitched" ts--wave-normally
+    :if tsc--child-scope-p)
+   ("u" "unswitched" tsc--wave-normally
     :transient transient--do-return
-    :if-not ts--child-scope-p)]
+    :if-not tsc--child-scope-p)]
 
   ;; in the body, we read the value of the parent and set our scope to
   ;; non-nil if the switch is set
   (interactive)
-  (let ((scope (transient-arg-value "--switch" (transient-args 'ts-inapt-parent))))
+  (let ((scope (transient-arg-value "--switch" (transient-args 'tsc-inapt-parent))))
     (message "scope: %s" scope)
     (message "type: %s" (type-of scope))
-    (transient-setup 'ts--inapt-children nil nil :scope (if scope t nil))))
+    (transient-setup 'tsc--inapt-children nil nil :scope (if scope t nil))))
 
-(transient-define-prefix ts-inapt-parent ()
+(transient-define-prefix tsc-inapt-parent ()
   "Prefix that configures child with inapt predicates."
 
   [("-s" "switch" "--switch")
-   ("a" "show arguments" ts-suffix-print-args)
-   ("c" "launch child prefix" ts--inapt-children :transient transient--do-recurse)])
+   ("a" "show arguments" tsc-suffix-print-args)
+   ("c" "launch child prefix" tsc--inapt-children :transient transient--do-recurse)])
 
-;; (ts-inapt-parent)
+;; (tsc-inapt-parent)
 
-(transient-define-prefix ts-levels-and-visibility ()
+(transient-define-prefix tsc-levels-and-visibility ()
   "Prefix with visibility levels for hiding rarely used commands."
 
   [["Setting the Current Level"
     ;; this binding is normally not displayed.  The value of
     ;; `transient-show-common-commands' controls this by default.
     ("C-x l" "set level" transient-set-level)
-    ("s" "show level" ts-suffix-show-level)]
+    ("s" "show level" tsc-suffix-show-level)]
 
    [2 "Per Group" ; 1 is the default default-child-level
-      ("ws" "wave surely" ts--wave-surely) ; 1 is the default default-child-level
-      (3"wn" "wave normally" ts--wave-normally)
-      (5"wb" "wave non-essentially" ts--wave-non-essentially)]
+      ("ws" "wave surely" tsc--wave-surely) ; 1 is the default default-child-level
+      (3"wn" "wave normally" tsc--wave-normally)
+      (5"wb" "wave non-essentially" tsc--wave-non-essentially)]
 
    [3 "Per Group Somewhat Useful"
-      ("wd" "wave definitely" ts--wave-definitely)]
+      ("wd" "wave definitely" tsc--wave-definitely)]
 
    [6 "Groups hide visible children"
-      (1 "wh" "wave hidden" ts--wave-hidden)]
+      (1 "wh" "wave hidden" tsc--wave-hidden)]
 
    [5 "Per Group Rarely Useful"
-      ("we" "wave eventually" ts--wave-eventually)]])
+      ("we" "wave eventually" tsc--wave-eventually)]])
 
-;; (ts-levels-and-visibility)
+;; (tsc-levels-and-visibility)
 
-(transient-define-prefix ts-generated-child ()
+(transient-define-prefix tsc-generated-child ()
   "Prefix that uses `setup-children' to generate single child."
 
   ["Replace this child"
@@ -943,9 +943,9 @@ When this is called in layouts, it's the transient being layed out"
                                (interactive)
                                (message "You should replace me!")))])
 
-;; (ts-generated-child)
+;; (tsc-generated-child)
 
-(transient-define-prefix ts-generated-group ()
+(transient-define-prefix tsc-generated-group ()
   "Prefix that uses `setup-children' to generate a group."
 
   ["Replace this child"
@@ -964,13 +964,13 @@ When this is called in layouts, it's the transient being layed out"
                                (interactive)
                                (message "You should replace me!")))])
 
-;; (ts-generated-group)
+;; (tsc-generated-group)
 
 ;; The children we will be picking can be of several forms.  The
 ;; transient--layout symbol property of a prefix is a vector of vectors, lists,
 ;; and strings.  It's not the actual eieio types or we would use
 ;; `transient-format-description' to just ask them for the descriptions.
-(defun ts--layout-child-desc (layout-child)
+(defun tsc--layout-child-desc (layout-child)
   "Get the description from LAYOUT-CHILD.
 LAYOUT-CHILD is a transient layout vector or list."
   (let ((description
@@ -991,7 +991,7 @@ LAYOUT-CHILD is a transient layout vector or list."
 ;; We repeat the read using a lisp expression from `read-from-minibuffer' to get
 ;; the LOC key for `transient-get-suffix' until we get a valid result.  This
 ;; ensures we don't store an invalid LOC.
-(defun ts-child-infix--reader (prompt initial-input history)
+(defun tsc-child-infix--reader (prompt initial-input history)
   "Read a location and check that it exists within the current transient.
 PROMPT, INITIAL-INPUT, and HISTORY are forwarded to `read-from-minibuffer'."
   (let ((command (oref transient--prefix command))
@@ -1009,21 +1009,21 @@ PROMPT, INITIAL-INPUT, and HISTORY are forwarded to `read-from-minibuffer'."
     success))
 
 ;; Inherit from variable abstract class
-(defclass ts-child-infix (transient-variable)
+(defclass tsc-child-infix (transient-variable)
   ((value-object :initarg value-object :initform nil)
    ;; this is a new slot for storing the hydrated value.  we re-use the
    ;; value infrastructure for storing the serialization-friendly value,
    ;; which is basically a suffix addres or id.
 
-   (reader :initform #'ts-child-infix--reader)
-   (prompt :initform "Location, a key \"c\", suffix-command-symbol like ts--wave-normally or coordinates like (0 2 0): ")))
+   (reader :initform #'tsc-child-infix--reader)
+   (prompt :initform "Location, a key \"c\", suffix-command-symbol like tsc--wave-normally or coordinates like (0 2 0): ")))
 
 ;; We have to define this on non-abstract infix classes.  See
 ;; `transient-init-value' in transient source.  The method on
 ;; `transient-argument' class is the best example for initializing your
 ;; suffix based on the prefix's value, but it does support a lot of
 ;; behaviors.
-(cl-defmethod transient-init-value ((obj ts-child-infix))
+(cl-defmethod transient-init-value ((obj tsc-child-infix))
   "Set the `value' and `value-object' slots using the prefix's value."
   (let* ((prefix-value (oref transient--prefix value))
          (key (oref obj command))
@@ -1032,7 +1032,7 @@ PROMPT, INITIAL-INPUT, and HISTORY are forwarded to `read-from-minibuffer'."
     (oset obj value value)
     (oset obj value-object value-object)))
 
-(cl-defmethod transient-infix-set ((obj ts-child-infix) value)
+(cl-defmethod transient-infix-set ((obj tsc-child-infix) value)
   "Update `value' slot to VALUE.
 Update `value-object' slot to the value corresponding to VALUE."
   (let* ((command (oref transient--prefix command))
@@ -1044,7 +1044,7 @@ Update `value-object' slot to the value corresponding to VALUE."
 ;; method.  You also need this method if your value needs some processing
 ;; or use of an alternate value for later rehydration.  Tell the prefix
 ;; what to store when setting / saving
-(cl-defmethod transient-infix-value ((obj ts-child-infix))
+(cl-defmethod transient-infix-value ((obj tsc-child-infix))
   "Return our actual value for rehydration later."
 
   ;; this is almost identical to the method defined for `transient-infix',
@@ -1052,63 +1052,63 @@ Update `value-object' slot to the value corresponding to VALUE."
   (list (oref obj command) (oref obj value)))
 
 ;; Show user's a useful representation of your ugly value
-(cl-defmethod transient-format-value ((obj ts-child-infix))
+(cl-defmethod transient-format-value ((obj tsc-child-infix))
   "All transient children have some description we can display.
 Show either the child's description or a default if no child is selected."
   (if-let* ((value (and (slot-boundp obj 'value) (oref obj value)))
             (value-object (and (slot-boundp obj 'value-object)
                                (oref obj value-object))))
       (propertize
-       (format "(%s)" (ts--layout-child-desc value-object))
+       (format "(%s)" (tsc--layout-child-desc value-object))
        'face 'transient-value)
     (propertize "¯\_(ツ)_/¯" 'face 'transient-inactive-value)))
 
 ;; Now that we have our class defined, we can create an infix the usual
 ;; way, just specifying our class
-(transient-define-infix ts--inception-child-infix ()
-  :class ts-child-infix)
+(transient-define-infix tsc--inception-child-infix ()
+  :class tsc-child-infix)
 
 ;; All set!  This transient just tests our or new toy.
-(transient-define-prefix ts-inception ()
+(transient-define-prefix tsc-inception ()
   "Prefix that picks a suffix from its own layout."
 
   [["Pick a suffix"
     ("-s" "just a switch" "--switch") ; makes history value structure apparent
-    ("c" "child" ts--inception-child-infix :class ts-child-infix)]
+    ("c" "child" tsc--inception-child-infix :class tsc-child-infix)]
 
    ["Some suffixes"
-    ("s" "wave surely" ts--wave-surely)
-    ("d" "wave definitely" ts--wave-definitely)
-    ("e" "wave eventually" ts--wave-eventually)
-    ("C" "call & exit normally" ts--wave-normally :transient nil)]
+    ("s" "wave surely" tsc--wave-surely)
+    ("d" "wave definitely" tsc--wave-definitely)
+    ("e" "wave eventually" tsc--wave-eventually)
+    ("C" "call & exit normally" tsc--wave-normally :transient nil)]
 
    ["Read variables"
-    ("r" "read args" ts-suffix-print-args )]])
+    ("r" "read args" tsc-suffix-print-args )]])
 
-;; (ts-inception)
+;; (tsc-inception)
 ;; Try setting the infix to "e" (yes, include quotes)
 ;; Try: (1 2)
-;; Try: ts--wave-normally
+;; Try: tsc--wave-normally
 ;; Set the infix and re-open it
 ;; Save the infix, re-evaluate the prefix, and open the prefix again
 ;; Try flipping through history
 ;; Now do think of doing things like this with org ids, magit-sections, buffers etc.
 
-(transient-define-suffix ts--inception-update-description ()
+(transient-define-suffix tsc--inception-update-description ()
    "Update the description of of the selected child."
    (interactive)
    (let* ((args (transient-args transient-current-command))
           (description (transient-arg-value "--description=" args))
           ;; This is the part where we read the other infix
-          (loc (car (cdr (assoc 'ts--inception-child-infix args))))
-          (layout-child (transient-get-suffix 'ts-inception-update loc)))
+          (loc (car (cdr (assoc 'tsc--inception-child-infix args))))
+          (layout-child (transient-get-suffix 'tsc-inception-update loc)))
      (cond
       ;; Once again, do different bodies based on what we found at the layout locition.
       ((or (listp layout-child) ; child
           (vectorp layout-child) ; group
           (stringp layout-child)) ; string child
        (if (stringp layout-child)
-           (transient-replace-suffix 'ts-inception-update loc description) ; plain-text child
+           (transient-replace-suffix 'tsc-inception-update loc description) ; plain-text child
          (plist-put (elt layout-child 2) :description description)))
       (t (message (propertize (format
                                "Don't know how to modify whatever is at: %s"
@@ -1116,26 +1116,26 @@ Show either the child's description or a default if no child is selected."
      ;; re-enter the transient manually to display the modified layout
      (transient-setup transient-current-command)))
 
-(transient-define-prefix ts-inception-update ()
+(transient-define-prefix tsc-inception-update ()
   "Prefix that picks and updates its own suffix."
 
   [["Pick a suffix"
-    ("c" "child" ts--inception-child-infix)]
+    ("c" "child" tsc--inception-child-infix)]
 
    ["Update the description!"
     ("-d" "description" "--description=") ; makes history value structure apparent
-    ("u" "update" ts--inception-update-description :transient transient--do-exit)]
+    ("u" "update" tsc--inception-update-description :transient transient--do-exit)]
 
    ["Some suffixes"
-    ("s" "wave surely" ts--wave-surely)
-    ("d" "wave definitely" ts--wave-definitely)
-    ("e" "wave eventually" ts--wave-eventually)
-    ("C" "call & exit normally" ts--wave-normally :transient nil)]
+    ("s" "wave surely" tsc--wave-surely)
+    ("d" "wave definitely" tsc--wave-definitely)
+    ("e" "wave eventually" tsc--wave-eventually)
+    ("C" "call & exit normally" tsc--wave-normally :transient nil)]
 
    ["Read variables"
-    ("r" "read args" ts-suffix-print-args )]])
+    ("r" "read args" tsc-suffix-print-args )]])
 
-;; (ts-inception-update)
+;; (tsc-inception-update)
 ;; Pick a suffix,
 ;; Then set the description
 ;; Then update the suffix's you picked with the new description!
@@ -1143,62 +1143,62 @@ Show either the child's description or a default if no child is selected."
 ;; Try to rename a group, such as (0 0)
 ;; Rename the very outer group, (0)
 
-(transient-define-prefix ts-showcase ()
+(transient-define-prefix tsc-showcase ()
   "A launcher for a currated selection of examples.
 While most of the prefixes have their :transient slot set to t, it's not
 possible to return from all of them, especially if they demonstrate flow
 control such as replacing or exiting."
 
   [["Layouts"
-    ("ls" "stacked" ts-layout-stacked :transient t)
-    ("lc" "columns" ts-layout-columns :transient t)
-    ("lt" "stacked columns" ts-layout-stacked-columns :transient t)
-    ("lg" "grid" ts-layout-the-grid :transient t)
-    ("lp" "spaced out" ts-layout-spaced-out :transient t)
-    ("le" "explicit class" ts-layout-explicit-classes :transient t)
-    ("ld" "descriptions" ts-layout-descriptions :transient t)
+    ("ls" "stacked" tsc-layout-stacked :transient t)
+    ("lc" "columns" tsc-layout-columns :transient t)
+    ("lt" "stacked columns" tsc-layout-stacked-columns :transient t)
+    ("lg" "grid" tsc-layout-the-grid :transient t)
+    ("lp" "spaced out" tsc-layout-spaced-out :transient t)
+    ("le" "explicit class" tsc-layout-explicit-classes :transient t)
+    ("ld" "descriptions" tsc-layout-descriptions :transient t)
     ;; padded description to sc
-    ("lD" "dynamic descriptions        " ts-layout-dynamic-descriptions :transient t)]
+    ("lD" "dynamic descriptions        " tsc-layout-dynamic-descriptions :transient t)]
 
    ["Nesting & Flow Control"
-    ("fs" "stay transient" ts-stay-transient :transient t)
-    ("fb" "binding sub-prefix" ts-simple-parent :transient t)
-    ("fr" "sub-prefix with return" ts-simple-parent-with-return :transient t)
-    ("fm" "manual setup in suffix" ts-parent-with-setup-suffix :transient t)
-    ("fi" "mixing interactive" ts-interactive-basic :transient t)
-    ("fe" "early return" ts-simple-messager :transient t)]]
+    ("fs" "stay transient" tsc-stay-transient :transient t)
+    ("fb" "binding sub-prefix" tsc-simple-parent :transient t)
+    ("fr" "sub-prefix with return" tsc-simple-parent-with-return :transient t)
+    ("fm" "manual setup in suffix" tsc-parent-with-setup-suffix :transient t)
+    ("fi" "mixing interactive" tsc-interactive-basic :transient t)
+    ("fe" "early return" tsc-simple-messager :transient t)]]
 
    [["Managing State" ; padded right group
-    ("sb" "a bunch of infixes" ts-basic-infixes :transient t)
-    ("sc" "using scope (accepts prefix)" ts-scope :transient t)
-    ("sn" "set & save / snowcones" ts-snowcone-eater :transient t)
-    ("sp" "history key / ping-pong" ts-ping :transient t)
-    ("sg" "always forget / goldfish" ts-goldfish :transient t)
-    ("se" "always remember / elephant" ts-elephant :transient t)
-    ("sd" "default values" ts-default-values :transient t)
-    ("sf" "enforcing inputs" ts-enforcing-inputs :transient t)
-    ("sl" "lisp variables" ts-lisp-variable :transient t)]
+    ("sb" "a bunch of infixes" tsc-basic-infixes :transient t)
+    ("sc" "using scope (accepts prefix)" tsc-scope :transient t)
+    ("sn" "set & save / snowcones" tsc-snowcone-eater :transient t)
+    ("sp" "history key / ping-pong" tsc-ping :transient t)
+    ("sg" "always forget / goldfish" tsc-goldfish :transient t)
+    ("se" "always remember / elephant" tsc-elephant :transient t)
+    ("sd" "default values" tsc-default-values :transient t)
+    ("sf" "enforcing inputs" tsc-enforcing-inputs :transient t)
+    ("sl" "lisp variables" tsc-lisp-variable :transient t)]
 
   ["CLI arguments"
-    ("cb" "basic arguments" ts-switches-and-arguments :transient t)
-    ("cm" "random-init infix" ts-maybe-on :transient t)
-    ("cc" "basic choices" ts-animal-choices :transient t)
-    ("ce" "exclusive switches" ts-exclusive-switches :transient t)
-    ("ci" "incompatible switches" ts-incompatible :transient t)
-    ("co" "completions for choices" ts-choices-with-completions :transient t)
-    ("cc" "cowsay cli wrapper" ts-cowsay :transient t)]]
+    ("cb" "basic arguments" tsc-switches-and-arguments :transient t)
+    ("cm" "random-init infix" tsc-maybe-on :transient t)
+    ("cc" "basic choices" tsc-animal-choices :transient t)
+    ("ce" "exclusive switches" tsc-exclusive-switches :transient t)
+    ("ci" "incompatible switches" tsc-incompatible :transient t)
+    ("co" "completions for choices" tsc-choices-with-completions :transient t)
+    ("cc" "cowsay cli wrapper" tsc-cowsay :transient t)]]
 
    [["Visibility"
      ;; padded description to sc
-    ("vp" "predicates                  " ts-visibility-predicates :transient t)
-    ("vi" "inapt (not suitable)" ts-inapt-parent :transient t)
-    ("vl" "levels" ts-levels-and-visibility :transient t)]
+    ("vp" "predicates                  " tsc-visibility-predicates :transient t)
+    ("vi" "inapt (not suitable)" tsc-inapt-parent :transient t)
+    ("vl" "levels" tsc-levels-and-visibility :transient t)]
 
    ["Advanced"
-    ("ac" "generated child" ts-generated-child :transient t)
-    ("ag" "generated group" ts-generated-group :transient t)
-    ("ai" "custom infixes" ts-inception :transient t)
-    ("au" "custom infixes & update" ts-inception-update :transient t)]])
+    ("ac" "generated child" tsc-generated-child :transient t)
+    ("ag" "generated group" tsc-generated-group :transient t)
+    ("ai" "custom infixes" tsc-inception :transient t)
+    ("au" "custom infixes & update" tsc-inception-update :transient t)]])
 
 (provide 'transient-showcase)
 ;;; transient-showcase.el ends here
