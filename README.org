@@ -26,7 +26,7 @@ of =magit=.
   If you install the package, you can read source for each example with the
   normal.  =describe-function= command.  All commands are under =tsc-*= prefix.
   Somewhat useful suffixes are under =tsc-suffix-*= while less useful ones under
-  =tsc--suffix-*=.  They will come in handly when you are developing new
+  =tsc--suffix-*=.  They will come in handily when you are developing new
   applications.
 
   Installations for straight and elpaca:
@@ -48,7 +48,7 @@ of =magit=.
 
   *Note* While this file is also the README for this repository, it's not
   intended to be used copy-paste.  Many links will only open in Emacs.  Some
-  definitions are included by refrence from [[*Preludes][Preludes]]
+  definitions are included by reference from [[*Preludes][Preludes]]
 
 ** Packaging
    :PROPERTIES:
@@ -164,7 +164,7 @@ of =magit=.
 - [[Summary][Summary]]
 :END:
 
-  Transient means temporary.  Transient gets it's name from the temporary keymap
+  Transient means temporary.  Transient gets its name from the temporary keymap
   and the popup UI for displaying that keymap.  Emacs has a similar idea
   built-in with [[elisp:(describe-function 'set-transient-map)][set-transient-map]] for a temporary high-precedence keymap.
 
