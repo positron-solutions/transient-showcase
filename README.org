@@ -471,6 +471,7 @@ of =magit=.
         "Prefix that generate descriptions dynamically when transient is shown."
         ;; group using function-name to generate description
         [:description current-time-string
+         ("-s" "--switch" "switch=") ; switch just to cause updates
          ;; single suffix with dynamic description
          ("wa" tsc-suffix-wave
           :description (lambda ()
@@ -489,10 +490,10 @@ of =magit=.
     :TOC:      :ignore this
     :END:
 
-
-    *Note*, the uuid is generated on every key input.  Layout updates are fun.
-    It does not also work when changing descriptions in the layout via hackery.
-    凸( ` ﾛ ´ )凸
+    *Note*, the uuid in the group description is generated on every key input.
+    Layout updates are fun.  It does not also work when changing the suffix
+    descriptions in the layout via hackery.  They are evidently evaluated only
+    once per layout. 凸( ` ﾛ ´ )凸
 
 ** Layouts
 

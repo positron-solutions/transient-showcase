@@ -169,6 +169,7 @@
    "Prefix that generate descriptions dynamically when transient is shown."
    ;; group using function-name to generate description
    [:description current-time-string
+    ("-s" "--switch" "switch=") ; switch just to cause updates
     ;; single suffix with dynamic description
     ("wa" tsc-suffix-wave
      :description (lambda ()
