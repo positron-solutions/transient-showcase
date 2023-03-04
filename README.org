@@ -2674,7 +2674,7 @@ of =magit=.
    :ID:       49cb2ea4-66fa-4bc4-ab91-268580e907a5
    :END:
 
-    First you need to explort the layout data structures.
+    First you need to export the layout data structures.
 
     #+begin_src elisp :tangle no :results replace
 
