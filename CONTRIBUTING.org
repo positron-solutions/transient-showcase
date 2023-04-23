@@ -1,4 +1,4 @@
-#+TITLE: Conributing
+#+TITLE: Contributing
 #+AUTHOR: Psionik K
 
 * Contents
@@ -25,7 +25,7 @@
 There's a lot of ways something could have gone wrong while tangling the README
 into the package.
 
-There are TODO's within the document.  Some are notes to add support to
+There are TODOs within the document.  Some are notes to add support to
 transient.  Errata in particular is where something seems possibly broken,
 missing, or unnecessarily weird.
 
@@ -54,7 +54,7 @@ All changes must:
   =tsc-showcase=.  It will also byte compile lint the package.
 
   If you cannot reproduce a failure (or success) on CI, then you may want to
-  switch to using [[https://nixos.org/download.html][nix]] to get a reprodicible toolchain so you can further develop
+  switch to using [[https://nixos.org/download.html][nix]] to get a reproducible toolchain so you can further develop
   with frozen versions from the nix [[https://nixos.wiki/wiki/Flakes][flake's]] flake.lock.
 
   #+begin_src shell
@@ -64,7 +64,7 @@ All changes must:
 
   #+end_src
 
-  The run-shim.el file is a small ad-hoc elisp script.  You can reproduce its
+  The run-shim.el file is a small ad-hoc Elisp script.  You can reproduce its
   three commands almost identically like so:
 
   #+begin_src shell eval: never
@@ -102,7 +102,7 @@ All changes must:
    in the /lisp directory will be re-compiled and loaded appropriately.
 
    *Note*, during reloading, unloading the current module is forced.  If other
-   packages you use depend on the project feature, results may be unpredicatable.
+   packages you use depend on the project feature, results may be unpredictable.
    This is one reason batch style testing can be preferred.
 
 *** Manual Loading & Reloading
@@ -123,7 +123,7 @@ All changes must:
 
   This project is distributed with a Developer Certificate of Origin.  By adding
   a sign-off notice and GPG signature to each commit, you will provide means to
-  authenticate your sign-off later strengthening your attestations stated in the
+  authenticate your sign-off later -- strengthening your attestation stated in the
   DCO, upholding the overall integrity of the license coverage over the project.
 
   A [[./DCO][copy of the DCO]] is distributed with this project.  Read its text to
@@ -145,7 +145,7 @@ All changes must:
    A GPG signed commit shows that the owner of the private key submitted the
    changes.  Wherever signatures are recorded in chains, they can demonstrate
    participation in changes elsewhere and awareness of what the submitter is
-   participating in.  Corroborating user's signature accross a history of works
+   participating in.  Corroborating user's signature across a history of works
    strengthens that user's attestation provided by DCO sign-off.
 
 ** User setup for submitting changes
@@ -156,13 +156,13 @@ All changes must:
    to add GPG signatures.  File issues if you run into Emacs-specific problems.
 
    Because signing is intended to be a conscious process, please remember to
-   read and understand the [[./DCO][Developer Certificate of Origin]] before confinguring
+   read and understand the [[./DCO][Developer Certificate of Origin]] before configuring
    your client to automatically sign-off on commits.
 
 *** Automatically add sign-off
 
-    In magit, set the =-s= switch.  Use =C-x C-s= (=transient-save=) to
-    preserve this switch on future uses.  (Note, this is not per-project).You
+    In Magit, set the =-s= switch.  Use =C-x C-s= (=transient-save=) to
+    preserve this switch on future uses.  (Note, this is not per-project). You
     can also set the signature flag this way.
 
 *** Automatic GPG signing with per-project keys
@@ -170,7 +170,7 @@ All changes must:
     In order to specify which projects you intend to sign with which keys, you
     will want to configure your git client using path-specific configurations.
 
-    Configuing git for this can be done with the following directory structure:
+    Configuring git for this can be done with the following directory structure:
 
     #+begin_src
 
