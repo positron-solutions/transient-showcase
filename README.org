@@ -39,10 +39,10 @@ of =magit=.
                   :type git :host github :repo "positron-solutions/transient-showcase"))
 
     ;; using elpaca (recommended to add a hash for reproducibility)
-    (elpaca-use-package
-     (transient-showcase :host github
-                         :repo "positron-solutions/transient-showcase")
-     :demand t)
+    (use-package transient-showcase
+      :elpaca (transient-showcase
+               :host github
+               :repo "positron-solutions/transient-showcase"))
 
   #+end_src
 
