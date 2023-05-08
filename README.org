@@ -26,7 +26,7 @@ of =magit=.
   If you install the package, you can read source for each example with the
   normal.  =describe-function= command.  All commands are under =tsc-*= prefix.
   Somewhat useful suffixes are under =tsc-suffix-*= while less useful ones under
-  =tsc--suffix-*=.  They will come in handly when you are developing new
+  =tsc--suffix-*=.  They will come in handy when you are developing new
   applications.
 
   Installations for straight and elpaca:
@@ -48,7 +48,7 @@ of =magit=.
 
   *Note* While this file is also the README for this repository, it's not
   intended to be used copy-paste.  Many links will only open in Emacs.  Some
-  definitions are included by refrence from [[*Preludes][Preludes]]
+  definitions are included by reference from [[*Preludes][Preludes]]
 
 ** Packaging
    :PROPERTIES:
@@ -164,7 +164,7 @@ of =magit=.
 - [[Summary][Summary]]
 :END:
 
-  Transient means temporary.  Transient gets it's name from the temporary keymap
+  Transient means temporary.  Transient gets its name from the temporary keymap
   and the popup UI for displaying that keymap.  Emacs has a similar idea
   built-in with [[elisp:(describe-function 'set-transient-map)][set-transient-map]] for a temporary high-precedence keymap.
 
@@ -978,7 +978,7 @@ of =magit=.
   - Obtaining a scope in a custom =transient-init-scope= method
   - Default values in prefix definition
   - Saved values of infixes
-  - Saved values in other infixes / prefixs with shared =history-key=
+  - Saved values in other infixes / prefixes with shared =history-key=
   - User-set infix values from the current or parent prefix
   - Ad-hoc values in regular =defvar= and =defcustom= etc
   - Reading values from another, perhaps distant prefix
@@ -1033,7 +1033,7 @@ of =magit=.
 *** Basic Infixes
 
     Infix classes built-in all descend from =transient-infix= and can be seen
-    clearly in the =eieio-browse=.  View their slots and documentaiton with
+    clearly in the =eieio-browse=.  View their slots and documentation with
     ~(describe-class transient-infix)~ etc.  Here you can see what most infixes
     look like and how they behave.
 
@@ -1077,7 +1077,7 @@ of =magit=.
 
    *Reminder* in the section on [[*Pre-Commands Explained][pre-commands]] the discussion about the
     =:transient= mentions that the values available in a suffix body depend on
-    whe ther the pre-command called =transient--export= before evaluating the
+    whether the pre-command called =transient--export= before evaluating the
     suffix body.
 
     There are two basic ways to read infixes:
@@ -1092,7 +1092,7 @@ of =magit=.
      :TOC: :ignore this
      :END:
 
-     In my opinion the API should make it easer to get raw values from suffixes,
+     In my opinion the API should make it easier to get raw values from suffixes,
      but this is also a matter of custom infixes needing to serialize values
      correctly so that =transient-arg-value= will "just work".
 
@@ -1100,7 +1100,7 @@ of =magit=.
 
    When you call a function with an argument, you want to know in the body of
    your function what that argument was.  This is the scope.  The prefix is
-   initialized with the =:scope= either in it's own body or a similar form.
+   initialized with the =:scope= either in its own body or a similar form.
    Suffixes can then read back that scope in their body.  The suffix object is
    given the scope and can use it to alter its own display or behavior.  The
    layout also can interpret the scope while it is initializing.
@@ -1170,9 +1170,10 @@ of =magit=.
     :TOC:      :ignore this
     :END:
 
-    Key binding sequences, such as "wa" instead of single-key prefix bindings
-    will unset the prefix argument (the old-school Emacs =C-u= prefix argument,
-    not the prefix's scope or other explicit arguments)
+    Key binding sequences, such as =wa= instead of single-key prefix
+    bindings, will unset the prefix argument (the old-school Emacs
+    =C-u= prefix argument, not the prefix's scope or other explicit
+    arguments)
 
     *Possibly a bug in transient.*
 
@@ -1186,7 +1187,7 @@ of =magit=.
    - The values obtained from =transient-args= are usually quite ephemeral and
      don't even persist beyond the body of form of the suffixes you usually read
      them in
-   - =transient-values= contains saved values that are used to rehydrate the
+   - =transient-values= contains saved values that are used to re-hydrate the
      prefix =:value= slot when the prefix is created
    - =transient-history= is used to make it faster for the user to flip through
      previous states (which can have independent histories for infixes and
@@ -1352,7 +1353,7 @@ of =magit=.
     #+end_src
 
     *These two values may be independent.* They are written at the same time
-    when calling =transient-save=.  During prefix initializaton, the =:value= is
+    when calling =transient-save=.  During prefix initialization, the =:value= is
     written from =transient-values=.
 
     Play with the =tsc-snowcone-eater= and =tsc-ping= and =tsc-pong= in the =C-x=
@@ -1624,7 +1625,7 @@ of =magit=.
 
    Choices can be set for an argument.  The property API and
    =transient-define-argument= are equivalent for configuring choices.  You can
-   either hardcode or generate choices.
+   either hard-code or generate choices.
 
    #+begin_src elisp :tangle transient-showcase.el :var _=print-args-prelude
 
@@ -1648,7 +1649,7 @@ of =magit=.
 
 **** Choices shorthand in prefix definition
 
-   Choices can also be defined in a shorthand form.  Use =:class
+    Choices can also be defined in a shorthand form.  Use =:class
    'transient-option= if you need to force a different class to be used.
 
    #+begin_src elisp :tangle no :var _=print-args-prelude
@@ -1704,7 +1705,7 @@ of =magit=.
     you can set the prefix property =:incompatible= and a list of the long-style
     argument.
 
-    Use a list of lists, where each sublist is the long argument style. Match
+    Use a list of lists, where each sub-list is the long argument style. Match
     the string completely, including use of ~=~ in both arguments and switches.
 
    #+begin_src elisp :tangle transient-showcase.el :var  _=print-args-prelude
@@ -1752,10 +1753,10 @@ of =magit=.
     =completing-read-multiple=.  The =:choices= key coresponds to the
     =COLLECTION= argument passed to completing reads.
 
-    *Note*, using a function for completions can appear to require a daunting
-    amount of behavior if you read the manul [[info:elisp#Programmed
-    Completion][section on programmed completions]].  If you however just return
-    a list of options, even when FLAG is not t, everything seems just fine.
+    *Note*, using a function for completions can appear to require a
+    daunting amount of behavior if you read the manual [[info:elisp#Programmed Completion][section on
+    programmed completions]].  If you however just return a list of
+    options, even when FLAG is not t, everything seems just fine.
 
    #+begin_src elisp :tangle transient-showcase.el :var  _=print-args-prelude
 
@@ -1802,8 +1803,9 @@ of =magit=.
    need to do a bit of work processing the arguments.  The following example
    uses cowsay.
 
-   - Cowsay doesn't actually have a =message== argument, So we end up stripping
-     it from the arguments and re-assembling something =call-process= can use.
+   - Cowsay doesn't actually have a =message= argument, So we end up
+     stripping it from the arguments and re-assembling something
+     =call-process= can use.
 
    - Cowsay supports more options, but for the sake of keeping this example
      small (and to refocus effort on transient itself), the set of all CLI
@@ -1977,9 +1979,10 @@ of =magit=.
    Inapt predicates work on suffixes, but not on groups (which would have to
    modify every child).
 
-   *Note*, like visibility predicates, =inapt-*= predicates do not take effect
-   until the transient has it's layout fully redone.  Therefore this example
-   uses a child transient and updates the scope.
+   *Note*, like visibility predicates, =inapt-*= predicates do not
+   take effect until the transient has its layout fully redone.
+   Therefore this example uses a child transient and updates the
+   scope.
 
    #+begin_src elisp :tangle transient-showcase.el :var _=print-args-prelude :var __=levels-prelude
 
@@ -2049,7 +2052,7 @@ of =magit=.
    child level is less-than-or-equal to the child level, the child is visible.
 
    A hidden group will hide a suffix even if that suffix is at a low enough
-   level.  Issue #153 has some addional information about behavior that might
+   level.  Issue #153 has some additional information about behavior that might
    get cleaned up.
 
 **** Defining group & suffix levels
@@ -2226,7 +2229,7 @@ of =magit=.
     to read the scope from the prefix when there is no prefix, it might fail.
 
     Therefore, a method called =transient-init-scope= can be overridden and used
-    at the correct point in the lifecycle for the suffix to correct the issue.
+    at the correct point in the life-cycle for the suffix to correct the issue.
 
     *Note*, the behavior is actually quite ad-hoc.  You will read the prefix
     yourself and then decide if you want to use some fallback.
@@ -2247,7 +2250,7 @@ of =magit=.
    :END:
 
    Not everything is a string or boolean.  You may want to represent complex
-   objects in your transint infixes.  If your objects can be rehydrated from
+   objects in your transient infixes.  If your objects can be re-hydrated from
    some serialized ID, you may want history support.
 
    If you need to set and display a custom type, use the simple OOP techniques
@@ -2258,7 +2261,7 @@ of =magit=.
 
    - Defining a reader to set the infix with user input
    - =prompt= slot's default form, =initform= for asking the user for input
-   - =transient-init-value= to rehydrate saved values
+   - =transient-init-value= to re-hydrate saved values
    - =transient-infix-value= so that setting & saving persist what you want to rehydrate
    - =transient-format-value= to display a user-meaningful form for your value
 
@@ -2403,7 +2406,7 @@ of =magit=.
 
     This is a difficult example, but once you understand the pieces, you can
     see some of the magit variables in action like =magit--git-variable= and
-    it's many subclasses.
+    its many subclasses.
 
     Revisit the section on [[id:6f6c8eba-1c0e-41c4-b57f-c06ab00f64d1][detangling setting, saving and
     history]].  Watching the values update will make it clear what
@@ -2475,7 +2478,7 @@ of =magit=.
     :END:
 
     Modifying the very outer group doesn't quite work.  It's probably a
-    degenrate layout object, meaning setting a description doesn't cause it to
+    degenerate layout object, meaning setting a description doesn't cause it to
     behave like a group with a heading.  Maybe outer groups have a different
     data structure?  *An exercise left to the reader*
 
@@ -2590,7 +2593,7 @@ of =magit=.
 
 *** View Class Methods and Attributes
 
-    Using =describe-function= is extremely handly for viewing the class slots
+    Using =describe-function= is extremely handy for viewing the class slots
     and methods.
 
     Classes used in transient that you are likely to want to know the slots for:
@@ -2674,7 +2677,7 @@ of =magit=.
    :ID:       49cb2ea4-66fa-4bc4-ab91-268580e907a5
    :END:
 
-    First you need to explort the layout data structures.
+    First you need to export the layout data structures.
 
     #+begin_src elisp :tangle no :results replace
 
@@ -2727,7 +2730,7 @@ of =magit=.
 
    Definitions that are not that interesting on their own but are used in examples.
 
-*** tsc-suffix-wave Command
+*** =tsc-suffix-wave= Command
 
    #+name: wave-prelude
    #+begin_src elisp :tangle no
@@ -2739,7 +2742,7 @@ of =magit=.
 
    #+end_src
 
-*** tsc-suffix-show-level
+*** =tsc-suffix-show-level=
 
    #+name: show-level-prelude
    #+begin_src elisp :tangle no
@@ -2752,7 +2755,7 @@ of =magit=.
 
    #+end_src
 
-*** tsc--define-waver
+*** =tsc--define-waver=
 
    #+name: levels-prelude
    #+begin_src elisp :tangle no
@@ -2778,7 +2781,7 @@ of =magit=.
 
      #+end_src
 
-*** tsc-suffix-print-args
+*** =tsc-suffix-print-args=
 
    Here's a suffix that reads the transient's infix values, the prefix's
    scope, and any universal argument (=C-u 4= etc).
