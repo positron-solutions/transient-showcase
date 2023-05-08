@@ -114,6 +114,7 @@ of =magit=.
   - [[Descriptions][Descriptions]]
   - [[Layouts][Layouts]]
   - [[Manually setting group class][Manually setting group class]]
+  - [[Pad Keys][Pad Keys]]
 - [[Nesting & Flow Control][Nesting & Flow Control]]
   - [[Single versus multiple commands][Single versus multiple commands]]
   - [[Nesting][Nesting]]
@@ -413,6 +414,7 @@ of =magit=.
   - [[Empty strings make spaces][Empty strings make spaces]]
   - [[A Grid][A Grid]]
 - [[Manually setting group class][Manually setting group class]]
+- [[Pad Keys][Pad Keys]]
 :END:
 
    To define a transient, you need at least one group.  Groups are
@@ -642,6 +644,27 @@ of =magit=.
      ;; (tsc-layout-explicit-classes)
 
    #+end_src
+
+** Pad Keys
+
+   To align descriptions, set the group's :pad-keys to t
+
+   #+begin_src elisp :tangle no :var _=wave-prelude
+
+     (transient-define-prefix tsc-layout-padded-keys ()
+       "Prefix with padded keys to align descriptions."
+       ["Padded Column"
+        :class transient-column
+        :pad-keys t
+        ("t" "wave top" tsc-suffix-wave) ; spaces will be inserted after t
+        ("realyongk" "wave bottom" tsc-suffix-wave)])
+
+     ;; (tsc-layout-padded-keys)
+
+   #+end_src
+
+   Use this if you have different lengths of key sequences or your transient is
+   dynamic and not all keys will have the same length all the time.
 
 * Nesting & Flow Control
 :PROPERTIES:
