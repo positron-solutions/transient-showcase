@@ -1044,17 +1044,27 @@ PROMPT, INITIAL-INPUT, and HISTORY are forwarded to `read-from-minibuffer'."
 
 ;; We have to define this on non-abstract infix classes.  See
 ;; `transient-init-value' in transient source.  The method on
-;; `transient-argument' class is the best example for initializing your
-;; suffix based on the prefix's value, but it does support a lot of
-;; behaviors.
+;; `transient-argument' class was used to make this example, but it
+;; does support a lot of behaviors.  In short, the prefix has a value
+;; and you rehydrate the infix by looking into the prefix's value to
+;; find the suffix value.  Because our stored value is basically a
+;; serialization, we rehydrate it to be sure it's a valid value.
+;; Remember to handle values you can't rehydrate.
 (cl-defmethod transient-init-value ((obj tsc-child-infix))
   "Set the `value' and `value-object' slots using the prefix's value."
-  (let* ((prefix-value (oref transient--prefix value))
-         (key (oref obj command))
-         (value (car (alist-get key prefix-value))) ; car?
-         (value-object (transient-get-suffix (oref transient--prefix command) value)))
-    (oset obj value value)
-    (oset obj value-object value-object)))
+
+  ;; in the prefix declaration, the initial description is a reliable key
+  (let ((variable (oref obj description)))
+    (oset obj variable variable)
+
+    ;; rehydrate the value if the prefix has one for this infix
+    (when-let* ((prefix-value (oref transient--prefix value))
+                ;; (argument (and (slot-boundp obj 'argument)
+                ;;   (oref obj argument)))
+                (value (cdr (assoc variable prefix-value)))
+                (value-object (transient-get-suffix (oref transient--prefix command) value))) ; rehydrate
+      (oset obj value value)
+      (oset obj value-object value-object))))
 
 (cl-defmethod transient-infix-set ((obj tsc-child-infix) value)
   "Update `value' slot to VALUE.
@@ -1062,18 +1072,17 @@ Update `value-object' slot to the value corresponding to VALUE."
   (let* ((command (oref transient--prefix command))
          (child (ignore-errors (transient-get-suffix command value))))
     (oset obj value-object child)
-    (oset obj value (if child value nil))))
+    (oset obj value (if child value nil)))) ; TODO a bit ugly
 
-;; If you are making a suffix that needs history, you need to define this
-;; method.  You also need this method if your value needs some processing
-;; or use of an alternate value for later rehydration.  Tell the prefix
-;; what to store when setting / saving
+;; If you are making a suffix that needs history, you need to define
+;; this method.  The example here almost identical to the method
+;; defined for `transient-option',
 (cl-defmethod transient-infix-value ((obj tsc-child-infix))
   "Return our actual value for rehydration later."
 
-  ;; this is almost identical to the method defined for `transient-infix',
-  ;; but don't forget this if you want history on a suffix for example.
-  (list (oref obj command) (oref obj value)))
+  ;; Note, returning a cons for the value is very flexible and will
+  ;; work with homoiconicity in persistence.
+  (cons (oref obj variable) (oref obj value)))
 
 ;; Show user's a useful representation of your ugly value
 (cl-defmethod transient-format-value ((obj tsc-child-infix))
@@ -1098,7 +1107,7 @@ Show either the child's description or a default if no child is selected."
 
   [["Pick a suffix"
     ("-s" "just a switch" "--switch") ; makes history value structure apparent
-    ("c" "child" tsc--inception-child-infix :class tsc-child-infix)]
+    ("c" "child" tsc--inception-child-infix)]
 
    ["Some suffixes"
     ("s" "wave surely" tsc--wave-surely)
@@ -1110,12 +1119,20 @@ Show either the child's description or a default if no child is selected."
     ("r" "read args" tsc-suffix-print-args )]])
 
 ;; (tsc-inception)
+;;
 ;; Try setting the infix to "e" (yes, include quotes)
 ;; Try: (1 2)
 ;; Try: tsc--wave-normally
-;; Set the infix and re-open it
-;; Save the infix, re-evaluate the prefix, and open the prefix again
-;; Try flipping through history
+;;
+;; Observe that the LOC you enter is displayed using the description at that poin
+;;
+;; Set the infix and re-open it with C-x s, C-g, and M-x tsc-inception
+;; Observe that the set value persists across invocations
+;;
+;; Save the infix, with C-x C-s, re-evaluate the prefix, and open the prefix again.
+;; Observe that the
+;;
+;; Try flipping through history, C-x n, C-x p
 ;; Now do think of doing things like this with org ids, magit-sections, buffers etc.
 
 (transient-define-suffix tsc--inception-update-description ()
@@ -1123,20 +1140,28 @@ Show either the child's description or a default if no child is selected."
    (interactive)
    (let* ((args (transient-args transient-current-command))
           (description (transient-arg-value "--description=" args))
-          ;; This is the part where we read the other infix
-          (loc (car (cdr (assoc 'tsc--inception-child-infix args))))
+          ;; This is the part where we read the other infix.  It's
+          ;; similar to how we find the value during rehydration, but
+          ;; hard-coding the infix's argument, "child", which is used
+          ;; in its `transient-infix-value' method.
+          (loc (cdr (assoc "child" args)))
           (layout-child (transient-get-suffix 'tsc-inception-update loc)))
+
+     ;; Once again, do different bodies based on what we found at the
+     ;; layout locition.  This complexity is beacuse of the data we
+     ;; are operating on, not the transient methods we needed to
+     ;; implement.
      (cond
-      ;; Once again, do different bodies based on what we found at the layout locition.
       ((or (listp layout-child) ; child
           (vectorp layout-child) ; group
           (stringp layout-child)) ; string child
        (if (stringp layout-child)
            (transient-replace-suffix 'tsc-inception-update loc description) ; plain-text child
          (plist-put (elt layout-child 2) :description description)))
-      (t (message (propertize (format
-                               "Don't know how to modify whatever is at: %s"
-                               loc) 'face 'warning))))
+      (t (message
+          (propertize (format "Don't know how to modify whatever is at: %s" loc)
+                      'face 'warning))))
+
      ;; re-enter the transient manually to display the modified layout
      (transient-setup transient-current-command)))
 
@@ -1144,10 +1169,10 @@ Show either the child's description or a default if no child is selected."
   "Prefix that picks and updates its own suffix."
 
   [["Pick a suffix"
-    ("c" "child" tsc--inception-child-infix)]
+    ("c" "child" tsc--inception-child-infix :argument "child")]
 
    ["Update the description!"
-    ("-d" "description" "--description=") ; makes history value structure apparent
+    ("-d" "description" "--description=")
     ("u" "update" tsc--inception-update-description :transient transient--do-exit)]
 
    ["Some suffixes"
@@ -1160,12 +1185,18 @@ Show either the child's description or a default if no child is selected."
     ("r" "read args" tsc-suffix-print-args )]])
 
 ;; (tsc-inception-update)
-;; Pick a suffix,
-;; Then set the description
-;; Then update the suffix's you picked with the new description!
+;;
+;; 1. Press 'c' to start picking a suffix.  For example, enter the string "e"
+;; 2. Press 'C-x s' to set the values of this transient for the future
+;; 3. Then set the description, anything, no quotes
+;; 4. Then press 'u' the suffix's you picked with the new description!
+;;
 ;; Using a transient to modify a transient (⊃｡•́‿•̀｡)⊃━✿✿✿✿✿✿
-;; Try to rename a group, such as (0 0)
-;; Rename the very outer group, (0)
+;;
+;; Observe that the set values are persisted across invocations.
+;; Saving also works.  This makes it easier to set the description
+;; multiple times in succession.  The Payoff when building larger
+;; applications like magit rapidly adds up.
 
 (transient-define-prefix tsc-showcase ()
   "A launcher for a currated selection of examples.
