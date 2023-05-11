@@ -19,12 +19,12 @@
 
 name: CI
 
-on: # trigger this workflow on
+on: # trigger this workflow on...
   push:
-    branches: [ $default-branch ] # pushes to the default branch
-  pull_request:
+    branches: [ $default-branch ] # pushes to the default branch...
+  pull_request_target:
+    # ...or every pull request, from any branch to any branch,
     paths-ignore: ['README.org']
-    # or every pull request, from any branch to any branch
 
   workflow_dispatch:
     # Allows you to run this workflow manually from the Actions tab
