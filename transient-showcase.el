@@ -967,6 +967,29 @@ When this is called in layouts, it's the transient being layed out"
 
 ;; (tsc-generated-group)
 
+(defun tsc--self-modifying-add-command (command-symbol sequence)
+  (interactive "CSelect a command: \nMkey sequence: ")
+
+  ;; Generate an infix that will call the command and add it to the
+  ;; second group (index 1 at the 0th position)
+  (transient-insert-suffix
+    'tsc-self-modifying
+    '(0 1 0) ; set the child in `tsc-inception' for help with this argument
+    (list sequence (format "Call %s" command-symbol) command-symbol :transient t))
+
+  ;; we must re-enter the transient to force the layout update
+  (transient-setup 'tsc-self-modifying))
+
+(transient-define-prefix tsc-self-modifying ()
+ "Prefix that uses `transient-insert-suffix' to add commands to itself."
+
+ [["Add New Commands"
+   ("a" "add command" tsc--self-modifying-add-command)]
+  ["User Defined"
+   ""]]) ; blank line suffix creates an insertion point
+
+;; (tsc-self-modifying)
+
 ;; The children we will be picking can be of several forms.  The
 ;; transient--layout symbol property of a prefix is a vector of vectors, lists,
 ;; and strings.  It's not the actual eieio types or we would use
@@ -1198,6 +1221,7 @@ control such as replacing or exiting."
    ["Advanced"
     ("ac" "generated child" tsc-generated-child :transient t)
     ("ag" "generated group" tsc-generated-group :transient t)
+    ("as" "self-modifying" tsc-self-modifying :transient t)
     ("ai" "custom infixes" tsc-inception :transient t)
     ("au" "custom infixes & update" tsc-inception-update :transient t)]])
 

@@ -139,6 +139,7 @@ of =magit=.
   - [[Levels][Levels]]
 - [[Advanced][Advanced]]
   - [[Dynamically generating layouts][Dynamically generating layouts]]
+  - [[Modifying layouts][Modifying layouts]]
   - [[Using prefix scope in children][Using prefix scope in children]]
   - [[Custom Infix Types][Custom Infix Types]]
 - [[Appendixes][Appendixes]]
@@ -704,7 +705,7 @@ of =magit=.
 
         ;; this suffix will not exit after calling sub-prefix
         ("we" "wave & exit" tsc-wave-overridden)
-        ("ws" "wave & stay" tsc-wave :transient t)])
+        ("ws" "wave & stay" tsc-suffix-wave :transient t)])
 
      ;; (tsc-stay-transient)
 
@@ -1604,7 +1605,7 @@ of =magit=.
          ("S" "inline shortarg switch" ("-n" "--inline-shortarg-switch"))]]
 
        ["Commands"
-        ("w" "wave some" tsc-wave)
+        ("w" "wave some" tsc-suffix-wave)
         ("s" "show arguments" tsc-suffix-print-args)]) ; use to analyze the switch values
 
      ;; (tsc-switches-and-arguments)
@@ -2133,6 +2134,7 @@ of =magit=.
 :CONTENTS:
 - [[Dynamically generating layouts][Dynamically generating layouts]]
   - [[Correction in manual][Correction in manual]]
+- [[Modifying layouts][Modifying layouts]]
 - [[Using prefix scope in children][Using prefix scope in children]]
   - [[Obtaining Missing Scope][Obtaining Missing Scope]]
 - [[Custom Infix Types][Custom Infix Types]]
@@ -2238,6 +2240,49 @@ of =magit=.
 
     - These functions do mostly the same job.  Why do we need to specify a
       prefix for =transient-parse-suffixes=, for scope etc?
+
+** Modifying layouts
+
+   In this example, we will make a transient that can add new commands
+   to itself.
+
+   #+begin_src elisp :tangle transient-showcase.el
+
+     (defun tsc--self-modifying-add-command (command-symbol sequence)
+       (interactive "CSelect a command: \nMkey sequence: ")
+
+       ;; Generate an infix that will call the command and add it to the
+       ;; second group (index 1 at the 0th position)
+       (transient-insert-suffix
+         'tsc-self-modifying
+         '(0 1 0) ; set the child in `tsc-inception' for help with this argument
+         (list sequence (format "Call %s" command-symbol) command-symbol :transient t))
+
+       ;; we must re-enter the transient to force the layout update
+       (transient-setup 'tsc-self-modifying))
+
+     (transient-define-prefix tsc-self-modifying ()
+      "Prefix that uses `transient-insert-suffix' to add commands to itself."
+
+      [["Add New Commands"
+        ("a" "add command" tsc--self-modifying-add-command)]
+       ["User Defined"
+        ""]]) ; blank line suffix creates an insertion point
+
+     ;; (tsc-self-modifying)
+
+   #+end_src
+
+   Exercises for the reader:
+
+   - Use the interactive form to read an elisp expression and create
+     an anonymous command
+   - Add a command to remove suffixes
+   - Create a suffix editor interface, modifying the description, key,
+     command, or other slots
+
+  See the =transient-insert-suffix= for documentation on the =LOC=
+  argument.
 
 ** Using prefix scope in children
 
@@ -2985,6 +3030,7 @@ of =magit=.
       ["Advanced"
        ("ac" "generated child" tsc-generated-child :transient t)
        ("ag" "generated group" tsc-generated-group :transient t)
+       ("as" "self-modifying" tsc-self-modifying :transient t)
        ("ai" "custom infixes" tsc-inception :transient t)
        ("au" "custom infixes & update" tsc-inception-update :transient t)]])
 
