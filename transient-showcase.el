@@ -272,7 +272,7 @@
 
    ;; this suffix will not exit after calling sub-prefix
    ("we" "wave & exit" tsc-wave-overridden)
-   ("ws" "wave & stay" tsc-wave :transient t)])
+   ("ws" "wave & stay" tsc-suffix-wave :transient t)])
 
 ;; (tsc-stay-transient)
 
@@ -652,7 +652,7 @@ This command can be called from it's parent, `tsc-snowcone-eater' or independent
     ("S" "inline shortarg switch" ("-n" "--inline-shortarg-switch"))]]
 
   ["Commands"
-   ("w" "wave some" tsc-wave)
+   ("w" "wave some" tsc-suffix-wave)
    ("s" "show arguments" tsc-suffix-print-args)]) ; use to analyze the switch values
 
 ;; (tsc-switches-and-arguments)
