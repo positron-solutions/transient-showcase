@@ -24,7 +24,7 @@ of =magit=.
 ** Using as an installable package
 
   If you install the package, you can read source for each example with the
-  normal.  =describe-function= command.  All commands are under =tsc-*= prefix.
+  normal.  =describe-symbol= command.  All commands are under =tsc-*= prefix.
   Somewhat useful suffixes are under =tsc-suffix-*= while less useful ones under
   =tsc--suffix-*=.  They will come in handy when you are developing new
   applications.
@@ -267,16 +267,16 @@ of =magit=.
 
     #+begin_src elisp :tangle no
       ;; slots & methods that can be set / overridden in children
-      (describe-function transient-child)
+      (describe-symbol transient-child)
     #+end_src
 
   - Custom classes using EIEIO (basically elisp OOP) can change methods deeper
-    in the implementation than you can reach with slots.  =describe-function= is
+    in the implementation than you can reach with slots.  =describe-symbol= is
     a quick way to look at the methods.
 
     #+begin_src elisp :tangle no
       ;; slots & methods that can be set / overridden in suffixes
-      (describe-function transient-suffix)
+      (describe-symbol transient-suffix)
     #+end_src
 
     See the [[*EIEIO - OOP in Elisp][EIEIO Appendix]] for introduction to exploring EIEIO objects and
@@ -425,7 +425,7 @@ of =magit=.
    commands.
 
    If you begin a group vector with a string, you get a group heading.  Groups
-   also support some [[https://magit.vc/manual/transient/Group-Specifications.html#Group-Specifications][properties]].  The [[elisp:(describe-function transient-group)][group class]] also has a lot of information.
+   also support some [[https://magit.vc/manual/transient/Group-Specifications.html#Group-Specifications][properties]].  The [[elisp:(describe-symbol transient-group)][group class]] also has a lot of information.
 
 ** Descriptions
 
@@ -1583,7 +1583,7 @@ of =magit=.
    you get =:class transient-option= but if not, the default is a =:class
    transient-switch=
 
-   Use [[elisp:(describe-function transient-option)][=(describe-function transient-option)=]] and [[elisp:(describe-function transient-switch)][=(describe-function transient-option)=]]
+   Use [[elisp:(describe-symbol transient-option)][=(describe-symbol transient-option)=]] and [[elisp:(describe-symbol transient-switch)][=(describe-symbol transient-option)=]]
    to see a full document of their slots and methods.
 
    If you need an argument with a space instead of the equal sign, use a space
@@ -2635,7 +2635,7 @@ of =magit=.
 
         ;; opening the help documents for the class, which shows all methods and
         ;; slot forms
-        (describe-function transient-prefix))
+        (describe-symbol transient-prefix))
 
     #+end_src
 
@@ -2705,15 +2705,16 @@ of =magit=.
 
 *** View Class Methods and Attributes
 
-    Using =describe-function= is extremely handy for viewing the class slots
+    Using =describe-symbol= is extremely handy for viewing the class slots
     and methods.
 
     Classes used in transient that you are likely to want to know the slots for:
 
-    [[elisp:(describe-function 'transient-prefix)][transient-prefix]]
-    [[elisp:(describe-function 'transient-suffix)][transient-suffix]]
-    [[elisp:(describe-function 'transient-infix)][transient-infix]]
-    [[elisp:(describe-function 'transient-argument)][transient-argument]]
+    [[elisp:(describe-symbol 'transient-prefix)][transient-prefix]]
+    [[elisp:(describe-symbol 'transient-suffix)][transient-suffix]]
+    [[elisp:(describe-symbol 'transient-infix)][transient-infix]]
+    [[elisp:(describe-symbol 'transient-argument)][transient-argument]]
+    [[elisp:(describe-symbol 'transient-variable)][transient-variable]]
 
     [[https://www.gnu.org/software/emacs/manual/html_mono/eieio.html#Inheritance][The eieio docs]] have a more wordy treatment.  The class system has a lot of
     behavior that can be faster at times to just understand through description.
