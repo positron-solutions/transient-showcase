@@ -2189,7 +2189,7 @@ of =magit=.
 
    =transient--parse-child= takes the same configuration format as
    =transient-define-prefix=.  You can see the layout format in the [[id:49cb2ea4-66fa-4bc4-ab91-268580e907a5][layout
-   hacking appendix]].  =transient--prarse-group= works almost exactly the
+   hacking appendix]].  =transient--parse-group= works almost exactly the
    same, just for groups.
 
    The same thing, but parsing an entire group spec:
