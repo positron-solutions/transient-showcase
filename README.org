@@ -1583,7 +1583,7 @@ of =magit=.
    you get =:class transient-option= but if not, the default is a =:class
    transient-switch=
 
-   Use [[elisp:(describe-symbol transient-option)][=(describe-symbol transient-option)=]] and [[elisp:(describe-symbol transient-switch)][=(describe-symbol transient-option)=]]
+   Use [[elisp:(describe-symbol transient-option)][=(describe-symbol transient-option)=]] and [[elisp:(describe-symbol transient-switch)][=(describe-symbol transient-switch)=]]
    to see a full document of their slots and methods.
 
    If you need an argument with a space instead of the equal sign, use a space
