@@ -878,10 +878,10 @@ When this is called in layouts, it's the transient being layed out"
   ["Inapt Predicates Child"
    ("s" "switched" tsc--wave-surely
     :transient transient--do-return
-    :if tsc--child-scope-p)
+    :inapt-if tsc--child-scope-p)
    ("u" "unswitched" tsc--wave-normally
     :transient transient--do-return
-    :if-not tsc--child-scope-p)]
+    :inapt-if-not tsc--child-scope-p)]
 
   ;; in the body, we read the value of the parent and set our scope to
   ;; non-nil if the switch is set
