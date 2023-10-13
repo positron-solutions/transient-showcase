@@ -2832,7 +2832,7 @@ of =magit=.
 
     #+end_src
 
-    You might find this helpful when constructing [[*Dynamic Layouts][dynamic layouts]]
+    You might find this helpful when constructing [[*Dynamically generating layouts][dynamic layouts]].
 
 ** Hooks
 
