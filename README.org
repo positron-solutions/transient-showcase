@@ -1,9 +1,13 @@
 #+title: Transient Showcase
 #+author: Psionik K
 #+property: header-args :results silent :comments no :padline yes :no-expand true
-#+options: toc:nil
+#+options: toc:nil num:nil
 #+export_file_name: README.md
+#+EXCLUDE_TAGS: export_elisp noexport
 * Transient Showcase
+:PROPERTIES:
+:UNNUMBERED: notoc
+:END:
 
 #+begin_export html
 <!-- !!!THIS FILE HAS BEEN GENERATED!!! Edit README.org -->
@@ -88,11 +92,12 @@ After executing the block above, you can =execute-extended-command= (*M-x*) and 
 
 *Note* If the example above is hard to read, review some [[info:elisp#Top][elisp]] [[*Essential Elisp][syntax]] and typical forms.
 
-* Contents :export_markdown:
+#+toc: headlines 2
+* Contents :noexport:
 :PROPERTIES:
-:TOC:      :include siblings :depth 2
 :END:
 :CONTENTS:
+
 - [[Terminology][Terminology]]
   - [[Prefixes and Suffixes][Prefixes and Suffixes]]
   - [[Nesting Prefixes][Nesting Prefixes]]
@@ -149,16 +154,6 @@ After executing the block above, you can =execute-extended-command= (*M-x*) and 
 :END:
 
 * Terminology
-:PROPERTIES:
-:TOC:      :include descendants :depth 3 :local depth
-:END:
-:CONTENTS:
-- [[Prefixes and Suffixes][Prefixes and Suffixes]]
-  - [[Conceptual similarity to Emacs prefix arguments][Conceptual similarity to Emacs prefix arguments]]
-- [[Nesting Prefixes][Nesting Prefixes]]
-- [[Infix][Infix]]
-- [[Summary][Summary]]
-:END:
 
 Transient means temporary.  Transient gets its name from the temporary keymap and the popup UI for displaying that keymap.  Emacs has a similar idea built-in with [[elisp:(describe-function 'set-transient-map)][set-transient-map]] for a temporary high-precedence keymap.
 
@@ -212,16 +207,6 @@ See [[*Basic Infixes][Infix examples]] to get a better idea.
 - A *Suffix* may be yet another *Prefix*, in which case the transient is nested
 
 * Declaring - Equivalent Forms
-:PROPERTIES:
-:TOC:      :include descendants :depth 3 :local depth
-:END:
-:CONTENTS:
-- [[The Shorthand form][The Shorthand form]]
-- [[Keyword Arguments Style][Keyword Arguments Style]]
-- [[Macro Child Definition Style][Macro Child Definition Style]]
-- [[Overriding slots in the prefix definition][Overriding slots in the prefix definition]]
-- [[Quoting Note for Vectors][Quoting Note for Vectors]]
-:END:
 
 You can declare the same behavior 3-4 ways
 
@@ -348,21 +333,6 @@ If you just list the key and symbol followed by properties, it is also a support
 Inside the =[ ...vectors... ]= in =transient-define-prefix=, you don't need to quote symbols because in the vector, everything is a literal.  When you move a shorthand style =:property symbol= out to the =transient-define-suffix= form, which is a list, you might need to quote the symbol as =:property 'symbol=.
 
 * Groups & Layouts
-:PROPERTIES:
-:TOC:      :include descendants :depth 3 :local depth
-:END:
-:CONTENTS:
-- [[Descriptions][Descriptions]]
-  - [[Dynamic Descriptions][Dynamic Descriptions]]
-- [[Layouts][Layouts]]
-  - [[Groups one on top of the other][Groups one on top of the other]]
-  - [[Groups side by side][Groups side by side]]
-  - [[Group on top of groups side by side][Group on top of groups side by side]]
-  - [[Empty strings make spaces][Empty strings make spaces]]
-  - [[A Grid][A Grid]]
-- [[Manually setting group class][Manually setting group class]]
-- [[Pad Keys][Pad Keys]]
-:END:
 
 To define a transient, you need at least one group.  Groups are vectors, delimited as =[ ...group... ]=.
 
@@ -428,9 +398,6 @@ The =:description= key is applied last and therefore wins in ambiguous declarati
 #+end_src
 
 *** TODO Errata
-:PROPERTIES:
-:TOC:      :ignore this
-:END:
 
 *Note*, the uuid in the group description is generated on every key input.  Layout updates are fun.  It does not also work when changing the suffix descriptions in the layout via hackery.  They are evidently evaluated only once per layout. 凸( ` ﾛ ´ )凸
 
@@ -599,20 +566,6 @@ To align descriptions, set the group's :pad-keys to t
 Use this if you have different lengths of key sequences or your transient is dynamic and not all keys will have the same length all the time.
 
 * Nesting & Flow Control
-:PROPERTIES:
-:TOC:      :include descendants :depth 3 :local depth
-:END:
-:CONTENTS:
-- [[Single versus multiple commands][Single versus multiple commands]]
-- [[Nesting][Nesting]]
-  - [[Binding a Sub-Prefix][Binding a Sub-Prefix]]
-    - [[Nesting with multiple commands][Nesting with multiple commands]]
-  - [[Setting up another transient manually][Setting up another transient manually]]
-- [[Mixing Interactive][Mixing Interactive]]
-  - [[Early return][Early return]]
-- [[Pre-Commands Explained][Pre-Commands Explained]]
-  - [[Warning!][Warning!]]
-:END:
 
 
 Many transients call other transients.  This allows you to express similar behaviors as interactive commands that ask you for multiple arguments using the minibuffer.
@@ -719,10 +672,6 @@ This form is useful if you want a command to /perhaps/ load yet another transien
 #+end_src
 
 **** TODO Errata
-:PROPERTIES:
-:ID:       e6f2ba1b-b67e-4bde-8aaf-d3decba915c4
-:TOC:      :ignore this
-:END:
 
 This example should also work with the =transient--do-recurse= pre-command, but the child transient does not return.  There is a difference in the behavior that should not depend on if the suffix /is/ the prefix or just sets up the prefix.  *Possible bug*.
 
@@ -820,9 +769,6 @@ Below is a nested transient.
 
 
 ** Pre-Commands Explained
-:PROPERTIES:
-:ID:       0c106a1b-d824-4321-89a5-b1e06b468c63
-:END:
 
 The value in the =:transient= slot affects what state the body of your command will see and what will happen after your command, during the post-command.
 
@@ -853,33 +799,11 @@ Not all pre-commands are compatible with all situations and suffixes!
 [[Debugging][Debugging]]
 
 **** TODO Errata
-:PROPERTIES:
-:TOC:      :ignore this
-:END:
 
 There's definitely some edge cases that are unnecessarily complex for the
 use case.  Think of how life was before =transient--do-recurse=.
 
 * Using & Managing State
-:PROPERTIES:
-:TOC:      :include descendants :depth 3 :local depth
-:END:
-:CONTENTS:
-- [[The Magic of Transient][The Magic of Transient]]
-- [[Infixes][Infixes]]
-  - [[Basic Infixes][Basic Infixes]]
-  - [[Reading Infix Values][Reading Infix Values]]
-- [[Scope][Scope]]
-- [[Prefix Value & History][Prefix Value & History]]
-- [[History Keys][History Keys]]
-  - [[Detangling with Initialization, Setting, and Saving][Detangling with Initialization, Setting, and Saving]]
-- [[Disabling Set / Save on a Suffix][Disabling Set / Save on a Suffix]]
-- [[Setting or Saving Every Time a Suffix is Used][Setting or Saving Every Time a Suffix is Used]]
-  - [[Sticky infix support][Sticky infix support]]
-  - [[Default Values][Default Values]]
-  - [[Readers][Readers]]
-- [[Lisp Variables][Lisp Variables]]
-:END:
 
 There are several ways to create state.  The [[*Nesting & Flow Control][flow control]] examples in the previous section mainly covered how to get from one command to the other.  This section covers how to save values and then read them later, sometimes from a completely different transient.  *Coupled with [[*Custom Infix Types][custom infix types]], you can create some seriously rich user expression.*
 
@@ -981,9 +905,6 @@ There are two basic ways to read infixes:
 - =(transient-suffixes transient-current-command)= and retrieve your fully hydrated suffix
 
 **** TODO The =transient-suffixes= option requires filtering
-:PROPERTIES:
-:TOC:      :ignore this
-:END:
 
 In my opinion the API should make it easier to get raw values from suffixes, but this is also a matter of custom infixes needing to serialize values correctly so that =transient-arg-value= will "just work".
 
@@ -1054,9 +975,6 @@ When you call a function with an argument, you want to know in the body of your 
 #+end_src
 
 *** TODO Errata with prefix arg (=C-u= universal argument).
-:PROPERTIES:
-:TOC:      :ignore this
-:END:
 
 Key binding sequences, such as =wa= instead of single-key prefix bindings, will unset the prefix argument (the old-school Emacs =C-u= prefix argument, not the prefix's scope or other explicit arguments)
 
@@ -1189,9 +1107,6 @@ The following example can demonstrate the behavior with some user effort:
 #+end_src
 
 *** Detangling with Initialization, Setting, and Saving
-:PROPERTIES:
-:ID:       6f6c8eba-1c0e-41c4-b57f-c06ab00f64d1
-:END:
 
 Set values show up in the prefix's =value= slot.
 
@@ -1317,7 +1232,7 @@ Readers are the mechanism to provide completions and to enforce input validity o
 
 #+end_src
 
-Setting the reader can be used to enforce rules of valid input.  See [[id:0c3f2271-98e0-4db4-b95b-e31975bcbb5e][Advanced/Custom Infix Types]] for an example of writing a custom reader that validates input and assigning that reader via the class method instead of the =:reader= slot.
+Setting the reader can be used to enforce rules of valid input.  See [[Custom Infix Types][Advanced/Custom Infix Types]] for an example of writing a custom reader that validates input and assigning that reader via the class method instead of the =:reader= slot.
 
 ** Lisp Variables
 
@@ -1357,22 +1272,6 @@ Customizing this class can be useful when working with objects and functions tha
 #+end_src
 
 * Controlling CLI's
-:PROPERTIES:
-:TOC:      :include descendants :depth 2 :local depth
-:END:
-:CONTENTS:
-- [[Reading arguments within suffixes][Reading arguments within suffixes]]
-- [[Switches & Arguments Again][Switches & Arguments Again]]
-  - [[Argument and Infix Macros][Argument and Infix Macros]]
-  - [[Choices][Choices]]
-  - [[Mutually Exclusive Switches][Mutually Exclusive Switches]]
-  - [[Incompatible Switches][Incompatible Switches]]
-  - [[Short Args][Short Args]]
-  - [[Choices from a function][Choices from a function]]
-  - [[multiple instances][multiple instances]]
-- [[Dispatching args into a process][Dispatching args into a process]]
-  - [[Cleanup Cowsay][Cleanup Cowsay]]
-:END:
 
 This section covers more usages of infixes, focused on creating better argument strings for CLI tools.
 
@@ -1703,17 +1602,6 @@ There's some errata about this example:
 Clean up cowsay example.  Check for binary before attempting to run it.
 
 * Controlling Visibility
-:PROPERTIES:
-:TOC:      :include descendants :depth 3 :local depth
-:END:
-:CONTENTS:
-- [[Visibility Predicates][Visibility Predicates]]
-- [[Inapt (Temporarily Unavailable)][Inapt (Temporarily Unavailable)]]
-  - [[Documentation in manual missing][Documentation in manual missing]]
-- [[Levels][Levels]]
-  - [[Defining group & suffix levels][Defining group & suffix levels]]
-  - [[Using the Levels UI][Using the Levels UI]]
-:END:
 
 At times, you need a prefix to show or hide certain options depending on the context.
 
@@ -1886,18 +1774,6 @@ Press (*C-x l*) to open the levels UI for the user.  Press (*C-x l*) again to ch
 *While a child may be visible according to its own level, if it's hidden within the group, the user's level-setting UI for the prefix will contradict what's actually visible.  The UI does not allow setting group levels.*
 
 * Advanced
-:PROPERTIES:
-:TOC:      :include descendants :depth 3 :local depth
-:END:
-:CONTENTS:
-- [[Dynamically generating layouts][Dynamically generating layouts]]
-  - [[Correction in manual][Correction in manual]]
-- [[Modifying layouts][Modifying layouts]]
-- [[Using prefix scope in children][Using prefix scope in children]]
-  - [[Obtaining Missing Scope][Obtaining Missing Scope]]
-- [[Custom Infix Types][Custom Infix Types]]
-  - [[Reading custom infix values][Reading custom infix values]]
-:END:
 
 The previous sections are designed to go breadth-first so that you can get core ideas first. The following examples expand on combinations of several ideas or subclassing & customizing rarely used slots.
 
@@ -1938,7 +1814,7 @@ This is a group method that can be overridden in order to modify or eliminate so
 
 #+end_src
 
-=transient--parse-child= takes the same configuration format as =transient-define-prefix=.  You can see the layout format in the [[id:49cb2ea4-66fa-4bc4-ab91-268580e907a5][layout hacking appendix]].  =transient--prarse-group= works almost exactly the same, just for groups.
+=transient--parse-child= takes the same configuration format as =transient-define-prefix=.  You can see the layout format in the [[Layout Hacking][layout hacking appendix]].  =transient--prarse-group= works almost exactly the same, just for groups.
 
 The same thing, but parsing an entire group spec:
 
@@ -2046,9 +1922,6 @@ Each infix instance is declared in =transient-define-infix=, potentially with a 
 If it's holding a function, that function will be used as a backup during initialization in case there is no prefix or it has nothing in its =scope= slot.
 
 ** Custom Infix Types
-:PROPERTIES:
-:ID:       0c3f2271-98e0-4db4-b95b-e31975bcbb5e
-:END:
 
 Not everything is a string or boolean.  You may want to represent complex objects in your transient infixes.  If your objects can be re-hydrated from some serialized ID, you may want history support.
 
@@ -2065,9 +1938,9 @@ If you need to set and display a custom type, use the simple OOP techniques of [
 We will also use some layout introspection.  This makes the example a bit more complex, but represents a real custom infix type with real serialization and elisp objects backing it:
 
 - =transient-get-suffix= To get suffix by *key*, *location*, or *command symbol*
-- Getting a description from raw layout children (not EIEIO objects).  See [[id:49cb2ea4-66fa-4bc4-ab91-268580e907a5][Layout Hacking]].
+- Getting a description from raw layout children (not EIEIO objects).  See [[Layout Hacking][Layout Hacking]].
 
-This example is a bit intimidating because the serialized value we are storing and rehydrating is a layout child location, the LOC argument seen in transient programming.  It maps to an actual layout child, which we introspect and later modify.  The point of the example is to let the user handle a simple value that we can also persist but to use a more complex object that might only exist at runtime.  If this example makes little sense, try making an example with just a string or number before you start your own data type.
+This example is a bit intimidating because the serialized value we are storing and re-hydrating is a layout child location, the LOC argument seen in transient programming.  It maps to an actual layout child, which we introspect and later modify.  The point of the example is to let the user handle a simple value that we can also persist but to use a more complex object that might only exist at runtime.  If this example makes little sense, try making an example with just a string or number before you start your own data type.
 
 #+name: custom-infixes
 #+begin_src elisp :tangle transient-showcase.el :var _=levels-prelude :var __=print-args-prelude
@@ -2231,7 +2104,7 @@ This example is a bit intimidating because the serialized value we are storing a
 
 This is a difficult example, but once you understand the pieces, you can see some of the magit variables in action like =magit--git-variable= and its many subclasses.
 
-Revisit the section on [[id:6f6c8eba-1c0e-41c4-b57f-c06ab00f64d1][detangling setting, saving and history]].  Watching the values update will make it clear what representations are bing stored, where, and when.
+Revisit the section on [[Detangling with Initialization, Setting, and Saving][detangling setting, saving and history]].  Watching the values update will make it clear what representations are being stored, where, and when.
 
 *** Reading custom infix values
 
@@ -2309,19 +2182,12 @@ Revisit the section on [[id:6f6c8eba-1c0e-41c4-b57f-c06ab00f64d1][detangling set
 #+end_src
     
 *** TODO Errata
-:PROPERTIES:
-:ID:       2ca7838b-1215-4f8b-985b-8ebac41dd980
-:TOC:      :ignore this
-:END:
 
 Modifying the very outer group doesn't quite work.  It's probably a degenerate layout object, meaning setting a description doesn't cause it to behave like a group with a heading.  Maybe outer groups have a different data structure?  *An exercise left to the reader*
 
 The flow control for re-display is slightly fighting the history implementation.  It would be better if we could retain values while triggering a redraw without even more hacking & state manipulation.
 
 * Appendixes
-:PROPERTIES:
-:TOC:      :include descendants :depth 1
-:END:
 
 ** EIEIO - OOP in Elisp
 
@@ -2498,9 +2364,6 @@ When you are done, remember to use [[elisp:(edebug-remove-instrumentation)][=ede
 Because edebug works on defuns while suffixes are defined with macros, you may need to macro exand in order to come up with something debuggable.
 
 ** Layout Hacking
-:PROPERTIES:
-:ID:       49cb2ea4-66fa-4bc4-ab91-268580e907a5
-:END:
 
 First you need to export the layout data structures.
 
@@ -2657,9 +2520,6 @@ If you were hit in the face with the first example, you need to learn basic Elis
 #+end_src
 
 * More Packaging
-:PROPERTIES:
-:TOC:      :ignore this
-:END:
 
 The headers and footers for the tangled module.
 
