@@ -194,7 +194,7 @@ A prefix can also be bound as a suffix, enabling /nested/ prefixes.  A user inpu
 
 For example, in the =magit-dispatch= transient (=?=), =l= for =magit-log= is a nested transient. =b= for =all branches= is the suffix command =magit-log-all-branches=.
 
-See [[*Flow Control][Flow Control]] for nested transient examples with both sub-prefixes and suffixes that do no exit.
+See [[*Nesting & Flow Control][Flow Control]] for nested transient examples with both sub-prefixes and suffixes that do no exit.
 
 ** Infix
 
@@ -492,7 +492,7 @@ Vector on top of vector inside a vector.
 
 *** Empty strings make spaces
 
-Groups that are empty or only space have no effect.  This situation can happen with layouts that update dynamically.  See [[*dynamic layouts][dynamic layouts]].
+Groups that are empty or only space have no effect.  This situation can happen with layouts that update dynamically.  See [[*dynamically generating layouts][dynamic layouts]].
 
 #+begin_src elisp :tangle transient-showcase.el :var _=wave-prelude
 
@@ -860,7 +860,7 @@ Not all pre-commands are compatible with all situations and suffixes!
 There's definitely some edge cases that are unnecessarily complex for the
 use case.  Think of how life was before =transient--do-recurse=.
 
-* Using & Managing States
+* Using & Managing State
 :PROPERTIES:
 :TOC:      :include descendants :depth 3 :local depth
 :END:
@@ -1376,7 +1376,7 @@ Customizing this class can be useful when working with objects and functions tha
 
 This section covers more usages of infixes, focused on creating better argument strings for CLI tools.
 
-The section on [[*Flow control & managing state][flow control & managing state]] has more information about controlling elisp applications.
+The section on [[*Nesting & Flow control][flow control]] & [[*using & managing state][managing state]] has more information about controlling elisp applications.
 
 ** Reading arguments within suffixes
 
@@ -2052,7 +2052,7 @@ If it's holding a function, that function will be used as a backup during initia
 
 Not everything is a string or boolean.  You may want to represent complex objects in your transient infixes.  If your objects can be re-hydrated from some serialized ID, you may want history support.
 
-If you need to set and display a custom type, use the simple OOP techniques of [[*EIEIO][EIEIO]].  Also check the [[info:transient#Suffix Value Methods][suffix value methods]] section of the transient manual.  The following example applies these ideas.
+If you need to set and display a custom type, use the simple OOP techniques of [[*EIEIO - OOP in Elisp][EIEIO]].  Also check the [[info:transient#Suffix Value Methods][suffix value methods]] section of the transient manual.  The following example applies these ideas.
 
 *Essential behaviors for your custom infix:*
 
