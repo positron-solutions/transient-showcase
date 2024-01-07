@@ -1,7 +1,7 @@
 #+title: Transient Showcase
 #+author: Psionik K
 #+property: header-args :results silent :comments no :padline yes :no-expand true
-#+options: toc:nil num:nil
+#+options: toc:2 num:nil
 #+export_file_name: README.md
 #+EXCLUDE_TAGS: export_elisp noexport
 * Transient Showcase
