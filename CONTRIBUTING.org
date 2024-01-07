@@ -34,6 +34,7 @@ All changes must:
 
 - Don't break =org-babel-execute-source-block=
 - Don't break compile or tangle for the package
+- Update the README.md using ~org-md-export-to-markdown~
 - Don't break the TOC
 - GPG sign your commits
 
