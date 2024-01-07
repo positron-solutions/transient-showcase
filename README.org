@@ -3,6 +3,7 @@
 #+property: header-args :results silent :comments no :padline yes :no-expand true
 #+options: toc:nil
 #+export_file_name: README.md
+* Transient Showcase
 
 #+begin_export html
 <!-- !!!THIS FILE HAS BEEN GENERATED!!! Edit README.org -->
@@ -12,18 +13,18 @@ Code examples for interactive explanations of [[https://github.com/magit/transie
 
 This guide assumes you have minimal knowledge of Emacs, some programming experience in elisp and non-lisp languages, and have at least seen [[https://magit.vc/screenshots/][screenshots]] of =magit=.
 
-* How to use
+** How to use
 
 There are two ways:
 
-- Open this file in Emacs and run examples as literate org.
+- Open the README.org file in Emacs and run examples as literate org.
 - Install the package to run commands and read their source.  Start with the =tsc-showcase= command.
 
-** Using as literate org document
+*** Using as literate org document
 
-If you open this file in Emacs, it will switch to Org mode and you can run individual source blocks with =org-babel-execute-src-blk= on the block.
+If you open the org file in Emacs, it will switch to Org mode and you can run individual source blocks with =org-babel-execute-src-blk= on the block.
 
-** Using as an installable package
+*** Using as an installable package
 
 If you install the package, you can read source for each example with the normal.  =describe-symbol= command.  All commands are under =tsc-*= prefix.  Somewhat useful suffixes are under =tsc-suffix-*= while less useful ones under =tsc--suffix-*=.  They will come in handy when you are developing new applications.
 
@@ -45,17 +46,16 @@ Installations for straight and elpaca:
 
 #+end_src
 
-*Note* While this file is also the README for this repository, it's not intended to be used copy-paste.  Many links will only open in Emacs.  Some definitions are included by reference from [[*Preludes][Preludes]]
+*Note* While the exported markdown version of this file is also the README for this repository, it's not intended to be used directly or by copy-pasting.  Many links will only open in Emacs.  Some definitions are included by reference from [[*Preludes][Preludes]]
 
-** Packaging
+*** Packaging :export_elisp:
 :PROPERTIES:
 :VISIBILITY: folded
 :END:
 
-This file is produced with =org-babel-tangle=.  Package header and preludes
-included in the no-web block below:
+This org file is produced with =org-babel-tangle=.  Package header and preludes included in the no-web block below:
 
-#+begin_src elisp :tangle transient-showcase.el :noweb yes :hidden yes :eval never
+#+begin_src elisp :tangle transient-showcase.el :noweb yes :hidden yes :eval never :exports elisp
   <<package-header>>
   <<wave-prelude>>
   <<predicates-prelude>>
@@ -64,7 +64,7 @@ included in the no-web block below:
   <<print-args-prelude>>
 #+end_src
 
-** Running Examples in Org Mode
+*** Running Examples in Org Mode
 
 This is a basic transient, using an anonymous lambda interactive command as its only suffix.
 
@@ -88,7 +88,7 @@ After executing the block above, you can =execute-extended-command= (*M-x*) and 
 
 *Note* If the example above is hard to read, review some [[info:elisp#Top][elisp]] [[*Essential Elisp][syntax]] and typical forms.
 
-* Contents :noexport:
+* Contents :export_markdown:
 :PROPERTIES:
 :TOC:      :include siblings :depth 2
 :END:
@@ -114,7 +114,7 @@ After executing the block above, you can =execute-extended-command= (*M-x*) and 
   - [[Nesting][Nesting]]
   - [[Mixing Interactive][Mixing Interactive]]
   - [[Pre-Commands Explained][Pre-Commands Explained]]
-- [[Using & Managing States][Using & Managing States]]
+- [[Using & Managing State][Using & Managing State]]
   - [[The Magic of Transient][The Magic of Transient]]
   - [[Infixes][Infixes]]
   - [[Scope][Scope]]
