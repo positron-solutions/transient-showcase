@@ -4,6 +4,10 @@
 #+options: toc:nil
 #+export_file_name: README.md
 
+#+begin_export html
+<!-- !!!THIS FILE HAS BEEN GENERATED!!! Edit README.org -->
+#+end_export
+
 Code examples for interactive explanations of [[https://github.com/magit/transient][transient]].
 
 This guide assumes you have minimal knowledge of Emacs, some programming experience in elisp and non-lisp languages, and have at least seen [[https://magit.vc/screenshots/][screenshots]] of =magit=.
