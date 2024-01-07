@@ -104,7 +104,8 @@
       (interactive)
       (message "Called a suffix")))])
 
-;; First, use M-x org-babel-execute-src-blk to cause `tsc-hello' to be defined
+;; First, use M-x org-babel-execute-src-blk to cause `tsc-hello' to be
+;; defined
 ;; Second, M-x `eval-last-sexp' with your point at the end of the line below
 ;; (tsc-hello)
 
@@ -122,10 +123,10 @@
 ;; (get 'tsc-suffix-wave-macroed 'transient--suffix)
 
 ;; tsc-suffix-wave-suffix defined above
-
 (transient-define-prefix tsc-wave-macro-defined ()
   "Prefix to wave using a macro-defined suffix."
-  [(tsc-suffix-wave-macroed)]) ; note, information moved from prefix to the suffix.
+  [(tsc-suffix-wave-macroed)])
+;; note, information moved from prefix to the suffix.
 
 ;; (tsc-wave-macro-defined)
 
@@ -160,24 +161,24 @@
     ("k" "bad desc" tsc-suffix-wave :description "key-value wins")
     ("n" tsc-suffix-wave :description "no desc necessary")]
    [:description "Key Only Def"
-    ("wt" "wave too much" tsc-suffix-wave)
-    ("we" "wave excessively" tsc-suffix-wave)]])
+                 ("wt" "wave too much" tsc-suffix-wave)
+                 ("we" "wave excessively" tsc-suffix-wave)]])
 
 ;; (tsc-layout-descriptions)
 
 (transient-define-prefix tsc-layout-dynamic-descriptions ()
-   "Prefix that generate descriptions dynamically when transient is shown."
-   ;; group using function-name to generate description
-   [:description current-time-string
-    ("-s" "--switch" "switch=") ; switch just to cause updates
-    ;; single suffix with dynamic description
-    ("wa" tsc-suffix-wave
-     :description (lambda ()
-                    (format "Wave at %s" (current-time-string))))]
-   ;; group with anonymoous function generating description
-   [:description (lambda ()
-                   (format "Group %s" (org-id-new)))
-                 ("wu" "wave uniquely" tsc-suffix-wave)])
+  "Prefix that generate descriptions dynamically when transient is shown."
+  ;; group using function-name to generate description
+  [:description current-time-string
+                ("-s" "--switch" "switch=") ; switch just to cause updates
+                ;; single suffix with dynamic description
+                ("wa" tsc-suffix-wave
+                 :description (lambda ()
+                                (format "Wave at %s" (current-time-string))))]
+  ;; group with anonymoous function generating description
+  [:description (lambda ()
+                  (format "Group %s" (org-id-new)))
+                ("wu" "wave uniquely" tsc-suffix-wave)])
 
 ;; (tsc-layout-dynamic-descriptions)
 
@@ -238,7 +239,8 @@
 (transient-define-prefix tsc-layout-the-grid ()
   "Prefix with groups in a grid-like arrangement."
 
-  [:description "The Grid\n" ; must use slot or macro is confused
+  [:description
+   "The Grid\n" ; must use slot or macro is confused
    ["Left Column" ; note, no newline
     ("ltt" "left top top" tsc-suffix-wave)
     ("ltb" "left top bottom" tsc-suffix-wave)
@@ -403,7 +405,9 @@
    ("-e" "exclusive switches" tsc--exclusive-switches)
 
    ;; shorthand definitions
-   ("-b" "switch with shortarg" ("-w" "--switch-short")) ; with :short-arg != :key
+   ("-b" "switch with shortarg" ("-w" "--switch-short"))
+   ;; note :short-arg != :key
+
    ("-s" "switch" "--switch")
    ( "n" "no dash switch" "still works")
    ("-a" "argument" "--argument=" :prompt "Let's argue because: ")
@@ -433,8 +437,11 @@
   (interactive)
   (let ((scope (oref transient-current-prefix scope)))
     (if (numberp scope)
-        (transient-setup transient-current-command nil nil :scope (* scope 2))
-      (message (propertize (format "scope was non-numeric! %s" scope) 'face 'warning))
+        (transient-setup transient-current-command
+                         nil nil :scope (* scope 2))
+      (message
+       (propertize
+        (format "scope was non-numeric! %s" scope) 'face 'warning))
       (transient-setup transient-current-command))))
 
 (transient-define-suffix tsc--update-scope-with-prefix-re-enter (new-scope)
@@ -449,16 +456,20 @@
   "Prefix demonstrating use of scope."
 
   ;; note!  this is a location where we definitely had to use
-  ;; `transient--prefix' or get the transient object from the tsc-scope symbol.
-  ;; `transient-current-prefix' is not correct here!
-  [:description (lambda () (format "Scope: %s" (oref transient--prefix scope)))
+  ;; `transient--prefix' or get the transient object from the tsc-scope
+  ;; symbol.  `transient-current-prefix' would not be correct here!
+  [:description
+   (lambda () (format "Scope: %s"
+                      (oref transient--prefix scope)))
    [("r" "read scope" tsc--read-prefix-scope)
     ("d" "double scope" tsc--double-scope-re-enter)
-    ("o" "update scope (use prefix argument)" tsc--update-scope-with-prefix-re-enter)]]
+    ("o" "update scope (use prefix argument)"
+     tsc--update-scope-with-prefix-re-enter)]]
   (interactive "P")
   (transient-setup 'tsc-scope nil nil :scope scope))
 
-;; Setting an interactive argument for `eval-last-sexp' is a little different
+;; Setting an interactive argument for `eval-last-sexp' is a
+;; little different
 ;; (let ((current-prefix-arg 4)) (call-interactively 'tsc-scope))
 
 ;; (tsc-scope)
@@ -502,9 +513,11 @@ This command can be called from it's parent, `tsc-snowcone-eater' or independent
   ;; Definitely check out the =C-x= menu
   ["C-x Menu Behaviors"
    ("S" "save snowcone settings"
-    (lambda () (interactive) (message "saved!") (transient-save)) :transient t)
+    (lambda () (interactive) (message "saved!") (transient-save))
+    :transient t)
    ("R" "reset snowcone settings"
-    (lambda () (interactive) (message "reset!") (transient-reset)) :transient t)]
+    (lambda () (interactive) (message "reset!") (transient-reset))
+    :transient t)]
 
   ["Actions"
    ("m" "message arguments" tsc-suffix-print-args)
@@ -583,7 +596,8 @@ This command can be called from it's parent, `tsc-snowcone-eater' or independent
    ("-r" "rememeber" "--i-remember="
     :always-read t)
    ("w" "remember and wave" tsc-suffix-remember-and-wave)
-   ("a" "print args (skips remembering)" tsc-suffix-print-args :transient nil)])
+   ("a" "print args (skips remembering)" tsc-suffix-print-args
+    :transient nil)])
 
 ;; (tsc-elephant)
 
@@ -614,29 +628,30 @@ This command can be called from it's parent, `tsc-snowcone-eater' or independent
 
 (defvar tsc--position '(0 0) "A transient prefix location.")
 
-  (transient-define-infix tsc--pos-infix ()
-    "A location, key, or command symbol."
-    :class 'transient-lisp-variable
-    :transient t
-    :prompt "An expression such as (0 0), \"p\", nil, 'tsc--msg-pos: "
-    :variable 'tsc--position)
+(transient-define-infix tsc--pos-infix ()
+ "A location, key, or command symbol."
+ :class 'transient-lisp-variable
+ :transient t
+ :prompt "An expression such as (0 0), \"p\", nil, 'tsc--msg-pos: "
+ :variable 'tsc--position)
 
-  (transient-define-suffix tsc--msg-pos ()
-    "Message the element at location."
-    :transient 'transient--do-call
-    (interactive)
-    ;; lisp variables are not sent in the usual (transient-args) list.
-    ;; Just read `tsc--position' directly.
-    (let ((suffix (transient-get-suffix transient-current-command tsc--position)))
-      (message "%s" (oref suffix description))))
+(transient-define-suffix tsc--msg-pos ()
+ "Message the element at location."
+ :transient 'transient--do-call
+ (interactive)
+ ;; lisp variables are not sent in the usual (transient-args) list.
+ ;; Just read `tsc--position' directly.
+ (let ((suffix (transient-get-suffix
+                transient-current-command tsc--position)))
+   (message "%s" (oref suffix description))))
 
-  (transient-define-prefix tsc-lisp-variable ()
-    "A prefix that updates and uses a lisp variable."
-    ["Location Printing"
-     [("p" "position" tsc--pos-infix)]
-     [("m" "message" tsc--msg-pos)]])
+(transient-define-prefix tsc-lisp-variable ()
+ "A prefix that updates and uses a lisp variable."
+ ["Location Printing"
+  [("p" "position" tsc--pos-infix)]
+  [("m" "message" tsc--msg-pos)]])
 
-  ;; (tsc-lisp-variable)
+;; (tsc-lisp-variable)
 
 (transient-define-prefix tsc-switches-and-arguments (arg)
   "A prefix with switch and argument examples."
@@ -647,13 +662,15 @@ This command can be called from it's parent, `tsc-snowcone-eater' or independent
     ("v" "value" "--value=")]
 
    ["More Arguments"
-    ("-f" "argument with forced class" "--forced-class " :class transient-option)
+    ("-f" "argument with forced class" "--forced-class "
+     :class transient-option)
     ("I" "argument with inline" ("-i" "--inline-shortarg="))
     ("S" "inline shortarg switch" ("-n" "--inline-shortarg-switch"))]]
 
   ["Commands"
    ("w" "wave some" tsc-suffix-wave)
-   ("s" "show arguments" tsc-suffix-print-args)]) ; use to analyze the switch values
+   ("s" "show arguments" tsc-suffix-print-args)])
+;; use to `tsc-suffix-print-args' to analyze the switch values
 
 ;; (tsc-switches-and-arguments)
 
@@ -676,13 +693,17 @@ This command can be called from it's parent, `tsc-snowcone-eater' or independent
 ;; (tsc-maybe-on)
 ;; (tsc-maybe-on)
 ;; ...
-;; Run the command a few times to see the random initialization of `tsc--random-init-infix'
-;; It will only take more than ten tries for one in a thousand users.  Good luck.
+;; Run the command a few times to see the random initialization of
+;; `tsc--random-init-infix'
+;; It will only take more than ten tries for one in a thousand users.
+;; Good luck.
 
 (transient-define-argument tsc--animals-argument ()
   "Animal picker."
   :argument "--animals="
-  ; :multi-value t ; multi-value can be set to --animals=fox,otter,kitten etc
+  ;; :multi-value t
+  ;; :multi-value t means multiple options can be selected at once, such as:
+  ;; --animals=fox,otter,kitten etc
   :class 'transient-option
   :choices '("fox" "kitten" "peregrine" "otter"))
 
@@ -748,7 +769,8 @@ FLAG: request for metadata (which can be disrespected)"
 
     ;; when not handling a metadata request from completions, use some
     ;; logic to generate the choices, possibly based on input or some time
-    ;; / context sensitive process.  FLAG will be `t' when these are reqeusted.
+    ;; / context sensitive process.  FLAG will be `t' when these are
+    ;; reqeusted.
     (if (eq 0 (random 2))
         '("fox" "kitten" "otter")
       '("ant" "peregrine" "zebra"))))
@@ -808,12 +830,12 @@ FLAG: request for metadata (which can be disrespected)"
 
 (transient-define-prefix tsc-cowsay ()
   "Say things with animals!"
-
-  ; only one kind of eyes is meaningful at a time
+  ;; only one kind of eyes is meaningful at a time
   :incompatible '(("-b" "-g" "-p" "-s" "-t" "-w" "-y"))
 
   ["Message"
-   ("m" "message" "--message=" :always-read t)] ; always-read, so clear by entering empty string
+   ("m" "message" "--message=" :always-read t)]
+  ;; always-read, so clear by entering empty string
   [["Built-in Eyes"
     ("b" "borg" "-b")
     ("g" "greedy" "-g")
@@ -886,7 +908,8 @@ When this is called in layouts, it's the transient being layed out"
   ;; in the body, we read the value of the parent and set our scope to
   ;; non-nil if the switch is set
   (interactive)
-  (let ((scope (transient-arg-value "--switch" (transient-args 'tsc-inapt-parent))))
+  (let ((scope (transient-arg-value "--switch"
+                                    (transient-args 'tsc-inapt-parent))))
     (message "scope: %s" scope)
     (message "type: %s" (type-of scope))
     (transient-setup 'tsc--inapt-children nil nil :scope (if scope t nil))))
@@ -909,8 +932,8 @@ When this is called in layouts, it's the transient being layed out"
     ("C-x l" "set level" transient-set-level)
     ("s" "show level" tsc-suffix-show-level)]
 
-   [2 "Per Group" ; 1 is the default default-child-level
-      ("ws" "wave surely" tsc--wave-surely) ; 1 is the default default-child-level
+   [2 "Per Group" ;; 1 is the default default-child-level
+      ("ws" "wave surely" tsc--wave-surely)
       (3"wn" "wave normally" tsc--wave-normally)
       (5"wb" "wave non-essentially" tsc--wave-non-essentially)]
 
@@ -981,28 +1004,32 @@ When this is called in layouts, it's the transient being layed out"
   (transient-setup 'tsc-self-modifying))
 
 (transient-define-prefix tsc-self-modifying ()
- "Prefix that uses `transient-insert-suffix' to add commands to itself."
+  "Prefix that uses `transient-insert-suffix' to add commands to itself."
 
- [["Add New Commands"
-   ("a" "add command" tsc--self-modifying-add-command)]
-  ["User Defined"
-   ""]]) ; blank line suffix creates an insertion point
+  [["Add New Commands"
+    ("a" "add command" tsc--self-modifying-add-command)]
+   ["User Defined"
+    ""]]) ; blank line suffix creates an insertion point
 
 ;; (tsc-self-modifying)
 
 ;; The children we will be picking can be of several forms.  The
-;; transient--layout symbol property of a prefix is a vector of vectors, lists,
-;; and strings.  It's not the actual eieio types or we would use
+;; transient--layout symbol property of a prefix is a vector of vectors,
+;; lists, and strings.  It's not the actual eieio types or we would use
 ;; `transient-format-description' to just ask them for the descriptions.
 (defun tsc--layout-child-desc (layout-child)
   "Get the description from LAYOUT-CHILD.
 LAYOUT-CHILD is a transient layout vector or list."
   (let ((description
          (cond
-          ((vectorp layout-child) (or (plist-get (aref layout-child 2) :description) "<group, no desc>")) ; group
+          ((vectorp layout-child)
+           (or (plist-get (aref layout-child 2) :description)
+               "<group, no desc>")) ; group
           ((stringp layout-child) layout-child) ; plain-text child
-          ((listp layout-child) (plist-get (elt layout-child 2) :description)) ; suffix
-          (t (message (propertize "You traversed into a child's list elements!" 'face 'warning))
+          ((listp layout-child)
+           (plist-get (elt layout-child 2) :description)) ; suffix
+          (t
+           (message (propertize "You traversed into a child's list elements!" 'face 'warning))
              (format "(child's interior) element: %s" layout-child)))))
     (cond
      ;; The description is sometimes a callable function with no arguments,
@@ -1012,16 +1039,17 @@ LAYOUT-CHILD is a transient layout vector or list."
      ((functionp description) (apply description))
      (t description))))
 
-;; We repeat the read using a lisp expression from `read-from-minibuffer' to get
-;; the LOC key for `transient-get-suffix' until we get a valid result.  This
-;; ensures we don't store an invalid LOC.
+;; We repeat the read using a lisp expression from `read-from-minibuffer' to
+;; get the LOC key for `transient-get-suffix' until we get a valid result.
+;; This ensures we don't store an invalid LOC.
 (defun tsc-child-infix--reader (prompt initial-input history)
   "Read a location and check that it exists within the current transient.
 PROMPT, INITIAL-INPUT, and HISTORY are forwarded to `read-from-minibuffer'."
   (let ((command (oref transient--prefix command))
         (success nil))
     (while (not success)
-      (let* ((loc (read (read-from-minibuffer prompt initial-input nil nil history)))
+      (let* ((loc (read (read-from-minibuffer
+                         prompt initial-input nil nil history)))
              (child (ignore-errors (transient-get-suffix command loc))))
         (if child (setq success loc)
           (message (propertize
@@ -1040,7 +1068,8 @@ PROMPT, INITIAL-INPUT, and HISTORY are forwarded to `read-from-minibuffer'."
    ;; which is basically a suffix addres or id.
 
    (reader :initform #'tsc-child-infix--reader)
-   (prompt :initform "Location, a key \"c\", suffix-command-symbol like tsc--wave-normally or coordinates like (0 2 0): ")))
+   (prompt :initform
+           "Location, a key \"c\",\ suffix-command-symbol like\ tsc--wave-normally or coordinates like (0 2 0): ")))
 
 ;; We have to define this on non-abstract infix classes.  See
 ;; `transient-init-value' in transient source.  The method on
@@ -1062,7 +1091,9 @@ PROMPT, INITIAL-INPUT, and HISTORY are forwarded to `read-from-minibuffer'."
                 ;; (argument (and (slot-boundp obj 'argument)
                 ;;   (oref obj argument)))
                 (value (cdr (assoc variable prefix-value)))
-                (value-object (transient-get-suffix (oref transient--prefix command) value))) ; rehydrate
+                ;; rehydrate
+                (value-object (transient-get-suffix
+                               (oref transient--prefix command) value)))
       (oset obj value value)
       (oset obj value-object value-object))))
 
@@ -1124,46 +1155,50 @@ Show either the child's description or a default if no child is selected."
 ;; Try: (1 2)
 ;; Try: tsc--wave-normally
 ;;
-;; Observe that the LOC you enter is displayed using the description at that poin
+;; Observe that the LOC you enter is displayed using the description at that
+;; point
 ;;
 ;; Set the infix and re-open it with C-x s, C-g, and M-x tsc-inception
 ;; Observe that the set value persists across invocations
 ;;
-;; Save the infix, with C-x C-s, re-evaluate the prefix, and open the prefix again.
-;; Observe that the
+;; Save the infix, with C-x C-s, re-evaluate the prefix, and open the
+;; prefix again.
 ;;
 ;; Try flipping through history, C-x n, C-x p
-;; Now do think of doing things like this with org ids, magit-sections, buffers etc.
+;; Now do think of doing things like this with org ids, magit-sections,
+;; buffers etc.
 
 (transient-define-suffix tsc--inception-update-description ()
-   "Update the description of of the selected child."
-   (interactive)
-   (let* ((args (transient-args transient-current-command))
-          (description (transient-arg-value "--description=" args))
-          ;; This is the part where we read the other infix.  It's
-          ;; similar to how we find the value during rehydration, but
-          ;; hard-coding the infix's argument, "child", which is used
-          ;; in its `transient-infix-value' method.
-          (loc (cdr (assoc "child" args)))
-          (layout-child (transient-get-suffix 'tsc-inception-update loc)))
+  "Update the description of of the selected child."
+  (interactive)
+  (let* ((args (transient-args transient-current-command))
+         (description (transient-arg-value "--description=" args))
+         ;; This is the part where we read the other infix.  It's
+         ;; similar to how we find the value during rehydration, but
+         ;; hard-coding the infix's argument, "child", which is used
+         ;; in its `transient-infix-value' method.
+         (loc (cdr (assoc "child" args)))
+         (layout-child (transient-get-suffix 'tsc-inception-update loc)))
 
-     ;; Once again, do different bodies based on what we found at the
-     ;; layout locition.  This complexity is beacuse of the data we
-     ;; are operating on, not the transient methods we needed to
-     ;; implement.
-     (cond
-      ((or (listp layout-child) ; child
+    ;; Once again, do different bodies based on what we found at the
+    ;; layout locition.  This complexity is beacuse of the data we
+    ;; are operating on, not the transient methods we needed to
+    ;; implement.
+    (cond
+     ((or (listp layout-child) ; child
           (vectorp layout-child) ; group
           (stringp layout-child)) ; string child
-       (if (stringp layout-child)
-           (transient-replace-suffix 'tsc-inception-update loc description) ; plain-text child
-         (plist-put (elt layout-child 2) :description description)))
-      (t (message
-          (propertize (format "Don't know how to modify whatever is at: %s" loc)
-                      'face 'warning))))
+      (if (stringp layout-child) ; plain-text child
+          (transient-replace-suffix 'tsc-inception-update loc description)
 
-     ;; re-enter the transient manually to display the modified layout
-     (transient-setup transient-current-command)))
+        (plist-put (elt layout-child 2) :description description)))
+     (t (message
+         (propertize
+          (format "Don't know how to modify whatever is at: %s" loc)
+                     'face 'warning))))
+
+    ;; re-enter the transient manually to display the modified layout
+    (transient-setup transient-current-command)))
 
 (transient-define-prefix tsc-inception-update ()
   "Prefix that picks and updates its own suffix."
@@ -1173,7 +1208,8 @@ Show either the child's description or a default if no child is selected."
 
    ["Update the description!"
     ("-d" "description" "--description=")
-    ("u" "update" tsc--inception-update-description :transient transient--do-exit)]
+    ("u" "update" tsc--inception-update-description
+     :transient transient--do-exit)]
 
    ["Some suffixes"
     ("s" "wave surely" tsc--wave-surely)
@@ -1213,7 +1249,8 @@ control such as replacing or exiting."
     ("le" "explicit class" tsc-layout-explicit-classes :transient t)
     ("ld" "descriptions" tsc-layout-descriptions :transient t)
     ;; padded description to sc
-    ("lD" "dynamic descriptions        " tsc-layout-dynamic-descriptions :transient t)]
+    ("lD" "dynamic descriptions        "
+     tsc-layout-dynamic-descriptions :transient t)]
 
    ["Nesting & Flow Control"
     ("fs" "stay transient" tsc-stay-transient :transient t)
@@ -1223,7 +1260,7 @@ control such as replacing or exiting."
     ("fi" "mixing interactive" tsc-interactive-basic :transient t)
     ("fe" "early return" tsc-simple-messager :transient t)]]
 
-   [["Managing State" ; padded right group
+  [["Managing State" ; padded right group
     ("sb" "a bunch of infixes" tsc-basic-infixes :transient t)
     ("sc" "using scope (accepts prefix)" tsc-scope :transient t)
     ("sn" "set & save / snowcones" tsc-snowcone-eater :transient t)
@@ -1234,7 +1271,7 @@ control such as replacing or exiting."
     ("sf" "enforcing inputs" tsc-enforcing-inputs :transient t)
     ("sl" "lisp variables" tsc-lisp-variable :transient t)]
 
-  ["CLI arguments"
+   ["CLI arguments"
     ("cb" "basic arguments" tsc-switches-and-arguments :transient t)
     ("cm" "random-init infix" tsc-maybe-on :transient t)
     ("cc" "basic choices" tsc-animal-choices :transient t)
@@ -1243,9 +1280,10 @@ control such as replacing or exiting."
     ("co" "completions for choices" tsc-choices-with-completions :transient t)
     ("cc" "cowsay cli wrapper" tsc-cowsay :transient t)]]
 
-   [["Visibility"
-     ;; padded description to sc
-    ("vp" "predicates                  " tsc-visibility-predicates :transient t)
+  [["Visibility"
+    ;; padded description to sc
+    ("vp" "predicates                  "
+     tsc-visibility-predicates :transient t)
     ("vi" "inapt (not suitable)" tsc-inapt-parent :transient t)
     ("vl" "levels" tsc-levels-and-visibility :transient t)]
 
