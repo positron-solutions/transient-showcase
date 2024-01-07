@@ -22,16 +22,11 @@
 - [[#maintaining-nixpkgs-versions][Maintaining nixpkgs versions]]
 :END:
 
-There's a lot of ways something could have gone wrong while tangling the README
-into the package.
+There's a lot of ways something could have gone wrong while tangling the README into the package.
 
-There are TODO's within the document.  Some are notes to add support to
-transient.  Errata in particular is where something seems possibly broken,
-missing, or unnecessarily weird.
+There are TODO's within the document.  Some are notes to add support to transient.  Errata in particular is where something seems possibly broken, missing, or unnecessarily weird.
 
-Spot something that seems inconsistent, unclear, or an example where the
-behavior is just odd?  Please file an issue.  If you can fix it, please submit a
-PR or patch suggestion in your issue.
+Spot something that seems inconsistent, unclear, or an example where the behavior is just odd?  Please file an issue.  If you can fix it, please submit a PR or patch suggestion in your issue.
 
 Want to add a new example?  Welcome.  PR please.
 
@@ -40,27 +35,22 @@ All changes must:
 - Don't break =org-babel-execute-source-block=
 - Don't break compile or tangle for the package
 - Don't break the TOC
-- Include DCO sign-off in your changes
 - GPG sign your commits
 
 * Development
 
-  This repository was created with [[https://github.com/positron-solutions/elisp-repo-kit/][elisp-repo-kit]].  You can use it to streamline
-  development workflows.
+This repository was created with [[https://github.com/positron-solutions/elisp-repo-kit/][elisp-repo-kit]].  You can use it to streamline development workflows.
 
 * Reproducing CI
 
-  CI will tangle the README, load the package, and then try to run
-  =tsc-showcase=.  It will also byte compile lint the package.
+CI will tangle the README, load the package, and then try to run =tsc-showcase=.  It will also byte compile lint the package.
 
-  If you cannot reproduce a failure (or success) on CI, then you may want to
-  switch to using [[https://nixos.org/download.html][nix]] to get a reproducible toolchain so you can further develop
-  with frozen versions from the nix [[https://nixos.wiki/wiki/Flakes][flake's]] flake.lock.
+If you cannot reproduce a failure (or success) on CI, then you may want to switch to using [[https://nixos.org/download.html][nix]] to get a reproducible toolchain so you can further develop with frozen versions from the nix [[https://nixos.wiki/wiki/Flakes][flake's]] flake.lock.
 
-  #+begin_src shell
+#+begin_src shell
 
-    nix develop .github# # loads the devShells.default from flake.nix
-    cd .github && direnv allow # same as above with file watching
+  nix develop .github# # loads the devShells.default from flake.nix
+  cd .github && direnv allow # same as above with file watching
 
   #+end_src
 
@@ -77,163 +67,112 @@ All changes must:
 
 ** Lint and byte-compile code
 
-   This package uses [[https://github.com/gonewest818/elisp-lint][elisp-lint]] to detect issues with byte compiling, package
-   format, code structure and others.  This is run after tangling the new
-   package.
+This package uses [[https://github.com/gonewest818/elisp-lint][elisp-lint]] to detect issues with byte compiling, package format, code structure and others.  This is run after tangling the new package.
 
-   The configuration is found inside [[.github/run-shim.el][.github/run-shim.el]].  The CI run is invoked
-   inside of [[.github/workflows/ci.yml][ci.yml]] using Emacs in script mode.  Most of the configuration is in
-   the run shim.
+The configuration is found inside [[.github/run-shim.el][.github/run-shim.el]].  The CI run is invoked inside of [[.github/workflows/ci.yml][ci.yml]] using Emacs in script mode.  Most of the configuration is in the run shim.
 
-   You can run the lints manually almost the same as running tests.
+You can run the lints manually almost the same as running tests.
 
-   #+begin_src bash
+#+begin_src bash
 
-     nix develop .github#
-     # nix develop .github#emacs28
-     # nix develop .github#emacsGit
-     emacs --script .github/run-shim.el -- lint
+  nix develop .github#
+  # nix develop .github#emacs28
+  # nix develop .github#emacsGit
+  emacs --script .github/run-shim.el -- lint
 
    #+end_src
 
 ** Loading and re-loading your package
 
-   Run =erk-reload-package= in one of your project files.  All features
-   in the /lisp directory will be re-compiled and loaded appropriately.
+Run =erk-reload-package= in one of your project files.  All features in the /lisp directory will be re-compiled and loaded appropriately.
 
-   *Note*, during reloading, unloading the current module is forced.  If other
-   packages you use depend on the project feature, results may be unpredictable.
-   This is one reason batch style testing can be preferred.
+*Note*, during reloading, unloading the current module is forced.  If other packages you use depend on the project feature, results may be unpredictable.  This is one reason batch style testing can be preferred.
 
 *** Manual Loading & Reloading
 
-    To manually unload, run built-in command ~unload-feature~ and select your
-    package name. If you do not unload, reloading has no effect and you will see
-    stale behavior.
+To manually unload, run built-in command ~unload-feature~ and select your package name. If you do not unload, reloading has no effect and you will see stale behavior.
 
-    Next, add the package to your load-path and then require it or, more
-    directly, call =emacs-lisp-byte-compile-and-load= or
-    =emacs-lisp-native-compile-and-load=.
+Next, add the package to your load-path and then require it or, more directly, call =emacs-lisp-byte-compile-and-load= or =emacs-lisp-native-compile-and-load=.
 
 * License
 
-  This project is GPL3 licensed and a copy is distributed in the file, [[./COPYING][COPYING]].
+This project is GPL3 licensed and a copy is distributed in the file, [[./COPYING][COPYING]].
 
 * Developer Certificate of Origin (DCO)
 
-  This project is distributed with a Developer Certificate of Origin.  By adding
-  a sign-off notice and GPG signature to each commit, you will provide means to
-  authenticate your sign-off later strengthening your attestations stated in the
-  DCO, upholding the overall integrity of the license coverage over the project.
-
-  A [[./DCO][copy of the DCO]] is distributed with this project.  Read its text to
-  understand the significance of configuring for sign-off.
-
-** Sign-off
-
-   A sign-off means adding a "trailer" to your commit that looks like the
-   following:
-
-   #+begin_src
-
-   Signed-off-by: Random J Developer <random@developer.example.org>
-
-   #+end_src
+This project requires signed commits.  Please set up your Github appropriately so that the check passes.
 
 ** GPG signature
 
-   A GPG signed commit shows that the owner of the private key submitted the
-   changes.  Wherever signatures are recorded in chains, they can demonstrate
-   participation in changes elsewhere and awareness of what the submitter is
-   participating in.  Corroborating user's signature across a history of works
-   strengthens that user's attestation provided by DCO sign-off.
+A GPG signed commit shows that the owner of the private key submitted the changes.  Wherever signatures are recorded in chains, they can demonstrate participation in changes elsewhere and awareness of what the submitter is participating in.  Corroborating user's signature across a history of works strengthens that user's attestation provided by DCO sign-off.
 
 ** User setup for submitting changes
 
-   Follow these instructions before you get ready to submit a pull-request.
+Follow these instructions before you get ready to submit a pull-request.
 
-   Refer to the [[https://docs.github.com/en/authentication/managing-commit-signature-verification/signing-commits][Github signing commits]] instructions to set up your git client
-   to add GPG signatures.  File issues if you run into Emacs-specific problems.
+Refer to the [[https://docs.github.com/en/authentication/managing-commit-signature-verification/signing-commits][Github signing commits]] instructions to set up your git client to add GPG signatures.  File issues if you run into Emacs-specific problems.
 
-   Because signing is intended to be a conscious process, please remember to
-   read and understand the [[./DCO][Developer Certificate of Origin]] before configuring
-   your client to automatically sign-off on commits.
+Because signing is intended to be a conscious process, please remember to read and understand the [[./DCO][Developer Certificate of Origin]] before configuring your client to automatically sign-off on commits.
 
 *** Automatically add sign-off
 
-    In magit, set the =-s= switch.  Use =C-x C-s= (=transient-save=) to
-    preserve this switch on future uses.  (Note, this is not per-project).You
-    can also set the signature flag this way.
+In magit, set the =-s= switch.  Use =C-x C-s= (=transient-save=) to preserve this switch on future uses.  (Note, this is not per-project).You can also set the signature flag this way.
 
 *** Automatic GPG signing with per-project keys
 
-    In order to specify which projects you intend to sign with which keys, you
-    will want to configure your git client using path-specific configurations.
+In order to specify which projects you intend to sign with which keys, you will want to configure your git client using path-specific configurations.
 
-    Configuring git for this can be done with the following directory structure:
+Configuring git for this can be done with the following directory structure:
 
     #+begin_src
 
-   /home/rjdeveloper/
-   ├── .gitconfig
-   └── .gitconfig.d
-       ├── sco-linux-projects.conf
-       ├── other-projects.conf
-       └── gpg-signing-projects.conf
+  /home/rjdeveloper/
+  ├── .gitconfig
+  └── .gitconfig.d
+      ├── sco-linux-projects.conf
+      ├── other-projects.conf
+      └── gpg-signing-projects.conf
 
     #+end_src
 
-    In your root config, ~.gitconfig~, add an =includeIf= directive that will
-    load the configuration you use for projects you intend to GPG sign commits
-    for.
+In your root config, ~.gitconfig~, add an =includeIf= directive that will load the configuration you use for projects you intend to GPG sign commits for.
 
-    #+begin_src
+#+begin_src
 
-   [includeIf "gitdir:/home/rjdeveloper/**/gpg-signing/**/.git"]
-     path = "~/.gitconfig.d/gpg-signing-projects.conf"
+  [includeIf "gitdir:/home/rjdeveloper/**/gpg-signing/**/.git"]
+    path = "~/.gitconfig.d/gpg-signing-projects.conf"
 
-    #+end_src
+#+end_src
 
-    In the ~gpg-signing-projects.conf~ add your GPG signing configuration from
-    earlier.  =sign= adds the GPG signature automatically.  File an issue if you
-    need help with multiple GPG homes or other configurations.
+In the ~gpg-signing-projects.conf~ add your GPG signing configuration from earlier.  =sign= adds the GPG signature automatically.  File an issue if you need help with multiple GPG homes or other configurations.
 
-    #+begin_src
+#+begin_src
 
-   [user]
-     name = "Random J Developer"
-     email = "random@developer.example.org"
-     signingkey = "5FF0EBDC623B3AD4"
+  [user]
+    name = "Random J Developer"
+    email = "random@developer.example.org"
+    signingkey = "5FF0EBDC623B3AD4"
 
-   [commit]
-     sign = true
-     gpgSign = true
+  [commit]
+    sign = true
+    gpgSign = true
 
     #+end_src
 
 *** Manually signing & adding sign-off
 
-    If you don't like these configurations and want to individually indicate you
-    have read and intend to apply the DCO to your changes, these commands are
-    equivalent:
+If you don't like these configurations and want to individually indicate you have read and intend to apply the DCO to your changes, these commands are equivalent:
 
-    #+begin_src bash
-      git commit -s -S --message "I don't like using .gitconfig"
+#+begin_src bash
+  git commit -s -S --message "I don't like using .gitconfig"
 
-      # To clean up a commit
-      git commit --amend -s -S --no-message
+  # To clean up a commit
+  git commit --amend -s -S --no-message
 
-      # Combine with rebase to sign / sign-off multiple existing commits
-      git rebase -i
+  # Combine with rebase to sign / sign-off multiple existing commits
+  git rebase -i
     #+end_src
 
 * Maintaining nixpkgs versions
 
-  Nixpkgs has a new release about every six months.  You can check their [[https://github.com/NixOS/nixpkgs/branches][branches]]
-  and [[https://github.com/NixOS/nixpkgs/tags][tags]] to see what's current.  To get updated dependencies from MELPA, it's
-  necessary to update the emacs-overlay with =nix flake lock --update-input
-  emacs-overlay=.  You can also specify revs and branches if you need to roll
-  back. There is a make shortcut: =make flake-update= MacOS tends to get a little
-  less test emphasis, and so =nixpkgs-darwin-<version>= branches exist and are
-  required to pass more Darwin tests before merging.  This is more stable if you
-  are on MacOS. =nixpkgs-unstable= or =master= are your other less common options.
+Nixpkgs has a new release about every six months.  You can check their [[https://github.com/NixOS/nixpkgs/branches][branches]] and [[https://github.com/NixOS/nixpkgs/tags][tags]] to see what's current.  To get updated dependencies from MELPA, it's necessary to update the emacs-overlay with =nix flake lock --update-input emacs-overlay=.  You can also specify revs and branches if you need to roll back. There is a make shortcut: =make flake-update= MacOS tends to get a little less test emphasis, and so =nixpkgs-darwin-<version>= branches exist and are required to pass more Darwin tests before merging.  This is more stable if you are on MacOS. =nixpkgs-unstable= or =master= are your other less common options.
