@@ -22,25 +22,39 @@
 - [[#maintaining-nixpkgs-versions][Maintaining nixpkgs versions]]
 :END:
 
-There's a lot of ways something could have gone wrong while tangling the README into the package.
-
-There are TODO's within the document.  Some are notes to add support to transient.  Errata in particular is where something seems possibly broken, missing, or unnecessarily weird.
+There are TODO's within the document.  Some are notes to add support to transient.  Errata in particular is where something seems possibly broken, missing, or unnecessarily weird.  *Transient has been updated a lot, and many Errata were fixed.  Please PR if you see something that works!*
 
 Spot something that seems inconsistent, unclear, or an example where the behavior is just odd?  Please file an issue.  If you can fix it, please submit a PR or patch suggestion in your issue.
 
-Want to add a new example?  Welcome.  PR please.
+Want to add a new example?  It is welcome.  PR please.
 
 All changes must:
 
-- Don't break =org-babel-execute-source-block=
+- Re-generate the =transient-showcase.el=
+- Re-generate the the =README.md=
+- Don't break ~org-babel-execute-source-block~
 - Don't break compile or tangle for the package
-- Update the README.md using ~org-md-export-to-markdown~
-- Don't break the TOC
+- Don't break the TOC (re-generated using ~org-make-toc~
 - GPG sign your commits
 
-* Development
+This repository was created with [[https://github.com/positron-solutions/elisp-repo-kit/][elisp-repo-kit]]. (A literate org template is work in progress).
 
-This repository was created with [[https://github.com/positron-solutions/elisp-repo-kit/][elisp-repo-kit]].  You can use it to streamline development workflows.
+* Updating Generated Files
+
+TODO this should be automated with the style of solutions from Elisp Repo Kit, using save hooks.
+
+** Tangling
+
+~org-babel-tangle-file~
+
+** Export
+
+The markdown export needs to skip the Elisp sections.  You can configure this by running this expression inside the README.org buffer context. (~eval-expression~ when inside the buffer)
+
+#+begin_src elisp
+  (let ((org-export-exclude-tags '("export_elisp")))
+    (call-interactively #'org-md-export-to-markdown))
+#+end_src
 
 * Reproducing CI
 
