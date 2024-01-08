@@ -320,7 +320,8 @@
    ;; to trigger the following transient correctly.  This example will
    ;; work with `transient--do-replace' or no custom pre-command
 
-   ("bc" "become child" tsc-suffix-setup-child :transient transient--do-replace)])
+   ("bc" "become child" tsc-suffix-setup-child
+    :transient transient--do-replace)])
 
 ;; (tsc-parent-with-setup-suffix)
 
@@ -867,7 +868,7 @@ abstract major modes."
   [["Function Predicates"
     ;; note, after toggling, the transient needs to be re-displayed for the
     ;; predicate to take effect
-    ("b" "toggle busy" tsc--toggle-busy)
+    ("tb" "toggle busy" tsc--toggle-busy :transient t)
     ("bw" "wave busily" tsc-suffix-wave :if tsc--busy-p)]
 
    ["Programming Actions"
@@ -919,7 +920,8 @@ When this is called in layouts, it's the transient being layed out"
 
   [("-s" "switch" "--switch")
    ("a" "show arguments" tsc-suffix-print-args)
-   ("c" "launch child prefix" tsc--inapt-children :transient transient--do-recurse)])
+   ("c" "launch child prefix" tsc--inapt-children
+    :transient transient--do-recurse)])
 
 ;; (tsc-inapt-parent)
 
@@ -1029,7 +1031,9 @@ LAYOUT-CHILD is a transient layout vector or list."
           ((listp layout-child)
            (plist-get (elt layout-child 2) :description)) ; suffix
           (t
-           (message (propertize "You traversed into a child's list elements!" 'face 'warning))
+           (message
+            (propertize "You traversed into a child's list elements!"
+                        'face 'warning))
              (format "(child's interior) element: %s" layout-child)))))
     (cond
      ;; The description is sometimes a callable function with no arguments,
