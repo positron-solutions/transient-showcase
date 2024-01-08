@@ -59,7 +59,7 @@ Installations for straight and elpaca:
 
 This org file is produced with =org-babel-tangle=.  Package header and preludes included in the no-web block below:
 
-#+begin_src elisp :tangle transient-showcase.el :noweb yes :hidden yes :eval never :exports elisp
+#+begin_src elisp :tangle transient-showcase.el :noweb yes :hidden yes :eval never
   <<package-header>>
   <<wave-prelude>>
   <<predicates-prelude>>
@@ -2515,13 +2515,13 @@ If you were hit in the face with the first example, you need to learn basic Elis
 
 - [[elisp:(find-library "magit")][*Magit source*]] ([[https://github.com/magit/magit/search?q=transient][web link]]) contains numerous examples of transient being used in a big, full-feature application.  Search the source for "transient" and you will find many prefixes, suffixes, and custom classes.  The smallest examples may be harder to find and most combine many behaviors at once.
 
+* More Packaging :export_elisp:
+
+The headers and footers for the tangled module.
+
 #+begin_src elisp :tangle transient-showcase.el :noweb yes :hidden yes :eval never
   <<package-footer>>
 #+end_src
-
-* More Packaging
-
-The headers and footers for the tangled module.
 
 ** Package Header
 
