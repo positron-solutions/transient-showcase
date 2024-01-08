@@ -6,12 +6,16 @@ Code examples for interactive explanations of [transient](https://github.com/mag
 
 This guide assumes you have minimal knowledge of Emacs, some programming experience in elisp and non-lisp languages, and have at least seen [screenshots](https://magit.vc/screenshots/) of `magit`.
 
+These examples serve to **illustrate** the documentation in transient's manual, which probably ships with your Emacs, accessible via `M-x info-display-manual transient`.
+
 
 ## How to use
 
-There are two ways:
+If you are reading the README.md on Github, this markdown file is exported as a preview for transient-showcase.org and to appear in search results etc.
 
--   Open the README.org file in Emacs and run examples as literate org.
+There are two better ways:
+
+-   Open the transient-showcase.org file in Emacs and run examples as literate org.
 -   Install the package to run commands and read their source.  Start with the `tsc-showcase` command.
 
 
@@ -22,24 +26,30 @@ If you open the org file in Emacs, it will switch to Org mode and you can run in
 
 ### Using as an installable package
 
-If you install the package, you can read source for each example with the normal.  `describe-symbol` command.  All commands are under `tsc-*` prefix.  Somewhat useful suffixes are under `tsc-suffix-*` while less useful ones under `tsc--suffix-*`.  They will come in handy when you are developing new applications.
+If you install the package, you can read source for each example with the normal `describe-command`.  All commands are under `tsc-*` prefix.  Somewhat useful suffixes are under `tsc-suffix-*` while less useful ones under `tsc--suffix-*`.  They will come in handy when you are developing new applications.
 
 Installations for straight and elpaca:
 
+    
+    ;; using package-vc (built-in)
+    (package-vc-install
+     '(transient-showcase
+       :url "https://github.com/positron-solutions/transient-showcase.git"))
+    (require 'transient-showcase) ; now you can access the commands
+    
+    ;; using elpaca (recommended to add a rev for reproducibility)
+    (use-package transient-showcase
+      :elpaca (transient-showcase
+               :host github
+               :repo "positron-solutions/transient-showcase"))
     
     ;; using straight use-package with custom recipe
     (use-package transient-showcase
       :straight '(transient-showcase
                   :type git :host github
                   :repo "positron-solutions/transient-showcase"))
-    
-    ;; using elpaca (recommended to add a hash for reproducibility)
-    (use-package transient-showcase
-      :elpaca (transient-showcase
-               :host github
-               :repo "positron-solutions/transient-showcase"))
 
-**Note** While the exported markdown version of this file is also the README for this repository, it's not intended to be used directly or by copy-pasting.  Many links will only open in Emacs.  Some definitions are included by reference from [Preludes](#orgd2eb7a9)
+**Note** While the exported markdown version of this file is also the README for this repository, it's not intended to be used directly or by copy-pasting.  Many links will only open in Emacs.  Some definitions are included by reference from [Preludes](#org99dbecd)
 
 
 ### Running Examples in Org Mode
@@ -61,72 +71,73 @@ This is a basic transient, using an anonymous lambda interactive command as its 
 
 After executing the block above, you can `execute-extended-command` (**M-x**) and select `tsc-hello` to show this transient.  All transient prefixes are also commands that show up in (**M-x**)
 
-**Note** If the example above is hard to read, review some [elisp](elisp#Top) [syntax](#org6c9c3f1) and typical forms.
+**Note** If the example above is hard to read, review some [elisp](elisp#Top) [syntax](#org0be6c59) and typical forms.
 
 
 # Table of Contents
 
--   [Terminology](#orga1bf5af)
-    -   [Prefixes and Suffixes](#org0814c08)
-    -   [Nesting Prefixes](#org07c4669)
-    -   [Infix](#org9f4bac0)
-    -   [Summary](#orgd8cbc97)
--   [Declaring - Equivalent Forms](#org044807c)
-    -   [The Shorthand form](#orgeb50764)
-    -   [Keyword Arguments Style](#org45d4641)
-    -   [Macro Child Definition Style](#org07b279a)
-    -   [Overriding slots in the prefix definition](#orgbe113f7)
-    -   [Quoting Note for Vectors](#org4702d25)
--   [Groups & Layouts](#orgbef4eaa)
-    -   [Descriptions](#orge210e0a)
-    -   [Layouts](#org59b53c0)
-    -   [Manually setting group class](#org2415d27)
-    -   [Pad Keys](#org09bd4ef)
--   [Nesting & Flow Control](#orgf137802)
-    -   [Single versus multiple commands](#org2e6f1da)
-    -   [Nesting](#org0b66cef)
-    -   [Mixing Interactive](#org07e0c4c)
-    -   [Pre-Commands Explained](#orgd69c70b)
--   [Using & Managing State](#orgde15745)
-    -   [The Magic of Transient](#org234371f)
-    -   [Infixes](#orgbcf2e88)
-    -   [Scope](#orgdad83bc)
-    -   [Prefix Value & History](#org0db5230)
-    -   [History Keys](#orgcd62c1c)
-    -   [Disabling Set / Save on a Suffix](#orge2cb742)
-    -   [Setting or Saving Every Time a Suffix is Used](#orgbe1c529)
-    -   [Lisp Variables](#org61a6cf1)
--   [Controlling CLI's](#orga3993f7)
-    -   [Reading arguments within suffixes](#org928f409)
-    -   [Switches & Arguments Again](#org16388c2)
-    -   [Dispatching args into a process](#org4ff0d3e)
--   [Controlling Visibility](#org4c0263d)
-    -   [Visibility Predicates](#orgd9ded36)
-    -   [Inapt (Temporarily Unavailable)](#org7a59697)
-    -   [Levels](#orgc20eb28)
--   [Advanced](#orgd387559)
-    -   [Dynamically generating layouts](#org8005342)
-    -   [Modifying layouts](#org80a8deb)
-    -   [Using prefix scope in children](#org270ff02)
-    -   [Custom Infix Types](#org25f899c)
--   [Appendixes](#org4bdf579)
-    -   [EIEIO - OOP in Elisp](#org7b3b9dc)
-    -   [Debugging](#org7f55958)
-    -   [Layout Hacking](#org01b4f57)
-    -   [Hooks](#org26c70a5)
-    -   [Preludes](#orgd2eb7a9)
-    -   [Essential Elisp](#org6c9c3f1)
--   [Further Reading](#org80c5193)
+-   [Terminology](#orge0cb765)
+    -   [Prefixes and Suffixes](#orgd73e6a6)
+    -   [Nesting Prefixes](#org9589c42)
+    -   [Infix](#orga977080)
+    -   [Summary](#org163b3e6)
+-   [Declaring - Equivalent Forms](#org230e2fe)
+    -   [The Shorthand form](#orgaf07757)
+    -   [Keyword Arguments Style](#org17cc3f3)
+    -   [Macro Child Definition Style](#orgff7cea4)
+    -   [Overriding slots in the prefix definition](#orgb0e3cab)
+    -   [Quoting Note for Vectors](#org3e20a89)
+-   [Groups & Layouts](#org200b43a)
+    -   [Descriptions](#org390ba88)
+    -   [Layouts](#org0805311)
+    -   [Manually setting group class](#org4c09f75)
+    -   [Pad Keys](#org48bbec9)
+-   [Nesting & Flow Control](#org07be70a)
+    -   [Single versus multiple commands](#org277d3d9)
+    -   [Nesting](#org7642de8)
+    -   [Mixing Interactive](#org4001f38)
+    -   [Pre-Commands Explained](#org60fdb06)
+-   [Using & Managing State](#orged7cfcb)
+    -   [The Magic of Transient](#org46fbd3b)
+    -   [Infixes](#org160db4a)
+    -   [Scope](#org858e5f1)
+    -   [Prefix Value & History](#org56c066e)
+    -   [History Keys](#orgf473057)
+    -   [Disabling Set / Save on a Suffix](#org261c0ec)
+    -   [Setting or Saving Every Time a Suffix is Used](#orgf0947ac)
+    -   [Lisp Variables](#org4a04e85)
+    -   [Buffer Local State](#org0df134e)
+-   [Controlling CLI's](#orgd949e3f)
+    -   [Reading arguments within suffixes](#org603f88e)
+    -   [Switches & Arguments Again](#org8b948b1)
+    -   [Dispatching args into a process](#orga3fca74)
+-   [Controlling Visibility](#orgc3d2c45)
+    -   [Visibility Predicates](#org1883338)
+    -   [Inapt (Temporarily Inappropriate)](#orgbd0068c)
+    -   [Levels](#orgbecc004)
+-   [Advanced](#org409c575)
+    -   [Dynamically generating layouts](#orgba6ff6c)
+    -   [Modifying layouts](#orge1900eb)
+    -   [Using prefix scope in children](#org4d2bc49)
+    -   [Custom Infix Types](#orgd80afc0)
+-   [Appendixes](#orga5fd09f)
+    -   [EIEIO - OOP in Elisp](#org5008e1e)
+    -   [Debugging](#org949488c)
+    -   [Layout Hacking](#orgd1ac608)
+    -   [Hooks](#org45da0e5)
+    -   [Preludes](#org99dbecd)
+    -   [Essential Elisp](#org0be6c59)
+-   [Further Reading](#org22a8572)
 
 
-<a id="orga1bf5af"></a>
+<a id="orge0cb765"></a>
 
 # Terminology
 
 Transient means temporary.  Transient gets its name from the temporary keymap and the popup UI for displaying that keymap.  Emacs has a similar idea built-in with [set-transient-map]((describe-function 'set-transient-map)) for a temporary high-precedence keymap.
 
 
-<a id="org0814c08"></a>
+<a id="orgd73e6a6"></a>
 
 ## Prefixes and Suffixes
 
@@ -150,10 +161,10 @@ With prefix arguments, you "call" commands with extra arguments, like you would 
 
 A transient prefix can set some states and its suffix can then use these states to tweak its behavior.  The difference is that within the lifecycle of a transient UI, and coordinating with transient's state persistence, you can create much more complex input to your commands.  You can use commands to construct phrases for other commands.
 
-To see a short example of prefix arguments being used within a transient prefix, see [the scope example](#orgdad83bc).
+To see a short example of prefix arguments being used within a transient prefix, see [the scope example](#org858e5f1).
 
 
-<a id="org07c4669"></a>
+<a id="org9589c42"></a>
 
 ## Nesting Prefixes
 
@@ -163,10 +174,10 @@ A prefix can also be bound as a suffix, enabling *nested* prefixes.  A user inpu
 
 For example, in the `magit-dispatch` transient (`?`), `l` for `magit-log` is a nested transient. `b` for `all branches` is the suffix command `magit-log-all-branches`.
 
-See [Flow Control](#orgf137802) for nested transient examples with both sub-prefixes and suffixes that do no exit.
+See [Flow Control](#org07be70a) for nested transient examples with both sub-prefixes and suffixes that do no exit.
 
 
-<a id="org9f4bac0"></a>
+<a id="orga977080"></a>
 
 ## Infix
 
@@ -174,10 +185,10 @@ Some suffixes need to hold state, toggling or storing an argument.  Infixes are 
 
 `Prefix -> Infix -> Infix -> Suffix`
 
-See [Infix examples](#org32a35ed) to get a better idea.
+See [Infix examples](#orgfd81825) to get a better idea.
 
 
-<a id="orgd8cbc97"></a>
+<a id="org163b3e6"></a>
 
 ## Summary
 
@@ -187,7 +198,7 @@ See [Infix examples](#org32a35ed) to get a better idea.
 -   A **Suffix** may be yet another **Prefix**, in which case the transient is nested
 
 
-<a id="org044807c"></a>
+<a id="org230e2fe"></a>
 
 # Declaring - Equivalent Forms
 
@@ -207,10 +218,10 @@ You can declare the same behavior 3-4 ways
     ;; slots & methods that can be set / overridden in suffixes
     (describe-symbol transient-suffix)
 
-See the [EIEIO Appendix](#org7b3b9dc) for introduction to exploring EIEIO objects and classes.
+See the [EIEIO Appendix](#org5008e1e) for introduction to exploring EIEIO objects and classes.
 
 
-<a id="orgeb50764"></a>
+<a id="orgaf07757"></a>
 
 ## The Shorthand form
 
@@ -227,7 +238,7 @@ Binding suffixes with the `("key" "description" suffix-or-command)` form within 
 **Note:** Both commands and suffixes from `transient-define-suffix` can be used.  It's a good reason to use `private--namespace` style names for suffix actions since these commands don't usually show up in (**M-x**) by default.
 
 
-<a id="org45d4641"></a>
+<a id="org17cc3f3"></a>
 
 ## Keyword Arguments Style
 
@@ -246,7 +257,7 @@ Not all behaviors have a shorthand form, so as you use more behaviors, you will 
 Launch the command, wave several times (note timestamp update) and then exit with (**C-g**).
 
 
-<a id="org07b279a"></a>
+<a id="orgff7cea4"></a>
 
 ## Macro Child Definition Style
 
@@ -276,7 +287,7 @@ The `transient-define-suffix` macro can help if you need to bind a command in mu
     ;; (tsc-wave-macro-defined)
 
 
-<a id="orgbe113f7"></a>
+<a id="orgb0e3cab"></a>
 
 ## Overriding slots in the prefix definition
 
@@ -303,14 +314,14 @@ If you just list the key and symbol followed by properties, it is also a support
 `("wf" tsc-suffix-wave :description "wave furiously")`
 
 
-<a id="org4702d25"></a>
+<a id="org3e20a89"></a>
 
 ## Quoting Note for Vectors
 
 Inside the `[ ...vectors... ]` in `transient-define-prefix`, you don't need to quote symbols because in the vector, everything is a literal.  When you move a shorthand style `:property symbol` out to the `transient-define-suffix` form, which is a list, you might need to quote the symbol as `:property 'symbol`.
 
 
-<a id="orgbef4eaa"></a>
+<a id="org200b43a"></a>
 
 # Groups & Layouts
 
@@ -321,7 +332,7 @@ There is basic layout support and you can use it to collect or differentiate com
 If you begin a group vector with a string, you get a group heading.  Groups also support some [properties](https://magit.vc/manual/transient/Group-Specifications.html#Group-Specifications).  The [group class]((describe-symbol transient-group)) also has a lot of information.
 
 
-<a id="orge210e0a"></a>
+<a id="org390ba88"></a>
 
 ## Descriptions
 
@@ -376,12 +387,12 @@ The `:description` key is applied last and therefore wins in ambiguous declarati
     ;; (tsc-layout-dynamic-descriptions)
 
 
-### TODO Errata
+### Errata
 
-**Note**, the uuid in the group description is generated on every key input.  Layout updates are fun.  It does not also work when changing the suffix descriptions in the layout via hackery.  They are evidently evaluated only once per layout. 凸( \` ﾛ ´ )凸
+**Note**, the uuid in the group description is generated on every key read, so multi-key sequences cause updates to the descriptions.  This is not likely to be changed because layout re-rendering is necessary to indicate the partially complete key sequence. 🤓
 
 
-<a id="org59b53c0"></a>
+<a id="org0805311"></a>
 
 ## Layouts
 
@@ -436,7 +447,7 @@ Vector on top of vector inside a vector.
 
 ### Empty strings make spaces
 
-Groups that are empty or only space have no effect.  This situation can happen with layouts that update dynamically.  See [dynamic layouts](#org8005342).
+Groups that are empty or only space have no effect.  This situation can happen with layouts that update dynamically.  See [dynamic layouts](#orgba6ff6c).
 
     
     (transient-define-prefix tsc-layout-spaced-out ()
@@ -498,7 +509,7 @@ So, you put columns into rows that are in columns and stuff like that.  This can
 of groups.
 
 
-<a id="org2415d27"></a>
+<a id="org4c09f75"></a>
 
 ## Manually setting group class
 
@@ -518,7 +529,7 @@ would normally use.
     ;; (tsc-layout-explicit-classes)
 
 
-<a id="org09bd4ef"></a>
+<a id="org48bbec9"></a>
 
 ## Pad Keys
 
@@ -538,7 +549,7 @@ To align descriptions, set the group's :pad-keys to t
 Use this if you have different lengths of key sequences or your transient is dynamic and not all keys will have the same length all the time.
 
 
-<a id="orgf137802"></a>
+<a id="org07be70a"></a>
 
 # Nesting & Flow Control
 
@@ -547,7 +558,7 @@ Many transients call other transients.  This allows you to express similar behav
 Transient has more options for retaining some state across several transients, making it easier to compose commands and to retain intermediate states for rapidly achieving series of actions over similar inputs.
 
 
-<a id="org2e6f1da"></a>
+<a id="org277d3d9"></a>
 
 ## Single versus multiple commands
 
@@ -567,7 +578,7 @@ Sometimes you want to execute multiple commands without re-opening the transient
 **Note**, if `tsc-wave` was used in both exit & stay, the `:transient` slot would be clobbered and we would only get one behavior.  Beware of re-using the same object instances in the same layout.  Move the `:transient` slot override between the two suffixes to see the change in behavior.
 
 
-<a id="org0b66cef"></a>
+<a id="org7642de8"></a>
 
 ## Nesting
 
@@ -614,7 +625,7 @@ This is the most simple way to create nesting.
 
 If you call `(transient-setup 'transient-command-symbol)`, you will activate a replacement transient.
 
-This form is useful if you want a command to *perhaps* load yet another transient in some situation.  You may even just want to load the same transient with different context, such as passing in a new [scope](#orgdad83bc).
+This form is useful if you want a command to *perhaps* load yet another transient in some situation.  You may even just want to load the same transient with different context, such as passing in a new [scope](#org858e5f1).
 
     
     (transient-define-suffix tsc-suffix-setup-child ()
@@ -644,7 +655,7 @@ This form is useful if you want a command to *perhaps* load yet another transien
 ⚠️ When the child is calling `transient-setup`, it will not be possible to use `transient--do-return` or `transient--do-recurse` to get back to the parent unless you explicitly cooperate with the transient state implementation, which may not be stable between versions.
 
 
-<a id="org07e0c4c"></a>
+<a id="org4001f38"></a>
 
 ## Mixing Interactive
 
@@ -736,7 +747,7 @@ These possible values for `:transient` change between transient versions.  See t
     ;; (tsc-complex-messager)
 
 
-<a id="orgd69c70b"></a>
+<a id="org60fdb06"></a>
 
 ## Pre-Commands Explained
 
@@ -767,7 +778,7 @@ During the pre-command and post-command, these can change.  When you are overrid
 
 Not all pre-commands are compatible with all situations and suffixes!
 
-[Debugging](#org7f55958)
+[Debugging](#org949488c)
 
 -   TODO Errata
 
@@ -775,11 +786,11 @@ Not all pre-commands are compatible with all situations and suffixes!
     use case.  Think of how life was before `transient--do-recurse`.
 
 
-<a id="orgde15745"></a>
+<a id="orged7cfcb"></a>
 
 # Using & Managing State
 
-There are several ways to create state.  The [flow control](#orgf137802) examples in the previous section mainly covered how to get from one command to the other.  This section covers how to save values and then read them later, sometimes from a completely different transient.  **Coupled with [custom infix types](#org25f899c), you can create some seriously rich user expression.**
+There are several ways to create state.  The [flow control](#org07be70a) examples in the previous section mainly covered how to get from one command to the other.  This section covers how to save values and then read them later, sometimes from a completely different transient.  **Coupled with [custom infix types](#orgd80afc0), you can create some seriously rich user expression.**
 
 To spark your imagination, here's a non-exhaustive list of how to get data into your commands:
 
@@ -796,7 +807,7 @@ To spark your imagination, here's a non-exhaustive list of how to get data into 
 -   Arguments passed into interactive commands to call them as normal elisp functions
 
 
-<a id="org234371f"></a>
+<a id="org46fbd3b"></a>
 
 ## The Magic of Transient
 
@@ -823,7 +834,7 @@ Because interactive forms and transients are both still just consuming linear us
 Transient's UI also provides greater awareness to the user of the current state.  This makes it easier for the user to achieve the greater complexity that is intended, without remembering the command language you are designing for your application.
 
 
-<a id="orgbcf2e88"></a>
+<a id="org160db4a"></a>
 
 ## Infixes
 
@@ -872,7 +883,7 @@ Infix classes built-in all descend from `transient-infix` and can be seen clearl
 
 ### Reading Infix Values
 
-**Reminder** in the section on [pre-commands](#orgd69c70b) the discussion about the `:transient` mentions that the values available in a suffix body depend on whether the pre-command called `transient--export` before evaluating the suffix body.
+**Reminder** in the section on [pre-commands](#org60fdb06) the discussion about the `:transient` mentions that the values available in a suffix body depend on whether the pre-command called `transient--export` before evaluating the suffix body.
 
 There are two basic ways to read infixes:
 
@@ -885,13 +896,13 @@ There are two basic ways to read infixes:
     In my opinion the API should make it easier to get raw values from suffixes, but this is also a matter of custom infixes needing to serialize values correctly so that `transient-arg-value` will "just work".
 
 
-<a id="orgdad83bc"></a>
+<a id="org858e5f1"></a>
 
 ## Scope
 
 When you call a function with an argument, you want to know in the body of your function what that argument was.  This is the scope.  The prefix is initialized with the `:scope` either in its own body or a similar form.  Suffixes can then read back that scope in their body.  The suffix object is given the scope and can use it to alter its own display or behavior.  The layout also can interpret the scope while it is initializing.
 
-**WARNING** When writing predicates against the scope, you will need to determine whether `transient--prefix` or `transient-current-prefix` is correct when writing prefix-generic suffixes.  It is very subtle if you accidentally choose the wrong one and the parent has a nil scope while the child has an entirely different scope.  These variables change throughout the lifecycle!  Use [edebug](#org9ec6396) you must!
+⚠️ **WARNING** When writing predicates against the scope, you will need to determine whether `transient--prefix` or `transient-current-prefix` is correct when writing prefix-generic suffixes.  It is very subtle if you accidentally choose the wrong one and the parent has a nil scope while the child has an entirely different scope.  These variables change throughout the lifecycle!  Use [edebug](#orga8cedc2) you must!
 
     
     (transient-define-suffix tsc--read-prefix-scope ()
@@ -958,7 +969,7 @@ Key binding sequences, such as `wa` instead of single-key prefix bindings, will 
 **Possibly a bug in transient.**
 
 
-<a id="org0db5230"></a>
+<a id="org56c066e"></a>
 
 ## Prefix Value & History
 
@@ -1034,7 +1045,7 @@ This is related to history keys.  If you set the arguments and then save them us
 It's worth bringing up the [`transient-show-common-commands`]((describe-variable 'transient-show-common-commands)) variable. **You may want to set this when working on the history support for your transients.** Otherwise, just remember the (`C-x`) menu inside transients.
 
 
-<a id="orgcd62c1c"></a>
+<a id="orgf473057"></a>
 
 ## History Keys
 
@@ -1085,7 +1096,7 @@ The following example can demonstrate the behavior with some user effort:
 
 ### Detangling with Initialization, Setting, and Saving
 
-Set values show up in the prefix's `value` slot.
+Set values show up in the prefix's `:value` slot.
 
     
     (oref (plist-get (symbol-plist 'tsc-ping) 'transient--prefix) value)
@@ -1106,7 +1117,7 @@ Play with the `tsc-snowcone-eater` and `tsc-ping` and `tsc-pong` in the `C-x` me
 When you re-evaluate the prefix or reload Emacs, you will see the result of initialization from `transient-values`.
 
 
-<a id="orge2cb742"></a>
+<a id="org261c0ec"></a>
 
 ## Disabling Set / Save on a Suffix
 
@@ -1128,7 +1139,7 @@ To disable saving and setting values, causing a prefix to always end up using th
 Try to update `remember` and then set and save it in the `C-x` menu.  Reload it.  It will never pay attention to history or setting & saving the transient value.
 
 
-<a id="orgbe1c529"></a>
+<a id="orgf0947ac"></a>
 
 ## Setting or Saving Every Time a Suffix is Used
 
@@ -1200,10 +1211,10 @@ Readers are the mechanism to provide completions and to enforce input validity o
     
     ;; (tsc-enforcing-inputs)
 
-Setting the reader can be used to enforce rules of valid input.  See [Advanced/Custom Infix Types](#org25f899c) for an example of writing a custom reader that validates input and assigning that reader via the class method instead of the `:reader` slot.
+Setting the reader can be used to enforce rules of valid input.  See [Advanced/Custom Infix Types](#orgd80afc0) for an example of writing a custom reader that validates input and assigning that reader via the class method instead of the `:reader` slot.
 
 
-<a id="org61a6cf1"></a>
+<a id="org4a04e85"></a>
 
 ## Lisp Variables
 
@@ -1240,23 +1251,28 @@ Customizing this class can be useful when working with objects and functions tha
     ;; (tsc-lisp-variable)
 
 
-<a id="orga3993f7"></a>
+<a id="org0df134e"></a>
+
+## Buffer Local State
+
+
+<a id="orgd949e3f"></a>
 
 # Controlling CLI's
 
 This section covers more usages of infixes, focused on creating better argument strings for CLI tools.
 
-The section on [flow control](#orgf137802) & [managing state](#orgde15745) has more information about controlling elisp applications.
+The section on [flow control](#org07be70a) & [managing state](#orged7cfcb) has more information about controlling elisp applications.
 
 
-<a id="org928f409"></a>
+<a id="org603f88e"></a>
 
 ## Reading arguments within suffixes
 
 **Note:** these forms are generic for different prefixes, allowing you to mix and match suffixes within prefixes.
 
 
-<a id="org16388c2"></a>
+<a id="org8b948b1"></a>
 
 ## Switches & Arguments Again
 
@@ -1471,7 +1487,7 @@ See `transient-infix-read` for actual code.  This method uses the prefix's histo
 Switches and arguments that can be used multiple times are supported.  Example needs to be written.  This is useful for CLI wrapping or perhaps situations where a command accepts multiple levels of the same setting.
 
 
-<a id="org4ff0d3e"></a>
+<a id="orga3fca74"></a>
 
 ## Dispatching args into a process
 
@@ -1489,11 +1505,11 @@ There's some errata about this example:
 
 -   The predicates don't update the transient.  `(transient--redisplay)`
     doesn't do the trick.  We could use `transient--do-replace` and
-    `transient-setup`, but that would lose existing state
+    `transient-setup`, but that would lose existing state unless we run `transient-set`
 
 -   The predicate needs to be exists & not empty (but doesn't matter yet)
 
-✨ If you are working on a CLI tool in order to fit a transient interface, consider a JSON-RPC process because you can build a normal command interface and dispatch it with transient even if you skip the CLI argument handling facilities.
+✨ If you are working on a CLI tool in order to fit a transient interface, consider a JSON-RPC process because you can build a normal command interface and dispatch it with transient even if you skip the CLI argument handling facilities.  CLI's are more fragile than JSON-RPC, and JSON-RPC processes can retain state.
 
     
     (defun tsc--quit-cowsay ()
@@ -1568,14 +1584,14 @@ There's some errata about this example:
 Clean up cowsay example.  Check for binary before attempting to run it.
 
 
-<a id="org4c0263d"></a>
+<a id="orgc3d2c45"></a>
 
 # Controlling Visibility
 
 At times, you need a prefix to show or hide certain options depending on the context.
 
 
-<a id="orgd9ded36"></a>
+<a id="org1883338"></a>
 
 ## Visibility Predicates
 
@@ -1612,7 +1628,7 @@ Open the following example in buffers with different modes (or change modes manu
       [["Function Predicates"
         ;; note, after toggling, the transient needs to be re-displayed for the
         ;; predicate to take effect
-        ("b" "toggle busy" tsc--toggle-busy)
+        ("tb" "toggle busy" tsc--toggle-busy :transient t)
         ("bw" "wave busily" tsc-suffix-wave :if tsc--busy-p)]
     
        ["Programming Actions"
@@ -1631,15 +1647,17 @@ Open the following example in buffers with different modes (or change modes manu
     ;; (tsc-visibility-predicates)
 
 
-<a id="org7a59697"></a>
+<a id="orgbd0068c"></a>
 
-## Inapt (Temporarily Unavailable)
+## Inapt (Temporarily Inappropriate)
 
 "Greyed out" suffixes.  Inapt is better if an option is temporarily unavailable due to a state that varies with each invocation of the transient.
 
-Inapt predicates work on suffixes, but not on groups (which would have to modify every child).
+Inapt predicates are supported on suffixes, but not on groups (which would have to modify every child).
 
 **Note**, like visibility predicates, `inapt-*` predicates do not take effect until the transient has its layout fully redone.  Therefore this example uses a child transient and updates the scope.
+
+✨ Adjust this example to use `:if` instead of `:inapt-if` to see the difference between visibility and inapt.
 
     
     (defun tsc--child-scope-p ()
@@ -1676,7 +1694,8 @@ Inapt predicates work on suffixes, but not on groups (which would have to modify
     
       [("-s" "switch" "--switch")
        ("a" "show arguments" tsc-suffix-print-args)
-       ("c" "launch child prefix" tsc--inapt-children :transient transient--do-recurse)])
+       ("c" "launch child prefix" tsc--inapt-children
+        :transient transient--do-recurse)])
     
     ;; (tsc-inapt-parent)
 
@@ -1686,7 +1705,7 @@ Inapt predicates work on suffixes, but not on groups (which would have to modify
 There is not a single mention of inapt even though it's fully implemented and works.
 
 
-<a id="orgc20eb28"></a>
+<a id="orgbecc004"></a>
 
 ## Levels
 
@@ -1740,7 +1759,7 @@ A hidden group will hide a suffix even if that suffix is at a low enough level. 
     **While a child may be visible according to its own level, if it's hidden within the group, the user's level-setting UI for the prefix will contradict what's actually visible.  The UI does not allow setting group levels.**
 
 
-<a id="orgd387559"></a>
+<a id="org409c575"></a>
 
 # Advanced
 
@@ -1749,7 +1768,7 @@ The previous sections are designed to go breadth-first so that you can get core 
 Some of these examples are approaching the complexity of just reading [magit source]((find-library "magit")).
 
 
-<a id="org8005342"></a>
+<a id="orgba6ff6c"></a>
 
 ## Dynamically generating layouts
 
@@ -1783,7 +1802,7 @@ This is a group method that can be overridden in order to modify or eliminate so
     
     ;; (tsc-generated-child)
 
-`transient--parse-child` takes the same configuration format as `transient-define-prefix`.  You can see the layout format in the [layout hacking appendix](#org01b4f57).  `transient--prarse-group` works almost exactly the same, just for groups.
+`transient--parse-child` takes the same configuration format as `transient-define-prefix`.  You can see the layout format in the [layout hacking appendix](#orgd1ac608).  `transient--prarse-group` works almost exactly the same, just for groups.
 
 The same thing, but parsing an entire group spec:
 
@@ -1827,7 +1846,7 @@ the prefix during layout.
     prefix for `transient-parse-suffixes`, for scope etc?
 
 
-<a id="org80a8deb"></a>
+<a id="orge1900eb"></a>
 
 ## Modifying layouts
 
@@ -1868,7 +1887,7 @@ Exercises for the reader:
 See the `transient-insert-suffix` for documentation on the `LOC` argument.
 
 
-<a id="org270ff02"></a>
+<a id="org4d2bc49"></a>
 
 ## Using prefix scope in children
 
@@ -1887,21 +1906,21 @@ There is a perfectly short example in [Magit source](https://github.com/magit/ma
 
 Each infix instance is declared in `transient-define-infix`, potentially with a `:scope` slot, possibly holding a function.
 
-If it's holding a function, that function will be used as a backup during initialization in case there is no prefix or it has nothing in its `scope` slot.
+If it's holding a function, that function will be used as a backup during initialization in case there is no prefix or it has nothing in its `:scope` slot.
 
 
-<a id="org25f899c"></a>
+<a id="orgd80afc0"></a>
 
 ## Custom Infix Types
 
 Not everything is a string or boolean.  You may want to represent complex objects in your transient infixes.  If your objects can be re-hydrated from some serialized ID, you may want history support.
 
-If you need to set and display a custom type, use the simple OOP techniques of [EIEIO](#org7b3b9dc).  Also check the [suffix value methods](transient#Suffix Value Methods) section of the transient manual.  The following example applies these ideas.
+If you need to set and display a custom type, use the simple OOP techniques of [EIEIO](#org5008e1e).  Also check the [suffix value methods](transient#Suffix Value Methods) section of the transient manual.  The following example applies these ideas.
 
 **Essential behaviors for your custom infix:**
 
 -   Defining a reader to set the infix with user input
--   `prompt` slot's default form, `initform` for asking the user for input
+-   `:prompt` slot's default form, `:initform` for asking the user for input
 -   `transient-init-value` to re-hydrate saved values
 -   `transient-infix-value` so that setting & saving persist what you want to rehydrate
 -   `transient-format-value` to display a user-meaningful form for your value
@@ -1909,7 +1928,7 @@ If you need to set and display a custom type, use the simple OOP techniques of [
 We will also use some layout introspection.  This makes the example a bit more complex, but represents a real custom infix type with real serialization and elisp objects backing it:
 
 -   `transient-get-suffix` To get suffix by **key**, **location**, or **command symbol**
--   Getting a description from raw layout children (not EIEIO objects).  See [Layout Hacking](#org01b4f57).
+-   Getting a description from raw layout children (not EIEIO objects).  See [Layout Hacking](#orgd1ac608).
 
 This example is a bit intimidating because the serialized value we are storing and re-hydrating is a layout child location, the LOC argument seen in transient programming.  It maps to an actual layout child, which we introspect and later modify.  The point of the example is to let the user handle a simple value that we can also persist but to use a more complex object that might only exist at runtime.  If this example makes little sense, try making an example with just a string or number before you start your own data type.
 
@@ -1930,7 +1949,9 @@ This example is a bit intimidating because the serialized value we are storing a
               ((listp layout-child)
                (plist-get (elt layout-child 2) :description)) ; suffix
               (t
-               (message (propertize "You traversed into a child's list elements!" 'face 'warning))
+               (message
+                (propertize "You traversed into a child's list elements!"
+                            'face 'warning))
                  (format "(child's interior) element: %s" layout-child)))))
         (cond
          ;; The description is sometimes a callable function with no arguments,
@@ -2071,7 +2092,7 @@ This example is a bit intimidating because the serialized value we are storing a
 
 This is a difficult example, but once you understand the pieces, you can see some of the magit variables in action like `magit--git-variable` and its many subclasses.
 
-Revisit the section on [detangling setting, saving and history](#orgab7fc81).  Watching the values update will make it clear what representations are being stored, where, and when.
+Revisit the section on [detangling setting, saving and history](#org566bc93).  Watching the values update will make it clear what representations are being stored, where, and when.
 
 
 ### Reading custom infix values
@@ -2153,12 +2174,12 @@ Modifying the very outer group doesn't quite work.  It's probably a degenerate l
 The flow control for re-display is slightly fighting the history implementation.  It would be better if we could retain values while triggering a redraw without even more hacking & state manipulation.
 
 
-<a id="org4bdf579"></a>
+<a id="orga5fd09f"></a>
 
 # Appendixes
 
 
-<a id="org7b3b9dc"></a>
+<a id="org5008e1e"></a>
 
 ## EIEIO - OOP in Elisp
 
@@ -2169,14 +2190,17 @@ You can use eieio API's to explore transient objects.  Let's look at some transi
     
     ;; The plist for a prefix command contains a `transient-prefix' object in the
     ;; `transient--prefix' key and a vector layout in `transient--layout'
-    ;; (symbol-plist
+    ;; symbol-plist
     (symbol-plist 'magit-dispatch)
     
     ;; getting the values from the symbol plist
-    (plist-get (symbol-plist 'magit-dispatch) 'transient--prefix)
+    (get 'magit-dispatch 'transient--prefix)
+    
+    ;; equivalent but longer
+    ;; (plist-get (symbol-plist 'magit-dispatch) 'transient--prefix)
     
     (let ((prefix-object
-           (plist-get (symbol-plist 'magit-dispatch) 'transient--prefix)))
+           (get 'magit-dispatch) 'transient--prefix))
     
       ;; printing the current slot values for that object
       (object-write prefix-object)
@@ -2271,7 +2295,7 @@ Classes used in transient that you are likely to want to know the slots for:
 behavior that can be faster at times to just understand through description.
 
 
-<a id="org7f55958"></a>
+<a id="org949488c"></a>
 
 ## Debugging
 
@@ -2334,7 +2358,7 @@ When you are done, remember to use [`edebug-remove-instrumentation`]((edebug-rem
     Because edebug works on defuns while suffixes are defined with macros, you may need to macro exand in order to come up with something debuggable.
 
 
-<a id="org01b4f57"></a>
+<a id="orgd1ac608"></a>
 
 ## Layout Hacking
 
@@ -2379,17 +2403,17 @@ First you need to export the layout data structures.
     ;;          :command magit-status-quick
     ;;          :if-not-mode magit-status-mode)))])
 
-You might find this helpful when constructing [dynamic layouts](#org8005342).
+You might find this helpful when constructing [dynamic layouts](#orgba6ff6c).
 
 
-<a id="org26c70a5"></a>
+<a id="org45da0e5"></a>
 
 ## Hooks
 
 Just a reminder, some hooks exist.  Use `describe-variable` and complete with `transient hook` for the most recent list of hooks.
 
 
-<a id="orgd2eb7a9"></a>
+<a id="org99dbecd"></a>
 
 ## Preludes
 
@@ -2455,7 +2479,7 @@ Here's a suffix that reads the transient's infix values, the prefix's scope, and
     ;; tsc-suffix-print-args command is incidentally created
 
 
-<a id="org6c9c3f1"></a>
+<a id="org0be6c59"></a>
 
 ## Essential Elisp
 
@@ -2475,7 +2499,7 @@ If you were hit in the face with the first example, you need to learn basic Elis
     [Common Lisp manual](cl#Top) you don't really need the common lisp manual for working with transient.  Don't be alarmed when you see EIEIO using functions like `cl-call-next-method`
 
 
-<a id="org80c5193"></a>
+<a id="org22a8572"></a>
 
 # Further Reading
 
