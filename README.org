@@ -2207,14 +2207,17 @@ You can use eieio API's to explore transient objects.  Let's look at some transi
 
   ;; The plist for a prefix command contains a `transient-prefix' object in the
   ;; `transient--prefix' key and a vector layout in `transient--layout'
-  ;; (symbol-plist
+  ;; symbol-plist
   (symbol-plist 'magit-dispatch)
 
   ;; getting the values from the symbol plist
-  (plist-get (symbol-plist 'magit-dispatch) 'transient--prefix)
+  (get 'magit-dispatch 'transient--prefix)
+
+  ;; equivalent but longer
+  ;; (plist-get (symbol-plist 'magit-dispatch) 'transient--prefix)
 
   (let ((prefix-object
-         (plist-get (symbol-plist 'magit-dispatch) 'transient--prefix)))
+         (get 'magit-dispatch) 'transient--prefix))
 
     ;; printing the current slot values for that object
     (object-write prefix-object)
