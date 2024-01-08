@@ -665,15 +665,14 @@ This form is useful if you want a command to /perhaps/ load yet another transien
      ;; to trigger the following transient correctly.  This example will
      ;; work with `transient--do-replace' or no custom pre-command
 
-     ("bc" "become child" tsc-suffix-setup-child :transient transient--do-replace)])
+     ("bc" "become child" tsc-suffix-setup-child
+      :transient transient--do-replace)])
 
   ;; (tsc-parent-with-setup-suffix)
 
 #+end_src
 
-**** TODO Errata
-
-This example should also work with the =transient--do-recurse= pre-command, but the child transient does not return.  There is a difference in the behavior that should not depend on if the suffix /is/ the prefix or just sets up the prefix.  *Possible bug*.
+⚠️ When the child is calling ~transient-setup~, it will not be possible to use ~transient--do-return~ or ~transient--do-recurse~ to get back to the parent unless you explicitly cooperate with the transient state implementation, which may not be stable between versions.
 
 ** Mixing Interactive
 
@@ -715,6 +714,8 @@ Below is a nested transient.
 - The body form of the nested child can return early without loading a new transient
 - The parent uses =transient--do-recurse= to make it's child "return" to it
 - The "radiations" command in the child explicitly overrides this, using =transient--do-exit= so that it /does not/ return to the parent
+
+These possible values for =:transient= change between transient versions.  See the [[info:transient#Transient State][transient]] manual.
 
 #+begin_src elisp :tangle transient-showcase.el
 
@@ -989,9 +990,9 @@ Briefly, there are three locations for state you need to be aware of for this se
 - =transient-values= contains saved values that are used to re-hydrate the prefix =:value= slot when the prefix is created
 - =transient-history= is used to make it faster for the user to flip through previous states (which can have independent histories for infixes and prefixes).  These are never used unless calling =transient-history-prev= and =transient-history-next=.
 
-  We can get this as a list of strings for any prefix by calling =transient-args= on =transient-current-command= in the suffix's interactive form.  If you know the command you want the value of, you can use it's symbol instead of =transient-current-command=.
+We can get this as a list of strings for any prefix by calling =transient-args= on =transient-current-command= in the suffix's interactive form.  If you know the command you want the value of, you can use it's symbol instead of =transient-current-command=.
 
-  This is related to history keys.  If you set the arguments and then save them using (=C-x s=) for the command =transient-save=, not only will the transient be updated with the new value, but if you call the child independently, it can still read the value from the suffix.
+This is related to history keys.  If you set the arguments and then save them using (=C-x s=) for the command =transient-save=, not only will the transient be updated with the new value, but if you call the child independently, it can still read the value from the suffix.
 
 #+begin_src elisp :tangle transient-showcase.el :var _=print-args-prelude
 
@@ -1527,6 +1528,8 @@ There's some errata about this example:
 
 - The predicate needs to be exists & not empty (but doesn't matter yet)
 
+✨ If you are working on a CLI tool in order to fit a transient interface, consider a JSON-RPC process because you can build a normal command interface and dispatch it with transient even if you skip the CLI argument handling facilities.
+
 #+begin_src elisp :tangle transient-showcase.el
 
   (defun tsc--quit-cowsay ()
@@ -1723,16 +1726,16 @@ There is not a single mention of inapt even though it's fully implemented and wo
 
 Levels are another way to control visibility.
 
-  - As a developer, you set levels to optionally expose or hide children in a prefix.
-  - As a user, you change the prefix's level and the levels of suffixes to customize what's visible in the transient.
+- As a developer, you set levels to optionally expose or hide children in a prefix.
+- As a user, you change the prefix's level and the levels of suffixes to customize what's visible in the transient.
 
-    *Lower levels are more visible. Setting the level higher reveals more suffixes.* 1-7 are valid levels.
+*Lower levels are more visible. Setting the level higher reveals more suffixes.* 1-7 are valid levels.
 
-    The user can adjust levels within a transient prefix by using (*C-x l*) for =transient-set-level=.  The default active level is 4, stored in =transient-default-level=.  The default level for children is 1, stored in =transient--default-child-level=.
+The user can adjust levels within a transient prefix by using (*C-x l*) for =transient-set-level=.  The default active level is 4, stored in =transient-default-level=.  The default level for children is 1, stored in =transient--default-child-level=.
 
-    Per-suffix and per-group, the user can set the level at which the child will be visible.  Each prefix has an active level, remembered per prefix.  If the child level is less-than-or-equal to the child level, the child is visible.
+Per-suffix and per-group, the user can set the level at which the child will be visible.  Each prefix has an active level, remembered per prefix.  If the child level is less-than-or-equal to the child level, the child is visible.
 
-    A hidden group will hide a suffix even if that suffix is at a low enough level.  Issue #153 has some additional information about behavior that might get cleaned up.
+A hidden group will hide a suffix even if that suffix is at a low enough level.  Issue #153 has some additional information about behavior that might get cleaned up.
 
 **** Defining group & suffix levels
 
