@@ -22,15 +22,15 @@ This guide assumes you have minimal knowledge of Emacs, some programming experie
 There are two ways:
 
 - Open the README.org file in Emacs and run examples as literate org.
-- Install the package to run commands and read their source.  Start with the =tsc-showcase= command.
+- Install the package to run commands and read their source.  Start with the ~tsc-showcase~ command.
 
 *** Using as literate org document
 
-If you open the org file in Emacs, it will switch to Org mode and you can run individual source blocks with =org-babel-execute-src-blk= on the block.
+If you open the org file in Emacs, it will switch to Org mode and you can run individual source blocks with ~org-babel-execute-src-blk~ on the block.
 
 *** Using as an installable package
 
-If you install the package, you can read source for each example with the normal.  =describe-symbol= command.  All commands are under =tsc-*= prefix.  Somewhat useful suffixes are under =tsc-suffix-*= while less useful ones under =tsc--suffix-*=.  They will come in handy when you are developing new applications.
+If you install the package, you can read source for each example with the normal ~describe-command~.  All commands are under =tsc-*= prefix.  Somewhat useful suffixes are under =tsc-suffix-*= while less useful ones under =tsc--suffix-*=.  They will come in handy when you are developing new applications.
 
 Installations for straight and elpaca:
 
@@ -57,7 +57,7 @@ Installations for straight and elpaca:
 :VISIBILITY: folded
 :END:
 
-This org file is produced with =org-babel-tangle=.  Package header and preludes included in the no-web block below:
+This org file is produced with ~org-babel-tangle~.  Package header and preludes included in the no-web block below:
 
 #+begin_src elisp :tangle transient-showcase.el :noweb yes :hidden yes :eval never
   <<package-header>>
@@ -88,7 +88,7 @@ This is a basic transient, using an anonymous lambda interactive command as its 
 
 #+end_src
 
-After executing the block above, you can =execute-extended-command= (*M-x*) and select =tsc-hello= to show this transient.  All transient prefixes are also commands that show up in (*M-x*)
+After executing the block above, you can ~execute-extended-command~ (*M-x*) and select ~tsc-hello~ to show this transient.  All transient prefixes are also commands that show up in (*M-x*)
 
 *Note* If the example above is hard to read, review some [[info:elisp#Top][elisp]] [[*Essential Elisp][syntax]] and typical forms.
 
@@ -162,8 +162,8 @@ The hello transient user input sequence is:
 
 =Prefix -> Suffix=
 
-- The *prefix* is the command you invoke first, such as =magit-dispatch=
-- A *suffix* is a command displayed in the transient UI, such as =magit-stage=
+- The *prefix* is the command you invoke first, such as ~magit-dispatch~
+- A *suffix* is a command displayed in the transient UI, such as ~magit-stage~
 
 #+begin_src elisp :tangle no
   (magit-dispatch) ; same as pressing 'h' in magit-status buffer
@@ -173,7 +173,7 @@ The keymap and UI display is frequently referred to as "a transient".  "Prefix" 
 
 *** Conceptual similarity to Emacs prefix arguments
 
-*Setting [[https://emacsdocs.org/docs/emacs/Prefix-Keymaps][prefix arguments]] with =universal-argument= (=C-u=) is a distinct, separate behavior that is part of Emacs.*
+*Setting [[https://emacsdocs.org/docs/emacs/Prefix-Keymaps][prefix arguments]] with ~universal-argument~ (=C-u=) is a distinct, separate behavior that is part of Emacs.*
 
 With prefix arguments, you "call" commands with extra arguments, like you would a function.
 
@@ -187,7 +187,7 @@ A prefix can also be bound as a suffix, enabling /nested/ prefixes.  A user inpu
 
 =Prefix -> Sub-Prefix -> Sub-Prefix -> Suffix=
 
-For example, in the =magit-dispatch= transient (=?=), =l= for =magit-log= is a nested transient. =b= for =all branches= is the suffix command =magit-log-all-branches=.
+For example, in the ~magit-dispatch~ transient (=?=), =l= for ~magit-log~ is a nested transient. =b= for =all branches= is the suffix command ~magit-log-all-branches~.
 
 See [[*Nesting & Flow Control][Flow Control]] for nested transient examples with both sub-prefixes and suffixes that do no exit.
 
@@ -210,7 +210,7 @@ See [[*Basic Infixes][Infix examples]] to get a better idea.
 
 You can declare the same behavior 3-4 ways
 
-- Shorthand forms within =transient-define-prefix= macro allow shorthand binding of suffixes & commands or creation of infixes directly within the layout definition.
+- Shorthand forms within ~transient-define-prefix~ macro allow shorthand binding of suffixes & commands or creation of infixes directly within the layout definition.
 
 - Macros for suffixes and infix definition streamline defining commands while also defining how they will behave in a layout.
 
@@ -221,7 +221,7 @@ You can declare the same behavior 3-4 ways
   (describe-symbol transient-child)
 #+end_src
 
-- Custom classes using EIEIO (basically elisp OOP) can change methods deeper in the implementation than you can reach with slots.  =describe-symbol= is a quick way to look at the methods.
+- Custom classes using EIEIO (basically elisp OOP) can change methods deeper in the implementation than you can reach with slots.  ~describe-symbol~ is a quick way to look at the methods.
 
 #+begin_src elisp :tangle no
   ;; slots & methods that can be set / overridden in suffixes
@@ -245,11 +245,11 @@ Binding suffixes with the =("key" "description" suffix-or-command)= form within 
 
 #+end_src
 
-*Note:* Both commands and suffixes from =transient-define-suffix= can be used.  It's a good reason to use =private--namespace= style names for suffix actions since these commands don't usually show up in (*M-x*) by default.
+*Note:* Both commands and suffixes from ~transient-define-suffix~ can be used.  It's a good reason to use =private--namespace= style names for suffix actions since these commands don't usually show up in (*M-x*) by default.
 
 ** Keyword Arguments Style
 
-You can customize the slot value (OOP attribute) of the transient, groups, and suffixes by adding extra ~:foo value~ style pairs.
+You can customize the slot value (OOP attribute) of the transient, groups, and suffixes by adding extra =:foo value= style pairs.
 
 Not all behaviors have a shorthand form, so as you use more behaviors, you will see more of the keyword argument style API.  Here we use the =:transient= property, set to true, meaning the suffix won't exit the transient.
 
@@ -268,7 +268,7 @@ Launch the command, wave several times (note timestamp update) and then exit wit
 
 ** Macro Child Definition Style
 
-The =transient-define-suffix= macro can help if you need to bind a command in multiple places and only override some properties for some prefixes.  It makes the prefix definition more compact at the expense of a more verbose command.
+The ~transient-define-suffix~ macro can help if you need to bind a command in multiple places and only override some properties for some prefixes.  It makes the prefix definition more compact at the expense of a more verbose command.
 
 #+name: tsc-wave-suffix-def
 #+begin_src elisp :tangle transient-showcase.el
@@ -302,7 +302,7 @@ The =transient-define-suffix= macro can help if you need to bind a command in mu
 
 ** Overriding slots in the prefix definition
 
-Even if you define a property via one of the macros, you can still override that property in the later prefix definition.  The example below overrides the =:transient=, =:description=, and =:key= properties of the =tsc-suffix-wave= suffix defined above:
+Even if you define a property via one of the macros, you can still override that property in the later prefix definition.  The example below overrides the =:transient=, =:description=, and =:key= properties of the ~tsc-suffix-wave~ suffix defined above:
 
 #+name: tsc-wave-overridden
 #+begin_src elisp :tangle transient-showcase.el :var _=tsc-wave-suffix-def
@@ -330,7 +330,7 @@ If you just list the key and symbol followed by properties, it is also a support
 
 ** Quoting Note for Vectors
 
-Inside the =[ ...vectors... ]= in =transient-define-prefix=, you don't need to quote symbols because in the vector, everything is a literal.  When you move a shorthand style =:property symbol= out to the =transient-define-suffix= form, which is a list, you might need to quote the symbol as =:property 'symbol=.
+Inside the =[ ...vectors... ]= in =transient-define-prefix=, you don't need to quote symbols because in the vector, everything is a literal.  When you move a shorthand style =:property symbol= out to the ~transient-define-suffix~ form, which is a list, you might need to quote the symbol as =:property 'symbol=.
 
 * Groups & Layouts
 
@@ -522,12 +522,12 @@ So, you put columns into rows that are in columns and stuff like that.  This can
 
 #+end_src
 
-*Note*, only =transient-columns=, not =transient-column= can act as a group
+*Note*, only ~transient-columns~, not ~transient-column~ can act as a group
 of groups.
 
 ** Manually setting group class
 
-If you need to override the class that the =transient-define-prefix= macro
+If you need to override the class that the ~transient-define-prefix~ macro
 would normally use.
 
 #+begin_src elisp :tangle transient-showcase.el :var _=wave-prelude
@@ -590,7 +590,7 @@ Sometimes you want to execute multiple commands without re-opening the transient
 
 #+end_src
 
-*Note*, if =tsc-wave= was used in both exit & stay, the =:transient= slot would be clobbered and we would only get one behavior.  Beware of re-using the same object instances in the same layout.  Move the =:transient= slot override between the two suffixes to see the change in behavior.
+*Note*, if ~tsc-wave~ was used in both exit & stay, the =:transient= slot would be clobbered and we would only get one behavior.  Beware of re-using the same object instances in the same layout.  Move the =:transient= slot override between the two suffixes to see the change in behavior.
 
 ** Nesting
 
@@ -640,7 +640,7 @@ Declaring a nested prefix that "returns" to its parent has a convenient shorthan
 
 *** Setting up another transient manually
 
-If you call =(transient-setup 'transient-command-symbol)=, you will activate a replacement transient.
+If you call ~(transient-setup 'transient-command-symbol)~, you will activate a replacement transient.
 
 This form is useful if you want a command to /perhaps/ load yet another transient in some situation.  You may even just want to load the same transient with different context, such as passing in a new [[*Scope][scope]].
 
@@ -707,13 +707,13 @@ input.
 
 *** Early return
 
-Sometimes you can complete your work without asking the user for more input.  In the custom body for a prefix, if you decline to call =transient-setup=, then the command will just exit with no problems.
+Sometimes you can complete your work without asking the user for more input.  In the custom body for a prefix, if you decline to call ~transient-setup~, then the command will just exit with no problems.
 
 Below is a nested transient.
 
 - The body form of the nested child can return early without loading a new transient
-- The parent uses =transient--do-recurse= to make it's child "return" to it
-- The "radiations" command in the child explicitly overrides this, using =transient--do-exit= so that it /does not/ return to the parent
+- The parent uses ~transient--do-recurse~ to make it's child "return" to it
+- The "radiations" command in the child explicitly overrides this, using ~transient--do-exit~ so that it /does not/ return to the parent
 
 These possible values for =:transient= change between transient versions.  See the [[info:transient#Transient State][transient]] manual.
 
@@ -773,9 +773,9 @@ These possible values for =:transient= change between transient versions.  See t
 
 The value in the =:transient= slot affects what state the body of your command will see and what will happen after your command, during the post-command.
 
-The =:transient= slot holds a function called the "pre-command."  Before your suffix body forms run, the pre-command is called and creates the conditions that your suffix may use to, for example, prepare for reading variables that were set on infixes.  If the pre-command calls =transient-export= then it will add to history.
+The =:transient= slot holds a function called the "pre-command."  Before your suffix body forms run, the pre-command is called and creates the conditions that your suffix may use to, for example, prepare for reading variables that were set on infixes.  If the pre-command calls ~transient-export~ then it will add to history.
 
-In =transient-define-prefix= and =transient-define-suffix=, the =t= value is actually translated to =transient--do-call= or =transient--do-recurse= depending on the situation.
+In ~transient-define-prefix~ and ~transient-define-suffix~, the =t= value is actually translated to ~transient--do-call~ or ~transient--do-recurse~ depending on the situation.
 
 These functions set up some states so that post-command can figure out if it needs to exit, save values, or enter another transient, and what else to do while entering that new transient.
 
@@ -785,15 +785,15 @@ The [[https://magit.vc/manual/transient.html#Transient-State][official long manu
 
 Some of the *trickiest bugs you can introduce* will happen when using the following variables and functions at varying points in command lifecycles:
 
-- =transient-current-command=
-- =transient--command=
-- =transient-current-prefix=
-- =transient--prefix=
-- =transient-args=
+- ~transient-current-command~
+- ~transient--command~
+- ~transient-current-prefix~
+- ~transient--prefix~
+- ~transient-args~
 
-During the pre-command and post-command, these can change.  When you are overriding the pre-command, you may discover things such as the result of =transient-args= changing.  Calling =transient-setup= may update things.  Even if you call =transient-args= on on the specific transient, the results change during the lifecycle and depending on the pre-command.
+During the pre-command and post-command, these can change.  When you are overriding the pre-command, you may discover things such as the result of ~transient-args~ changing.  Calling ~transient-setup~ may update things.  Even if you call ~transient-args~ on on the specific transient, the results change during the lifecycle and depending on the pre-command.
 
-*In particular* it seems like layout predicates should use =transient--prefix= while suffix bodies should use =transient-current-prefix=.
+*In particular* it seems like layout predicates should use ~transient--prefix~ while suffix bodies should use ~transient-current-prefix~.
 
 Not all pre-commands are compatible with all situations and suffixes!
 
@@ -802,7 +802,7 @@ Not all pre-commands are compatible with all situations and suffixes!
 **** TODO Errata
 
 There's definitely some edge cases that are unnecessarily complex for the
-use case.  Think of how life was before =transient--do-recurse=.
+use case.  Think of how life was before ~transient--do-recurse~.
 
 * Using & Managing State
 
@@ -812,13 +812,13 @@ To spark your imagination, here's a non-exhaustive list of how to get data into 
 
 - Interactive forms
 - Prefix arguments (=C-u= universal argument)
-- Setting the scope in =transient-setup=
-- Obtaining a scope in a custom =transient-init-scope= method
+- Setting the scope in ~transient-setup~
+- Obtaining a scope in a custom ~transient-init-scope~ method
 - Default values in prefix definition
 - Saved values of infixes
 - Saved values in other infixes / prefixes with shared =history-key=
 - User-set infix values from the current or parent prefix
-- Ad-hoc values in regular =defvar= and =defcustom= etc
+- Ad-hoc values in regular ~defvar~ and ~defcustom~ etc
 - Reading values from another, perhaps distant prefix
 - Arguments passed into interactive commands to call them as normal elisp functions
 
@@ -855,7 +855,7 @@ Functions need arguments.  Infixes are specialized suffixes with behavior defaul
 
 *** Basic Infixes
 
-Infix classes built-in all descend from =transient-infix= and can be seen clearly in the =eieio-browse=.  View their slots and documentation with ~(describe-class transient-infix)~ etc.  Here you can see what most infixes look like and how they behave.
+Infix classes built-in all descend from ~transient-infix~ and can be seen clearly in the ~eieio-browse~.  View their slots and documentation with ~(describe-class transient-infix)~ etc.  Here you can see what most infixes look like and how they behave.
 
 #+begin_src elisp :tangle transient-showcase.el :var  _=print-args-prelude
 
@@ -897,23 +897,23 @@ Infix classes built-in all descend from =transient-infix= and can be seen clearl
 
 *** Reading Infix Values
 
-*Reminder* in the section on [[*Pre-Commands Explained][pre-commands]] the discussion about the =:transient= mentions that the values available in a suffix body depend on whether the pre-command called =transient--export= before evaluating the suffix body.
+*Reminder* in the section on [[*Pre-Commands Explained][pre-commands]] the discussion about the =:transient= mentions that the values available in a suffix body depend on whether the pre-command called ~transient--export~ before evaluating the suffix body.
 
 There are two basic ways to read infixes:
 
-- =(transient-args transient-current-command)= and parse manually
-- =(transient-arg-value "--argument-" (transient-args transient-current-command)=
-- =(transient-suffixes transient-current-command)= and retrieve your fully hydrated suffix
+- ~(transient-args transient-current-command)~ and parse manually
+- ~(transient-arg-value "--argument-" (transient-args transient-current-command)~
+- ~(transient-suffixes transient-current-command)~ and retrieve your fully hydrated suffix
 
-**** TODO The =transient-suffixes= option requires filtering
+**** TODO The ~transient-suffixes~ option requires filtering
 
-In my opinion the API should make it easier to get raw values from suffixes, but this is also a matter of custom infixes needing to serialize values correctly so that =transient-arg-value= will "just work".
+In my opinion the API should make it easier to get raw values from suffixes, but this is also a matter of custom infixes needing to serialize values correctly so that ~transient-arg-value~ will "just work".
 
 ** Scope
 
 When you call a function with an argument, you want to know in the body of your function what that argument was.  This is the scope.  The prefix is initialized with the =:scope= either in its own body or a similar form.  Suffixes can then read back that scope in their body.  The suffix object is given the scope and can use it to alter its own display or behavior.  The layout also can interpret the scope while it is initializing.
 
-*WARNING* When writing predicates against the scope, you will need to determine whether =transient--prefix= or =transient-current-prefix= is correct when writing prefix-generic suffixes.  It is very subtle if you accidentally choose the wrong one and the parent has a nil scope while the child has an entirely different scope.  These variables change throughout the lifecycle!  Use [[*Watching evaluation in Edebug][edebug]] you must!
+⚠️ *WARNING* When writing predicates against the scope, you will need to determine whether ~transient--prefix~ or ~transient-current-prefix~ is correct when writing prefix-generic suffixes.  It is very subtle if you accidentally choose the wrong one and the parent has a nil scope while the child has an entirely different scope.  These variables change throughout the lifecycle!  Use [[*Watching evaluation in Edebug][edebug]] you must!
 
 #+begin_src elisp :tangle transient-showcase.el
 
@@ -985,14 +985,14 @@ Key binding sequences, such as =wa= instead of single-key prefix bindings, will 
 
 Briefly, there are three locations for state you need to be aware of for this section:
 
-- Each transient's prefix object has a =:value= that is updated by =transient-set= and =transient-save=
-- The values obtained from =transient-args= are usually quite ephemeral and don't even persist beyond the body of form of the suffixes you usually read them in
-- =transient-values= contains saved values that are used to re-hydrate the prefix =:value= slot when the prefix is created
-- =transient-history= is used to make it faster for the user to flip through previous states (which can have independent histories for infixes and prefixes).  These are never used unless calling =transient-history-prev= and =transient-history-next=.
+- Each transient's prefix object has a =:value= that is updated by ~transient-set~ and ~transient-save~
+- The values obtained from ~transient-args~ are usually quite ephemeral and don't even persist beyond the body of form of the suffixes you usually read them in
+- ~transient-values~ contains saved values that are used to re-hydrate the prefix =:value= slot when the prefix is created
+- ~transient-history~ is used to make it faster for the user to flip through previous states (which can have independent histories for infixes and prefixes).  These are never used unless calling ~transient-history-prev~ and ~transient-history-next~.
 
-We can get this as a list of strings for any prefix by calling =transient-args= on =transient-current-command= in the suffix's interactive form.  If you know the command you want the value of, you can use it's symbol instead of =transient-current-command=.
+We can get this as a list of strings for any prefix by calling ~transient-args~ on ~transient-current-command~ in the suffix's interactive form.  If you know the command you want the value of, you can use it's symbol instead of ~transient-current-command~.
 
-This is related to history keys.  If you set the arguments and then save them using (=C-x s=) for the command =transient-save=, not only will the transient be updated with the new value, but if you call the child independently, it can still read the value from the suffix.
+This is related to history keys.  If you set the arguments and then save them using (=C-x s=) for the command ~transient-save~, not only will the transient be updated with the new value, but if you call the child independently, it can still read the value from the suffix.
 
 #+begin_src elisp :tangle transient-showcase.el :var _=print-args-prelude
 
@@ -1059,12 +1059,12 @@ It's worth bringing up the [[elisp:(describe-variable 'transient-show-common-com
 
 ** History Keys
 
-History lets you *set* infixes using prior values.  It's per-prefix, per-suffix usually.  Using previous examples like =tsc-snowcone-eater=, you can flip through history using:
+History lets you *set* infixes using prior values.  It's per-prefix, per-suffix usually.  Using previous examples like ~tsc-snowcone-eater~, you can flip through history using:
 
-  - =C-x p= for =transient-history-prev=
-  - =C-x n= for =transient-history-next=
+  - =C-x p= for ~transient-history-prev~
+  - =C-x n= for ~transient-history-next~
 
-These bindings are revealed when =transient-show-common-commands= is =t= or when you hit the =C-x= prefix.
+These bindings are revealed when ~transient-show-common-commands~ is =t= or when you hit the =C-x= prefix.
 
 However, what if you *don't* want a unique history for some infixes or even prefixes?
 
@@ -1109,7 +1109,7 @@ The following example can demonstrate the behavior with some user effort:
 
 *** Detangling with Initialization, Setting, and Saving
 
-Set values show up in the prefix's =value= slot.
+Set values show up in the prefix's =:value= slot.
 
 #+begin_src elisp :tangle no :var _=tsc-ping-example
 
@@ -1117,11 +1117,11 @@ Set values show up in the prefix's =value= slot.
 
 #+end_src
 
-The prefix value will get the last value that was *set* using =transient-set=.
+The prefix value will get the last value that was *set* using ~transient-set~.
 
-However, the prefix value shown in =transient-values= is only updated when calling =transient-save=.
+However, the prefix value shown in ~transient-values~ is only updated when calling ~transient-save~.
 
-Saved values show up in =transient-values=.  If you save =tsc-ping=, you can see the saved value here:
+Saved values show up in ~transient-values~.  If you save ~tsc-ping~, you can see the saved value here:
 
 #+begin_src elisp :tangle no :var _=tsc-ping-example
 
@@ -1129,11 +1129,11 @@ Saved values show up in =transient-values=.  If you save =tsc-ping=, you can see
 
 #+end_src
 
-*These two values may be independent.* They are written at the same time when calling =transient-save=.  During prefix initialization, the =:value= is written from =transient-values=.
+*These two values may be independent.* They are written at the same time when calling ~transient-save~.  During prefix initialization, the =:value= is written from ~transient-values~.
 
-Play with the =tsc-snowcone-eater= and =tsc-ping= and =tsc-pong= in the =C-x= menu while also looking at what gets stored in =transient-values=, =transient-history= and the prefix's slots.
+Play with the ~tsc-snowcone-eater~ and ~tsc-ping~ and ~tsc-pong~ in the =C-x= menu while also looking at what gets stored in ~transient-values~, ~transient-history~ and the prefix's slots.
 
-When you re-evaluate the prefix or reload Emacs, you will see the result of initialization from =transient-values=.
+When you re-evaluate the prefix or reload Emacs, you will see the result of initialization from ~transient-values~.
 
 ** Disabling Set / Save on a Suffix
 
@@ -1155,7 +1155,7 @@ To disable saving and setting values, causing a prefix to always end up using th
 
 #+end_src
 
-Try to update =remember= and then set and save it in the =C-x= menu.  Reload it.  It will never pay attention to history or setting & saving the transient value.
+Try to update ~remember~ and then set and save it in the =C-x= menu.  Reload it.  It will never pay attention to history or setting & saving the transient value.
 
 ** Setting or Saving Every Time a Suffix is Used
 
@@ -1188,7 +1188,7 @@ Try to update =remember= and then set and save it in the =C-x= menu.  Reload it.
 
 *** TODO Sticky infix support
 
-There needs to be a slot that causes infixes to always be set on export.  This would cover cases where the most frequent user input changes just rapidly enough that both setting every time and saving are equally inconvenient.  Using =transient-set= is kind of brute-ish.
+There needs to be a slot that causes infixes to always be set on export.  This would cover cases where the most frequent user input changes just rapidly enough that both setting every time and saving are equally inconvenient.  Using ~transient-set~ is kind of brute-ish.
 
 *** Default Values
 
@@ -1212,7 +1212,7 @@ Every transient prefix has a value.  It's a list.  You can set it to create defa
 
 #+end_src
 
-*Note*, after setting or saving a value on this transient using the =C-x= menu, the next time the transient is set up, it will have a different value. If you want the default to return, use =transient-reset= in your suffix.
+*Note*, after setting or saving a value on this transient using the =C-x= menu, the next time the transient is set up, it will have a different value. If you want the default to return, use ~transient-reset~ in your suffix.
 
 *** Readers
 
@@ -1237,7 +1237,7 @@ Setting the reader can be used to enforce rules of valid input.  See [[Custom In
 
 ** Lisp Variables
 
-Lisp variables are currently at an experimental support level.  They way they work is to report and set the value of a lisp symbol variable.  Because they aren't necessarilly intended to be printed as crude CLI arguments, they *DO NOT* appear in =(transient-args 'prefix)= but this is fine because you can just use the variable.
+Lisp variables are currently at an experimental support level.  They way they work is to report and set the value of a lisp symbol variable.  Because they aren't necessarilly intended to be printed as crude CLI arguments, they *DO NOT* appear in ~(transient-args 'prefix)~ but this is fine because you can just use the variable.
 
 Customizing this class can be useful when working with objects and functions that exist entirely in elisp.
 
@@ -1284,7 +1284,7 @@ The section on [[*Nesting & Flow control][flow control]] & [[*using & managing s
 
 ** Switches & Arguments Again
 
-The shorthand forms in =transient-define-prefix= are heavily influenced by the CLI style switches and arguments that transient was built to control. Most shorthand forms look like so:
+The shorthand forms in ~transient-define-prefix~ are heavily influenced by the CLI style switches and arguments that transient was built to control. Most shorthand forms look like so:
 
 =("key" "description" "argument")=
 
@@ -1321,7 +1321,7 @@ If you need an argument with a space instead of the equal sign, use a space and 
 
 *** Argument and Infix Macros
 
-If you need to fine-tune a switch (boolean infix), use =transient-define-infix=.  Likewise, use =transient-define-argument= for fine-tuning an argument.  The class definitions can be used as a reference while the [[https://magit.vc/manual/transient/Suffix-Slots.html#Slotsc-of-transient_002dinfix][manual]] provides more explanation.
+If you need to fine-tune a switch (boolean infix), use ~transient-define-infix~.  Likewise, use ~transient-define-argument~ for fine-tuning an argument.  The class definitions can be used as a reference while the [[https://magit.vc/manual/transient/Suffix-Slots.html#Slotsc-of-transient_002dinfix][manual]] provides more explanation.
 
 #+begin_src elisp :tangle transient-showcase.el :var _=print-args-prelude
 
@@ -1353,7 +1353,7 @@ If you need to fine-tune a switch (boolean infix), use =transient-define-infix=.
 
 *** Choices
 
-Choices can be set for an argument.  The property API and =transient-define-argument= are equivalent for configuring choices.  You can either hard-code or generate choices.
+Choices can be set for an argument.  The property API and ~transient-define-argument~ are equivalent for configuring choices.  You can either hard-code or generate choices.
 
 #+begin_src elisp :tangle transient-showcase.el :var _=print-args-prelude
 
@@ -1466,7 +1466,7 @@ Shortarg cannot be used for exclusion excluding other options (prefix =:incompat
 
 *** Choices from a function
 
-See =transient-infix-read= for actual code.  This method uses the prefix's history and then delecates to =completing-read= or =completing-read-multiple=.  The =:choices= key coresponds to the =COLLECTION= argument passed to completing reads.
+See ~transient-infix-read~ for actual code.  This method uses the prefix's history and then delecates to ~completing-read~ or ~completing-read-multiple~.  The =:choices= key coresponds to the =COLLECTION= argument passed to completing reads.
 
 *Note*, using a function for completions can appear to require a daunting amount of behavior if you read the manual [[info:elisp#Programmed Completion][section on programmed completions]].  If you however just return a list of options, even when FLAG is not t, everything seems just fine.
 
@@ -1514,7 +1514,7 @@ If you want to call a command line application using the arguments, you might ne
 
 - Cowsay doesn't actually have a =message= argument, So we end up
   stripping it from the arguments and re-assembling something
-  =call-process= can use.
+  ~call-process~ can use.
 
 - Cowsay supports more options, but for the sake of keeping this example
   small (and to refocus effort on transient itself), the set of all CLI
@@ -1522,13 +1522,13 @@ If you want to call a command line application using the arguments, you might ne
 
 There's some errata about this example:
 
-- The predicates don't update the transient.  =(transient--redisplay)=
-  doesn't do the trick.  We could use =transient--do-replace= and
-  =transient-setup=, but that would lose existing state
+- The predicates don't update the transient.  ~(transient--redisplay)~
+  doesn't do the trick.  We could use ~transient--do-replace~ and
+  ~transient-setup~, but that would lose existing state unless we run ~transient-set~
 
 - The predicate needs to be exists & not empty (but doesn't matter yet)
 
-✨ If you are working on a CLI tool in order to fit a transient interface, consider a JSON-RPC process because you can build a normal command interface and dispatch it with transient even if you skip the CLI argument handling facilities.
+✨ If you are working on a CLI tool in order to fit a transient interface, consider a JSON-RPC process because you can build a normal command interface and dispatch it with transient even if you skip the CLI argument handling facilities.  CLI's are more fragile than JSON-RPC, and JSON-RPC processes can retain state.
 
 #+begin_src elisp :tangle transient-showcase.el
 
@@ -1731,7 +1731,7 @@ Levels are another way to control visibility.
 
 *Lower levels are more visible. Setting the level higher reveals more suffixes.* 1-7 are valid levels.
 
-The user can adjust levels within a transient prefix by using (*C-x l*) for =transient-set-level=.  The default active level is 4, stored in =transient-default-level=.  The default level for children is 1, stored in =transient--default-child-level=.
+The user can adjust levels within a transient prefix by using (*C-x l*) for ~transient-set-level~.  The default active level is 4, stored in ~transient-default-level~.  The default level for children is 1, stored in ~transient--default-child-level~.
 
 Per-suffix and per-group, the user can set the level at which the child will be visible.  Each prefix has an active level, remembered per prefix.  If the child level is less-than-or-equal to the child level, the child is visible.
 
@@ -1817,7 +1817,7 @@ This is a group method that can be overridden in order to modify or eliminate so
 
 #+end_src
 
-=transient--parse-child= takes the same configuration format as =transient-define-prefix=.  You can see the layout format in the [[Layout Hacking][layout hacking appendix]].  =transient--prarse-group= works almost exactly the same, just for groups.
+~transient--parse-child~ takes the same configuration format as ~transient-define-prefix~.  You can see the layout format in the [[Layout Hacking][layout hacking appendix]].  ~transient--prarse-group~ works almost exactly the same, just for groups.
 
 The same thing, but parsing an entire group spec:
 
@@ -1846,7 +1846,7 @@ The same thing, but parsing an entire group spec:
 
 #+end_src
 
-If you need to define a dynamic group class, override =transient-setup-children=.  It will work almost entirely the same as the examples above.  Set your group class in the prefix using the =:class= key.
+If you need to define a dynamic group class, override ~transient-setup-children~.  It will work almost entirely the same as the examples above.  Set your group class in the prefix using the =:class= key.
 
 *Note* you don't need to be inside of a layout body to hack around with dynamic layouts.  Mess around in [[elisp:(ielm))][ielm]].
 
@@ -1856,14 +1856,14 @@ If you need to define a dynamic group class, override =transient-setup-children=
 
 #+end_src
 
-*Note* you can replace =transient--prefix= with =tsc-generated-group= in the
-example above.  =transient--prefix= is just a variable that happens to hold
+*Note* you can replace ~transient--prefix~ with ~tsc-generated-group~ in the
+example above.  ~transient--prefix~ is just a variable that happens to hold
 the prefix during layout.
 
 *** TODO Correction in manual
 
 - These functions do mostly the same job.  Why do we need to specify a
-  prefix for =transient-parse-suffixes=, for scope etc?
+  prefix for ~transient-parse-suffixes~, for scope etc?
 
 ** Modifying layouts
 
@@ -1904,25 +1904,25 @@ Exercises for the reader:
 - Create a suffix editor interface, modifying the description, key,
   command, or other slots
 
-See the =transient-insert-suffix= for documentation on the =LOC= argument.
+See the ~transient-insert-suffix~ for documentation on the =LOC= argument.
 
 ** Using prefix scope in children
 
-Basically you are on your own.  Just call =(oref transient--prefix scope)= during layout setup or =(oref transient-current-prefix)= during suffix bodies.
+Basically you are on your own.  Just call ~(oref transient--prefix scope)~ during layout setup or ~(oref transient-current-prefix)~ during suffix bodies.
 
 *** Obtaining Missing Scope
 
 Because suffixes are basically also commands (riding in the same symbol plist), a suffix can be called independently.  In this case, if its expecting to read the scope from the prefix when there is no prefix, it might fail.
 
-Therefore, a method called =transient-init-scope= can be overridden and used at the correct point in the life-cycle for the suffix to correct the issue.
+Therefore, a method called ~transient-init-scope~ can be overridden and used at the correct point in the life-cycle for the suffix to correct the issue.
 
 *Note*, the behavior is actually quite ad-hoc.  You will read the prefix yourself and then decide if you want to use some fallback.
 
-There is a perfectly short example in [[https://github.com/magit/magit/blob/40fb3d20026139ad1c3a3d9069b40d7d61bf8786/lisp/magit-transient.el#L56-L61][Magit source]] for the custom =magit--git-variable= subclass of the =transient-variable= infix.
+There is a perfectly short example in [[https://github.com/magit/magit/blob/40fb3d20026139ad1c3a3d9069b40d7d61bf8786/lisp/magit-transient.el#L56-L61][Magit source]] for the custom ~magit--git-variable~ subclass of the ~transient-variable~ infix.
 
-Each infix instance is declared in =transient-define-infix=, potentially with a =:scope= slot, possibly holding a function.
+Each infix instance is declared in ~transient-define-infix~, potentially with a =:scope= slot, possibly holding a function.
 
-If it's holding a function, that function will be used as a backup during initialization in case there is no prefix or it has nothing in its =scope= slot.
+If it's holding a function, that function will be used as a backup during initialization in case there is no prefix or it has nothing in its =:scope= slot.
 
 ** Custom Infix Types
 
@@ -1933,14 +1933,14 @@ If you need to set and display a custom type, use the simple OOP techniques of [
 *Essential behaviors for your custom infix:*
 
 - Defining a reader to set the infix with user input
-- =prompt= slot's default form, =initform= for asking the user for input
-- =transient-init-value= to re-hydrate saved values
-- =transient-infix-value= so that setting & saving persist what you want to rehydrate
-- =transient-format-value= to display a user-meaningful form for your value
+- =:prompt= slot's default form, =:initform= for asking the user for input
+- ~transient-init-value~ to re-hydrate saved values
+- ~transient-infix-value~ so that setting & saving persist what you want to rehydrate
+- ~transient-format-value~ to display a user-meaningful form for your value
 
 We will also use some layout introspection.  This makes the example a bit more complex, but represents a real custom infix type with real serialization and elisp objects backing it:
 
-- =transient-get-suffix= To get suffix by *key*, *location*, or *command symbol*
+- ~transient-get-suffix~ To get suffix by *key*, *location*, or *command symbol*
 - Getting a description from raw layout children (not EIEIO objects).  See [[Layout Hacking][Layout Hacking]].
 
 This example is a bit intimidating because the serialized value we are storing and re-hydrating is a layout child location, the LOC argument seen in transient programming.  It maps to an actual layout child, which we introspect and later modify.  The point of the example is to let the user handle a simple value that we can also persist but to use a more complex object that might only exist at runtime.  If this example makes little sense, try making an example with just a string or number before you start your own data type.
@@ -2105,13 +2105,13 @@ This example is a bit intimidating because the serialized value we are storing a
 
 #+end_src
 
-This is a difficult example, but once you understand the pieces, you can see some of the magit variables in action like =magit--git-variable= and its many subclasses.
+This is a difficult example, but once you understand the pieces, you can see some of the magit variables in action like ~magit--git-variable~ and its many subclasses.
 
 Revisit the section on [[Detangling with Initialization, Setting, and Saving][detangling setting, saving and history]].  Watching the values update will make it clear what representations are being stored, where, and when.
 
 *** Reading custom infix values
 
-*Note*, however you store and rehydrate will affect how you read, so try to make it just work with =transient-read-arg=, unlike this example (TODO).
+*Note*, however you store and rehydrate will affect how you read, so try to make it just work with ~transient-read-arg~, unlike this example (TODO).
 
 #+name: custom-infixes
 #+begin_src elisp :tangle transient-showcase.el :var _=custom-infixes
@@ -2233,27 +2233,27 @@ Like all OOP, the three things you want to do are:
 
 **** Override methods
 
-=cl-defmethod= and sometimes =cl-call-next-method=
+~cl-defmethod~ and sometimes ~cl-call-next-method~
 
 **** Override default values
 
-Inside the =defclass= form, you can set slots that you don't like.  =:initform= is a default value.  =:initarg= configures which argument to pick up from the class constructor.
+Inside the ~defclass~ form, you can set slots that you don't like.  =:initform= is a default value.  =:initarg= configures which argument to pick up from the class constructor.
 
 **** Read & Update
 
-=oref= and =oset=
+~oref~ and ~oset~
 
 **** Call Methods
 
-=(method-name object arguments)=
+~(method-name object arguments)~
 
 **** Introspection
 
-See methods like =slot-boundp= in the EIEIO [[info:eieio#Function Index][eieio method index]]
+See methods like ~slot-boundp~ in the EIEIO [[info:eieio#Function Index][eieio method index]]
 
 *** Transient's defclasses and their inheritance
 
-Here's a list of all of transient's =defclass= and their ancestry.  This is
+Here's a list of all of transient's ~defclass~ and their ancestry.  This is
 how it is in 2022.
 
 #+begin_src elisp :tangle no :results replace
@@ -2291,7 +2291,7 @@ how it is in 2022.
 
 *** View Class Methods and Attributes
 
-Using =describe-symbol= is extremely handy for viewing the class slots
+Using ~describe-symbol~ is extremely handy for viewing the class slots
 and methods.
 
 Classes used in transient that you are likely to want to know the slots for:
@@ -2311,7 +2311,7 @@ There is a lot of support for both print-line and step-through debugging.
 
 *** Print debug messages
 
-Just set =transient--debug= to t.  [[elisp:(setq transient--debug t)][(setq transient-debug t)]]
+Just set ~transient--debug~ to t.  [[elisp:(setq transient--debug t)][(setq transient-debug t)]]
 
 You will get a lot of logs visible in =*Messages*= via
 [[elisp:(view-echo-message-area)][view-echo-message-area]] the next time you run a transient.
@@ -2354,11 +2354,11 @@ to watch your transient in Edebug.
 In short:
 
   - goto your [[elisp:(find-library "transient")][transient source]]
-  - instrument a function you want to watch with =edebug-defun=
+  - instrument a function you want to watch with ~edebug-defun~
   - call the transient / suffix that triggers entry of that function
   - use =SPC= to step forward, =c= to continue, =i= to enter a function call, or =h= for help etc
 
-First watch the debug output to gain an idea of how your code flows with the transient code.  Then instrument transient behaviors such as =transient--post-exit= and use =i= to =edebug-step-in= to calls of interest.
+First watch the debug output to gain an idea of how your code flows with the transient code.  Then instrument transient behaviors such as ~transient--post-exit~ and use =i= to ~edebug-step-in~ to calls of interest.
 
 When you are done, remember to use [[elisp:(edebug-remove-instrumentation)][=edebug-remove-instrumentation=]] so that you can go on without every transient you open trying to call the debugger.
 
@@ -2416,13 +2416,13 @@ You might find this helpful when constructing [[*Dynamically generating layouts]
 
 ** Hooks
 
-Just a reminder, some hooks exist.  Use =describe-variable= and complete with =transient hook= for the most recent list of hooks.
+Just a reminder, some hooks exist.  Use ~describe-variable~ and complete with ~transient hook~ for the most recent list of hooks.
 
 ** Preludes
 
 Definitions that are not that interesting on their own but are used in examples.
 
-*** =tsc-suffix-wave= Command
+*** ~tsc-suffix-wave~ Command
 
 #+name: wave-prelude
 #+begin_src elisp :tangle no
@@ -2434,7 +2434,7 @@ Definitions that are not that interesting on their own but are used in examples.
 
 #+end_src
 
-*** =tsc-suffix-show-level=
+*** ~tsc-suffix-show-level~
 
 #+name: show-level-prelude
 #+begin_src elisp :tangle no
@@ -2447,7 +2447,7 @@ Definitions that are not that interesting on their own but are used in examples.
 
 #+end_src
 
-*** =tsc--define-waver=
+*** ~tsc--define-waver~
 
 #+name: levels-prelude
 #+begin_src elisp :tangle no
@@ -2473,7 +2473,7 @@ Definitions that are not that interesting on their own but are used in examples.
 
 #+end_src
 
-*** =tsc-suffix-print-args=
+*** ~tsc-suffix-print-args~
 
 Here's a suffix that reads the transient's infix values, the prefix's scope, and any universal argument (=C-u 4= etc).
 
@@ -2497,18 +2497,18 @@ Here's a suffix that reads the transient's infix values, the prefix's scope, and
 
 If you were hit in the face with the first example, you need to learn basic Elisp.  This is not an Elisp guide.  Here's some starting points:
 
-- [[info:elisp#Macros][transient-define-prefix]] is a macro that creates a command and attaches a =transient-prefix= object to the command symbol's plist.
+- [[info:elisp#Macros][transient-define-prefix]] is a macro that creates a command and attaches a ~transient-prefix~ object to the command symbol's plist.
 - [[info:elisp#Lambda][lambda]] is a macro to create an anonymous function
-- [[info:elisp#Using Interactive][interactive]] is a macro that makes the function compatible with the command interface, the =M-x= or =execute-extended-command= menu
+- [[info:elisp#Using Interactive][interactive]] is a macro that makes the function compatible with the command interface, the =M-x= or ~execute-extended-command~ menu
 - [[info:elisp#Vector Functions][The brackets]] are just vector syntax.
 
-  Besides the other ways to evaluate elisp used in this README, try =ielm=.
+  Besides the other ways to evaluate elisp used in this README, try ~ielm~.
 
-  Use the built-in elisp manual by calling the command =elisp-index-search=.  See shortdocs for functions using =shortdoc-display-groups=.
+  Use the built-in elisp manual by calling the command ~elisp-index-search~.  See shortdocs for functions using ~shortdoc-display-groups~.
 
-  The EIEIO and CL manuals are independent from the Elisp manual for some reason.  EIEIO is pretty short and not used much once you get the hang of it. =info-display-manual=
+  The EIEIO and CL manuals are independent from the Elisp manual for some reason.  EIEIO is pretty short and not used much once you get the hang of it. ~info-display-manual~
 
-  [[info:cl#Top][Common Lisp manual]] you don't really need the common lisp manual for working with transient.  Don't be alarmed when you see EIEIO using functions like =cl-call-next-method=
+  [[info:cl#Top][Common Lisp manual]] you don't really need the common lisp manual for working with transient.  Don't be alarmed when you see EIEIO using functions like ~cl-call-next-method~
 
 * Further Reading
 
