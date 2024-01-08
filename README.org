@@ -134,7 +134,7 @@ After executing the block above, you can ~execute-extended-command~ (*M-x*) and 
   - [[Dispatching args into a process][Dispatching args into a process]]
 - [[Controlling Visibility][Controlling Visibility]]
   - [[Visibility Predicates][Visibility Predicates]]
-  - [[Inapt (Temporarily Unavailable)][Inapt (Temporarily Unavailable)]]
+  - [[Inapt (Temporarily Unavailable)][Inapt (Temporarily Inappropriate)]]
   - [[Levels][Levels]]
 - [[Advanced][Advanced]]
   - [[Dynamically generating layouts][Dynamically generating layouts]]
@@ -397,9 +397,9 @@ The =:description= key is applied last and therefore wins in ambiguous declarati
 
 #+end_src
 
-*** TODO Errata
+*** Errata
 
-*Note*, the uuid in the group description is generated on every key input.  Layout updates are fun.  It does not also work when changing the suffix descriptions in the layout via hackery.  They are evidently evaluated only once per layout. 凸( ` ﾛ ´ )凸
+*Note*, the uuid in the group description is generated on every key read, so multi-key sequences cause updates to the descriptions.  This is not likely to be changed because layout re-rendering is necessary to indicate the partially complete key sequence. 🤓
 
 ** Layouts
 
@@ -1648,7 +1648,7 @@ Open the following example in buffers with different modes (or change modes manu
     [["Function Predicates"
       ;; note, after toggling, the transient needs to be re-displayed for the
       ;; predicate to take effect
-      ("b" "toggle busy" tsc--toggle-busy)
+      ("tb" "toggle busy" tsc--toggle-busy :transient t)
       ("bw" "wave busily" tsc-suffix-wave :if tsc--busy-p)]
 
      ["Programming Actions"
@@ -1668,13 +1668,15 @@ Open the following example in buffers with different modes (or change modes manu
 
 #+end_src
 
-** Inapt (Temporarily Unavailable)
+** Inapt (Temporarily Inappropriate)
 
 "Greyed out" suffixes.  Inapt is better if an option is temporarily unavailable due to a state that varies with each invocation of the transient.
 
-Inapt predicates work on suffixes, but not on groups (which would have to modify every child).
+Inapt predicates are supported on suffixes, but not on groups (which would have to modify every child).
 
 *Note*, like visibility predicates, =inapt-*= predicates do not take effect until the transient has its layout fully redone.  Therefore this example uses a child transient and updates the scope.
+
+✨ Adjust this example to use =:if= instead of =:inapt-if= to see the difference between visibility and inapt.
 
 #+begin_src elisp :tangle transient-showcase.el :var _=print-args-prelude :var __=levels-prelude
 
@@ -1712,7 +1714,8 @@ Inapt predicates work on suffixes, but not on groups (which would have to modify
 
     [("-s" "switch" "--switch")
      ("a" "show arguments" tsc-suffix-print-args)
-     ("c" "launch child prefix" tsc--inapt-children :transient transient--do-recurse)])
+     ("c" "launch child prefix" tsc--inapt-children
+      :transient transient--do-recurse)])
 
   ;; (tsc-inapt-parent)
 
@@ -1964,7 +1967,9 @@ This example is a bit intimidating because the serialized value we are storing a
             ((listp layout-child)
              (plist-get (elt layout-child 2) :description)) ; suffix
             (t
-             (message (propertize "You traversed into a child's list elements!" 'face 'warning))
+             (message
+              (propertize "You traversed into a child's list elements!"
+                          'face 'warning))
                (format "(child's interior) element: %s" layout-child)))))
       (cond
        ;; The description is sometimes a callable function with no arguments,
