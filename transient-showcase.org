@@ -17,11 +17,15 @@ Code examples for interactive explanations of [[https://github.com/magit/transie
 
 This guide assumes you have minimal knowledge of Emacs, some programming experience in elisp and non-lisp languages, and have at least seen [[https://magit.vc/screenshots/][screenshots]] of =magit=.
 
+These examples serve to *illustrate* the documentation in transient's manual, which probably ships with your Emacs, accessible via =M-x info-display-manual transient=.
+
 ** How to use
 
-There are two ways:
+If you are reading the README.md on Github, this markdown file is exported as a preview for transient-showcase.org and to appear in search results etc.
 
-- Open the README.org file in Emacs and run examples as literate org.
+There are two better ways:
+
+- Open the transient-showcase.org file in Emacs and run examples as literate org.
 - Install the package to run commands and read their source.  Start with the ~tsc-showcase~ command.
 
 *** Using as literate org document
@@ -36,17 +40,23 @@ Installations for straight and elpaca:
 
 #+begin_src elisp
 
+  ;; using package-vc (built-in)
+  (package-vc-install
+   '(transient-showcase
+     :url "https://github.com/positron-solutions/transient-showcase.git"))
+  (require 'transient-showcase) ; now you can access the commands
+
+  ;; using elpaca (recommended to add a rev for reproducibility)
+  (use-package transient-showcase
+    :elpaca (transient-showcase
+             :host github
+             :repo "positron-solutions/transient-showcase"))
+
   ;; using straight use-package with custom recipe
   (use-package transient-showcase
     :straight '(transient-showcase
                 :type git :host github
                 :repo "positron-solutions/transient-showcase"))
-
-  ;; using elpaca (recommended to add a hash for reproducibility)
-  (use-package transient-showcase
-    :elpaca (transient-showcase
-             :host github
-             :repo "positron-solutions/transient-showcase"))
 
 #+end_src
 
