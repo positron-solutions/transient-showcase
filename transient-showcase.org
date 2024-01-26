@@ -10,7 +10,7 @@
 :END:
 
 #+begin_export html
-<!-- !!!THIS FILE HAS BEEN GENERATED!!! Edit README.org -->
+<!-- !!!THIS FILE HAS BEEN GENERATED!!! Edit transient-showcase.org -->
 #+end_export
 
 Code examples for interactive explanations of [[https://github.com/magit/transient][transient]].

@@ -1,6 +1,6 @@
 # Transient Showcase
 
-<!-- !!!THIS FILE HAS BEEN GENERATED!!! Edit README.org -->
+<!-- !!!THIS FILE HAS BEEN GENERATED!!! Edit transient-showcase.org -->
 
 Code examples for interactive explanations of [transient](https://github.com/magit/transient).
 
