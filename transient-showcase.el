@@ -182,6 +182,19 @@
 
 ;; (tsc-layout-dynamic-descriptions)
 
+(defun tsc--random-info ()
+  (format "Temperature outside: %d" (random 100)))
+
+(transient-define-prefix tsc-information ()
+    "Prefix that displays some information."
+    ["Group Header"
+     (:info "Basic info")
+     (:info #'tsc--random-info)
+     (:info "Use :format to remove whitespace" :format "%d")
+     ("k" :info "Keys will be greyed out")
+     () ; empty line
+     ("wg" "wave greenishly" tsc-suffix-wave)])
+
 (transient-define-prefix tsc-layout-stacked ()
   "Prefix with layout that stacks groups on top of each other."
   ["Top Group" ("wt" "wave top" tsc-suffix-wave)]

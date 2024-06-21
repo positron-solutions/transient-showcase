@@ -366,8 +366,26 @@ The =:description= key is applied last and therefore wins in ambiguous declarati
   ;; (tsc-layout-dynamic-descriptions)
 
 #+end_src
-*** Errata
+**** Errata
 *Note*, the uuid in the group description is generated on every key read, so multi-key sequences cause updates to the descriptions.  This is not likely to be changed because layout re-rendering is necessary to indicate the partially complete key sequence. 🤓
+*** Displaying Information
+The ~transient-information~ class can be used to show states that are purely informative, not having any keys.  Just pass =:info= in a suffix declaration to create a display-only element.  You can use a constant string or a function for reactivity.
+#+begin_src elisp :tangle transient-showcase.el :var _=wave-prelude
+
+  (defun tsc--random-info ()
+    (format "Temperature outside: %d" (random 100)))
+
+  (transient-define-prefix tsc-information ()
+      "Prefix that displays some information."
+      ["Group Header"
+       (:info "Basic info")
+       (:info #'tsc--random-info)
+       (:info "Use :format to remove whitespace" :format "%d")
+       ("k" :info "Keys will be greyed out")
+       () ; empty line
+       ("wg" "wave greenishly" tsc-suffix-wave)])
+
+#+end_src
 ** Layouts
 The default behavior treats groups a little differently depending on how they are nested.  For most simple groupings, this is sufficient control.
 *** Groups one on top of the other
