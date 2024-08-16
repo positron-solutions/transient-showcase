@@ -192,7 +192,7 @@
      (:info #'tsc--random-info)
      (:info "Use :format to remove whitespace" :format "%d")
      ("k" :info "Keys will be greyed out")
-     () ; empty line
+     ;; () ; empty line
      ("wg" "wave greenishly" tsc-suffix-wave)])
 
 (transient-define-prefix tsc-layout-stacked ()
