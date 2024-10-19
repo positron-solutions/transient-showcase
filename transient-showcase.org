@@ -1716,6 +1716,8 @@ This is a group method that can be overridden in order to modify or eliminate so
                                     (interactive)
                                     (message "okay!"))))))
 
+     ;; This child will not be visible when you run the example because it is
+     ;; replaced dynamically when the transient is set up
      ("s" "haha stupid suffix" (lambda ()
                                  (interactive)
                                  (message "You should replace me!")))])
@@ -1745,6 +1747,8 @@ The same thing, but parsing an entire group spec:
                                            (interactive)
                                            (message "okay!")))]))
 
+     ;; This child will not be visible when you run the example because it is
+     ;; replaced dynamically when the transient is set up
      ("s" "haha stupid suffix" (lambda ()
                                  (interactive)
                                  (message "You should replace me!")))])
@@ -1773,7 +1777,6 @@ the prefix during layout.
 
 ** Modifying layouts
 In this example, we will make a transient that can add new commands to itself.
-
 #+begin_src elisp :tangle transient-showcase.el
 
   (defun tsc--self-modifying-add-command (command-symbol sequence)
@@ -1800,7 +1803,6 @@ In this example, we will make a transient that can add new commands to itself.
   ;; (tsc-self-modifying)
 
 #+end_src
-
 Exercises for the reader:
 
 - Use the interactive form to read an elisp expression and create
@@ -1813,7 +1815,6 @@ See the ~transient-insert-suffix~ for documentation on the =LOC= argument.
 
 ** Using prefix scope in children
 Basically you are on your own.  Just call ~(oref transient--prefix scope)~ during layout setup or ~(oref transient-current-prefix)~ during suffix bodies.
-
 *** Obtaining Missing Scope
 Because suffixes are basically also commands (riding in the same symbol plist), a suffix can be called independently.  In this case, if its expecting to read the scope from the prefix when there is no prefix, it might fail.
 
