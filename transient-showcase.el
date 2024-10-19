@@ -192,7 +192,7 @@
      (:info #'tsc--random-info)
      (:info "Use :format to remove whitespace" :format "%d")
      ("k" :info "Keys will be greyed out")
-     () ; empty line
+     "" ; empty line
      ("wg" "wave greenishly" tsc-suffix-wave)])
 
 (transient-define-prefix tsc-layout-stacked ()
@@ -973,11 +973,13 @@ When this is called in layouts, it's the transient being layed out"
 
      ;; remember to return a list
      (list (transient-parse-suffix
-            transient--prefix
+            'transient--prefix
             '("r" "replacement" (lambda ()
                                   (interactive)
                                   (message "okay!"))))))
 
+   ;; This child will not be visible when you run the example because it is
+   ;; replaced dynamically when the transient is set up
    ("s" "haha stupid suffix" (lambda ()
                                (interactive)
                                (message "You should replace me!")))])
@@ -994,11 +996,13 @@ When this is called in layouts, it's the transient being layed out"
 
      ;; the result of parsing here will be a group
      (transient-parse-suffixes
-      transient--prefix
+      'transient--prefix
       ["Group Name" ("r" "replacement" (lambda ()
                                          (interactive)
                                          (message "okay!")))]))
 
+   ;; This child will not be visible when you run the example because it is
+   ;; replaced dynamically when the transient is set up
    ("s" "haha stupid suffix" (lambda ()
                                (interactive)
                                (message "You should replace me!")))])
