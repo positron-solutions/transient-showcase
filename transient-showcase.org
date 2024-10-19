@@ -1711,7 +1711,7 @@ This is a group method that can be overridden in order to modify or eliminate so
 
        ;; remember to return a list
        (list (transient-parse-suffix
-              transient--prefix
+              'transient--prefix
               '("r" "replacement" (lambda ()
                                     (interactive)
                                     (message "okay!"))))))
@@ -1740,7 +1740,7 @@ The same thing, but parsing an entire group spec:
 
        ;; the result of parsing here will be a group
        (transient-parse-suffixes
-        transient--prefix
+        'transient--prefix
         ["Group Name" ("r" "replacement" (lambda ()
                                            (interactive)
                                            (message "okay!")))]))
