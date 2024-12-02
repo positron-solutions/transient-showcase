@@ -770,7 +770,7 @@ This means predicates such as the =:if= slot.
 ** Pre-Commands Explained
 The value in the =:transient= slot affects the state of variables that the body of your command will see and what will happen after your command, during the post-command.
 
-The =:transient= slot holds a function symbol called the "pre-command."  Before your suffix body forms run, the pre-command is called and creates the conditions that your suffix may use to, for example, prepare for reading variables that were set on infixes.  If the pre-command calls ~transient-export~ then it will add to history.
+The =:transient= slot holds a function symbol called the "pre-command."  Before your suffix body forms run, the pre-command is called and creates the conditions that your suffix may use to, for example, read variables that were just set on infixes.  If the pre-command calls ~transient-export~ then it will add to history.
 
 When using macros to define prefixes, you will often see =:transient= set to =t=.  In ~transient-define-prefix~ and ~transient-define-suffix~, the =t= value is actually translated to ~transient--do-call~ or ~transient--do-recurse~ depending on the situation.
 
@@ -1683,7 +1683,7 @@ Per-suffix and per-group, the user can set the level at which the child will be 
 
 A hidden group will hide a suffix even if that suffix is at a low enough level.  Issue #153 has some additional information about behavior that might get cleaned up.
 
-**** Defining group & suffix levels
+*** Defining group & suffix levels
 Adding default levels for children is as simple as adding integers at the beginning of each list or vector.  If some commands are not likely to be used, instead of making the hard choice to include them or not, you can provide them, but tell the user in your README to set higher levels.
 
  #+begin_src elisp :tangle transient-showcase.el :var _=levels-prelude :var _=show-level-prelude
@@ -1715,7 +1715,7 @@ Adding default levels for children is as simple as adding integers at the beginn
 
 #+end_src
 
-**** Using the Levels UI
+*** Using the Levels UI
 Press (*C-x l*) to open the levels UI for the user.  Press (*C-x l*) again to change the active level.  Press a key such as "we" to change the level for a child.  After you cancel level editing with (*C-g*), you will see that children have either become visible or invisible depending on the changes you made.
 
 *While a child may be visible according to its own level, if it's hidden within the group, the user's level-setting UI for the prefix will contradict what's actually visible.  The UI does not allow setting group levels.*
@@ -1805,7 +1805,7 @@ If you need to define a dynamic group class, override ~transient-setup-children~
 example above.  ~transient--prefix~ is just a variable that happens to hold
 the prefix during layout.
 
-*** TODO Correction in manual
+*** TODO Question
 - These functions do mostly the same job.  Why do we need to specify a
   prefix for ~transient-parse-suffixes~, for scope etc?
 
