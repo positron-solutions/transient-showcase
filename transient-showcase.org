@@ -722,51 +722,6 @@ These possible values for =:transient= change between transient versions.  See t
   ;; (tsc-complex-messager)
 
 #+end_src
-** Accessing the Source Buffer
-This section is about using the buffer from which you called the transient and its [[info:elisp#Buffer-Local Variables][Buffer-Local Variables]].
-
-Some code you use to customize a transient /might/ be evaluated in the context of the transient's UI buffer.  If you instead want to access the buffer from which you called the transient, check the value of =transient--shadowed-buffer=.  It may differ from the value returned by ~current-buffer~.
-
-The docstring for =transient--shadowed-buffer= states:
-#+begin_quote
-This is bound while the suffix predicate is being evaluated and while drawing in the transient buffer.
-#+end_quote
-This means predicates such as the =:if= slot.
-
-⚠️ To quickly evaluate code in the source buffer, you probably want to use ~with-current-buffer~ instead of ~set-buffer~ to avoid leaving the wrong buffer active when your custom code returns to transient.
-
-#+begin_src elisp :tangle transient-showcase.el :var _=wave-prelude
-  (defun tsc--shadowed-buffer-org-mode-p ()
-    "Return t if major mode of shadowed buffer derives from `org-mode'."
-    (and transient--shadowed-buffer
-         (provided-mode-derived-p
-          (buffer-local-value 'major-mode transient--shadowed-buffer)
-          '(org-mode))))
-
-  (defun tsc--shadowed-buffer-elisp-mode-p ()
-    "Return t if major mode of shadowed buffer derives from `emacs-lisp-mode'."
-    (and transient--shadowed-buffer
-         (provided-mode-derived-p
-          (buffer-local-value 'major-mode transient--shadowed-buffer)
-          '(emacs-lisp-mode))))
-
-  (defun tsc--current-buffer-name ()
-    (current-buffer))
-
-  (defun tsc--shadowed-buffer-name ()
-    (if transient--shadowed-buffer
-        (buffer-name transient--shadowed-buffer)
-      "`transient--shadowed-buffer' was nil."))
-
-  (transient-define-prefix tsc-shadowed-buffer ()
-    "Display Mode-Specific Commands Based"
-    [["Org Mode Commands"
-      :if tsc--shadowed-buffer-org-mode-p
-      ("o" "org mode wave" tsc-suffix-wave)]
-     ["Elisp Mode Commands"
-      :if tsc--shadowed-buffer-elisp-mode-p
-      ("e" "elisp mode wave" tsc-suffix-wave)]])
-#+end_src
 ** Pre-Commands Explained
 The value in the =:transient= slot affects the state of variables that the body of your command will see and what will happen after your command, during the post-command.
 
