@@ -1807,7 +1807,7 @@ abstract major modes."
    "--switch"
    (transient-args transient-current-command)))
 
-(transient-define-prefix tsc-inapt-parent ()
+(transient-define-prefix tsc-inapt ()
   "Prefix that configures child with inapt predicates."
   :refresh-suffixes t ; important for updating inapt! (1)
   ["Options"
@@ -1828,7 +1828,7 @@ abstract major modes."
    ("q" "query" tsc--wave-inquisitively)
    ("w" "write" tsc--wave-writingly)])
 
-;; (tsc-inapt-parent)
+;; (tsc-inapt)
 
 ```
 
@@ -1839,7 +1839,7 @@ abstract major modes."
 
 ### Errata
 
-Calling `transient-args` with the symbol of the current command (`tsc-inapt-parent`) in `tsc--switch-on-p` causes infinite recursion as `transient-args` attempts to hydrate the transient instead of re-using the value that already is in motion via `transient-current-command`.
+Calling `transient-args` with the symbol of the current command (`tsc-inapt`) in `tsc--switch-on-p` causes infinite recursion as `transient-args` attempts to hydrate the transient instead of re-using the value that already is in motion via `transient-current-command`.
 
 
 <a id="orgc189767"></a>

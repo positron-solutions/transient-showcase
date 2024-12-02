@@ -1592,7 +1592,7 @@ Open the following example in buffers with different modes (or change modes manu
      "--switch"
      (transient-args transient-current-command)))
 
-  (transient-define-prefix tsc-inapt-parent ()
+  (transient-define-prefix tsc-inapt ()
     "Prefix that configures child with inapt predicates."
     :refresh-suffixes t ; important for updating inapt! (1)
     ["Options"
@@ -1613,7 +1613,7 @@ Open the following example in buffers with different modes (or change modes manu
      ("q" "query" tsc--wave-inquisitively)
      ("w" "write" tsc--wave-writingly)])
 
-  ;; (tsc-inapt-parent)
+  ;; (tsc-inapt)
 
 #+end_src
 
@@ -1622,7 +1622,7 @@ Open the following example in buffers with different modes (or change modes manu
 2. The use of =transient--do-call= has a nuance.  Normally, changing an infix does not update the most recent value seen when calling ~transient-args~.  However, when the infix uses =transient--do-call= as it's pre-command, the value seen will be updated.  This allows ~tsc--switch-on-p~ to see the updated value and for the inapt predicates to function properly.
 
 *** Errata
-Calling ~transient-args~ with the symbol of the current command (=tsc-inapt-parent=) in ~tsc--switch-on-p~ causes infinite recursion as ~transient-args~ attempts to hydrate the transient instead of re-using the value that already is in motion via ~transient-current-command~.
+Calling ~transient-args~ with the symbol of the current command (=tsc-inapt=) in ~tsc--switch-on-p~ causes infinite recursion as ~transient-args~ attempts to hydrate the transient instead of re-using the value that already is in motion via ~transient-current-command~.
 
 ** Levels
 Levels are another way to control visibility.
@@ -2500,7 +2500,7 @@ This block includes the showcase transient.
       ;; padded description to sc
       ("vp" "predicates                  "
        tsc-visibility-predicates :transient t)
-      ("vi" "inapt (not suitable)" tsc-inapt-parent :transient t)
+      ("vi" "inapt (not suitable)" tsc-inapt :transient t)
       ("vl" "levels" tsc-levels-and-visibility :transient t)]
 
      ["Advanced"

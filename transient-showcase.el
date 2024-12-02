@@ -907,7 +907,7 @@ abstract major modes."
    "--switch"
    (transient-args transient-current-command)))
 
-(transient-define-prefix tsc-inapt-parent ()
+(transient-define-prefix tsc-inapt ()
   "Prefix that configures child with inapt predicates."
   :refresh-suffixes t ; important for updating inapt! (1)
   ["Options"
@@ -928,7 +928,7 @@ abstract major modes."
    ("q" "query" tsc--wave-inquisitively)
    ("w" "write" tsc--wave-writingly)])
 
-;; (tsc-inapt-parent)
+;; (tsc-inapt)
 
 (transient-define-prefix tsc-levels-and-visibility ()
   "Prefix with visibility levels for hiding rarely used commands."
@@ -1297,7 +1297,7 @@ control such as replacing or exiting."
     ;; padded description to sc
     ("vp" "predicates                  "
      tsc-visibility-predicates :transient t)
-    ("vi" "inapt (not suitable)" tsc-inapt-parent :transient t)
+    ("vi" "inapt (not suitable)" tsc-inapt :transient t)
     ("vl" "levels" tsc-levels-and-visibility :transient t)]
 
    ["Advanced"
