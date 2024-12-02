@@ -40,24 +40,23 @@ All changes must:
 This repository was created with [[https://github.com/positron-solutions/elisp-repo-kit/][elisp-repo-kit]]. (A literate org template is work in progress).
 
 * Updating Generated Files
-
 TODO this should be automated with the style of solutions from Elisp Repo Kit, using save hooks.
 
 ** Tangling
-
 ~org-babel-tangle-file~
 
 ** Export
+You need to install [[https://github.com/larstvei/ox-gfm][ox-gfm]].
 
 The markdown export needs to skip the Elisp sections.  You can configure this by running this expression inside the README.org buffer context. (~eval-expression~ when inside the buffer)
 
 #+begin_src elisp
   (let ((org-export-exclude-tags '("export_elisp")))
-    (call-interactively #'org-md-export-to-markdown))
+    (call-interactively #'org-gfm-export-to-markdown))
 #+end_src
 
+The table of contents will be printed with angle bracket links but normal title links at the top of the document.  Manually clobber the angle bracket link ToC with the one generated at the top.  It is silly.  I have raised the issue and been given the runaround from both package maintainers.
 * Reproducing CI
-
 CI will tangle the README, load the package, and then try to run =tsc-showcase=.  It will also byte compile lint the package.
 
 If you cannot reproduce a failure (or success) on CI, then you may want to switch to using [[https://nixos.org/download.html][nix]] to get a reproducible toolchain so you can further develop with frozen versions from the nix [[https://nixos.wiki/wiki/Flakes][flake's]] flake.lock.
@@ -81,7 +80,6 @@ If you cannot reproduce a failure (or success) on CI, then you may want to switc
   #+end_src
 
 ** Lint and byte-compile code
-
 This package uses [[https://github.com/gonewest818/elisp-lint][elisp-lint]] to detect issues with byte compiling, package format, code structure and others.  This is run after tangling the new package.
 
 The configuration is found inside [[.github/run-shim.el][.github/run-shim.el]].  The CI run is invoked inside of [[.github/workflows/ci.yml][ci.yml]] using Emacs in script mode.  Most of the configuration is in the run shim.
@@ -96,45 +94,25 @@ You can run the lints manually almost the same as running tests.
   emacs --script .github/run-shim.el -- lint
 
    #+end_src
-
 ** Loading and re-loading your package
-
 Run =erk-reload-package= in one of your project files.  All features in the /lisp directory will be re-compiled and loaded appropriately.
 
 *Note*, during reloading, unloading the current module is forced.  If other packages you use depend on the project feature, results may be unpredictable.  This is one reason batch style testing can be preferred.
-
 *** Manual Loading & Reloading
-
 To manually unload, run built-in command ~unload-feature~ and select your package name. If you do not unload, reloading has no effect and you will see stale behavior.
 
 Next, add the package to your load-path and then require it or, more directly, call =emacs-lisp-byte-compile-and-load= or =emacs-lisp-native-compile-and-load=.
-
 * License
-
 This project is GPL3 licensed and a copy is distributed in the file, [[./COPYING][COPYING]].
-
 * Developer Certificate of Origin (DCO)
-
 This project requires signed commits.  Please set up your Github appropriately so that the check passes.
-
 ** GPG signature
-
 A GPG signed commit shows that the owner of the private key submitted the changes.  Wherever signatures are recorded in chains, they can demonstrate participation in changes elsewhere and awareness of what the submitter is participating in.  Corroborating user's signature across a history of works strengthens that user's attestation provided by DCO sign-off.
-
 ** User setup for submitting changes
-
 Follow these instructions before you get ready to submit a pull-request.
 
 Refer to the [[https://docs.github.com/en/authentication/managing-commit-signature-verification/signing-commits][Github signing commits]] instructions to set up your git client to add GPG signatures.  File issues if you run into Emacs-specific problems.
-
-Because signing is intended to be a conscious process, please remember to read and understand the [[./DCO][Developer Certificate of Origin]] before configuring your client to automatically sign-off on commits.
-
-*** Automatically add sign-off
-
-In magit, set the =-s= switch.  Use =C-x C-s= (=transient-save=) to preserve this switch on future uses.  (Note, this is not per-project).You can also set the signature flag this way.
-
 *** Automatic GPG signing with per-project keys
-
 In order to specify which projects you intend to sign with which keys, you will want to configure your git client using path-specific configurations.
 
 Configuring git for this can be done with the following directory structure:
@@ -173,21 +151,5 @@ In the ~gpg-signing-projects.conf~ add your GPG signing configuration from earli
     gpgSign = true
 
     #+end_src
-
-*** Manually signing & adding sign-off
-
-If you don't like these configurations and want to individually indicate you have read and intend to apply the DCO to your changes, these commands are equivalent:
-
-#+begin_src bash
-  git commit -s -S --message "I don't like using .gitconfig"
-
-  # To clean up a commit
-  git commit --amend -s -S --no-message
-
-  # Combine with rebase to sign / sign-off multiple existing commits
-  git rebase -i
-    #+end_src
-
 * Maintaining nixpkgs versions
-
 Nixpkgs has a new release about every six months.  You can check their [[https://github.com/NixOS/nixpkgs/branches][branches]] and [[https://github.com/NixOS/nixpkgs/tags][tags]] to see what's current.  To get updated dependencies from MELPA, it's necessary to update the emacs-overlay with =nix flake lock --update-input emacs-overlay=.  You can also specify revs and branches if you need to roll back. There is a make shortcut: =make flake-update= MacOS tends to get a little less test emphasis, and so =nixpkgs-darwin-<version>= branches exist and are required to pass more Darwin tests before merging.  This is more stable if you are on MacOS. =nixpkgs-unstable= or =master= are your other less common options.
