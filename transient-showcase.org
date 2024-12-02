@@ -1619,7 +1619,7 @@ Open the following example in buffers with different modes (or change modes manu
 
 1. *Note*, like visibility predicates, =inapt-= predicates do not *by default* take effect until the transient has its layout fully redone.  You must set the =:refresh-suffixes= slot on the *prefix*.
 
-2. The use of =transient--do-call= has a nuance.  Normally, changing an infix does not update the most recent value seen when calling ~transient-args~.  However, when the infix uses =transient--do-call= as it's pre-command, the value seen will be updated.  This allows ~tsc--switch-on-p~ to see the value and for the inapt predicates to function properly.
+2. The use of =transient--do-call= has a nuance.  Normally, changing an infix does not update the most recent value seen when calling ~transient-args~.  However, when the infix uses =transient--do-call= as it's pre-command, the value seen will be updated.  This allows ~tsc--switch-on-p~ to see the updated value and for the inapt predicates to function properly.
 
 *** Errata
 Calling ~transient-args~ with the symbol of the current command (=tsc-inapt-parent=) in ~tsc--switch-on-p~ causes infinite recursion as ~transient-args~ attempts to hydrate the transient instead of re-using the value that already is in motion via ~transient-current-command~.
