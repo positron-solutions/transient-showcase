@@ -849,9 +849,9 @@ There are two basic ways to read infixes:
 In my opinion the API should make it easier to get raw values from suffixes, but this is also a matter of custom infixes needing to serialize values correctly so that ~transient-arg-value~ will "just work".
 
 ** Scope
-When you call a function with an argument, you want to know in the body of your function what that argument was.  This is the scope.  The prefix is initialized with the =:scope= either in its own body or a similar form.  Suffixes can then read back that scope in their body.  The suffix object is given the scope and can use it to alter its own display or behavior.  The layout also can interpret the scope while it is initializing.
+When you call a function with an argument, you want to know in the body of your function what that argument was.  This is the scope.  The prefix is initialized with the =:scope= either when it was set up or by its own body or interactive form.
 
-⚠️ *WARNING* When writing predicates against the scope, you will need to determine whether ~transient--prefix~ or ~transient-current-prefix~ is correct when writing prefix-generic suffixes.  It is very subtle if you accidentally choose the wrong one and the parent has a nil scope while the child has an entirely different scope.  These variables change throughout the lifecycle!  Use [[*Watching evaluation in Edebug][edebug]] you must!
+Suffixes can then read back that scope in their body by calling ~transient-scope~.  The suffix object is given the scope and can use it to alter its own display or behavior.  The layout also can interpret the scope while it is initializing.
 
 #+begin_src elisp :tangle transient-showcase.el
 
@@ -859,7 +859,7 @@ When you call a function with an argument, you want to know in the body of your 
     "Read the scope of the prefix."
     :transient 'transient--do-call
     (interactive)
-    (let ((scope (oref transient-current-prefix scope)))
+    (let ((scope (transient-scope)))
       (message "scope: %s" scope)))
 
   (transient-define-suffix tsc--double-scope-re-enter ()
@@ -867,7 +867,7 @@ When you call a function with an argument, you want to know in the body of your 
     ;; :transient 'transient--do-replace ; builds up the stack
     :transient 'transient--do-exit
     (interactive)
-    (let ((scope (oref transient-current-prefix scope)))
+    (let ((scope (transient-scope)))
       (if (numberp scope)
           (transient-setup transient-current-command
                            nil nil :scope (* scope 2))
@@ -891,8 +891,7 @@ When you call a function with an argument, you want to know in the body of your 
     ;; `transient--prefix' or get the transient object from the tsc-scope
     ;; symbol.  `transient-current-prefix' would not be correct here!
     [:description
-     (lambda () (format "Scope: %s"
-                        (oref transient--prefix scope)))
+     (lambda () (format "Scope: %s" (transient-scope)))
      [("r" "read scope" tsc--read-prefix-scope)
       ("d" "double scope" tsc--double-scope-re-enter)
       ("o" "update scope (use prefix argument)"
@@ -912,7 +911,8 @@ When you call a function with an argument, you want to know in the body of your 
   ;; C-g to exit
 
 #+end_src
-
+*** Reading Scope Directly
+⚠️ *WARNING* When writing predicates, that read or write the scope using ~oref~ and ~oset~, you will need to determine whether ~transient--prefix~ or ~transient-current-prefix~ is correct.  When called from a parent transient, you might end up picking the wrong prefix to read from at the wrong time.  These variables change throughout the lifecycle!  Use [[*Watching evaluation in Edebug][edebug]] you must!
 *** TODO Errata with prefix arg (=C-u= universal argument).
 Key binding sequences, such as =wa= instead of single-key prefix bindings, will unset the prefix argument (the old-school Emacs =C-u= prefix argument, not the prefix's scope or other explicit arguments)
 
@@ -1803,7 +1803,7 @@ Exercises for the reader:
 See the ~transient-insert-suffix~ for documentation on the =LOC= argument.
 
 ** Using prefix scope in children
-Basically you are on your own.  Just call ~(oref transient--prefix scope)~ during layout setup or ~(oref transient-current-prefix)~ during suffix bodies.
+Basically you are on your own.  ~transient-scope~ may work.  Just call ~(oref transient--prefix scope)~ during layout setup or ~(oref transient-current-prefix scope)~ during suffix bodies.
 *** Obtaining Missing Scope
 Because suffixes are basically also commands (riding in the same symbol plist), a suffix can be called independently.  In this case, if its expecting to read the scope from the prefix when there is no prefix, it might fail.
 
@@ -2362,7 +2362,7 @@ Here's a suffix that reads the transient's infix values, the prefix's scope, and
     :transient 'transient--do-call
     (interactive "P")
     (let ((args (transient-args (oref transient-current-prefix command)))
-          (scope (oref transient-current-prefix scope)))
+          (scope (transient-scope)))
       (message "prefix-arg: %s \nprefix's scope value: %s \ntransient-args: %s"
                the-prefix-arg scope args)))
 
