@@ -95,7 +95,7 @@
   :transient 'transient--do-call
   (interactive "P")
   (let ((args (transient-args (oref transient-current-prefix command)))
-        (scope (oref transient-current-prefix scope)))
+        (scope (transient-scope)))
     (message "prefix-arg: %s \nprefix's scope value: %s \ntransient-args: %s"
              the-prefix-arg scope args)))
 
@@ -445,7 +445,7 @@
   "Read the scope of the prefix."
   :transient 'transient--do-call
   (interactive)
-  (let ((scope (oref transient-current-prefix scope)))
+  (let ((scope (transient-scope)))
     (message "scope: %s" scope)))
 
 (transient-define-suffix tsc--double-scope-re-enter ()
@@ -453,7 +453,7 @@
   ;; :transient 'transient--do-replace ; builds up the stack
   :transient 'transient--do-exit
   (interactive)
-  (let ((scope (oref transient-current-prefix scope)))
+  (let ((scope (transient-scope)))
     (if (numberp scope)
         (transient-setup transient-current-command
                          nil nil :scope (* scope 2))
@@ -477,8 +477,7 @@
   ;; `transient--prefix' or get the transient object from the tsc-scope
   ;; symbol.  `transient-current-prefix' would not be correct here!
   [:description
-   (lambda () (format "Scope: %s"
-                      (oref transient--prefix scope)))
+   (lambda () (format "Scope: %s" (transient-scope)))
    [("r" "read scope" tsc--read-prefix-scope)
     ("d" "double scope" tsc--double-scope-re-enter)
     ("o" "update scope (use prefix argument)"
