@@ -75,7 +75,7 @@
      ,(format "Wave at the user %s" name)
      :transient t
      (interactive)
-     (message (format "Waves at %s" (current-time-string)))))
+     (message (format "Waves %s at %s" ,name (current-time-string)))))
 
 ;; Each form results in a unique suffix definition.
 (tsc--define-waver "surely")
@@ -84,6 +84,10 @@
 (tsc--define-waver "definitely")
 (tsc--define-waver "eventually")
 (tsc--define-waver "hidden")
+(tsc--define-waver "inquisitively")
+(tsc--define-waver "writingly")
+(tsc--define-waver "switchedly")
+(tsc--define-waver "unswitchedly")
 
 
 (transient-define-suffix tsc-suffix-print-args (the-prefix-arg)
@@ -899,42 +903,31 @@ abstract major modes."
 
 ;; (tsc-visibility-predicates)
 
-(defun tsc--child-scope-p ()
-  "Return the scope of the current transient.
-When this is called in layouts, it's the transient being layed out"
-  (let ((scope (oref transient--prefix scope)))
-    (message "The scope is: %s" scope)
-    scope))
-
-;; the wave suffixes were :transient t as defined, so we need to manually
-;; override them to the `transient--do-return' value for :transient slot so
-;; that they return back to the parent.
-(transient-define-prefix tsc--inapt-children ()
-  "Prefix with children using inapt predicates."
-  ["Inapt Predicates Child"
-   ("s" "switched" tsc--wave-surely
-    :transient transient--do-return
-    :inapt-if tsc--child-scope-p)
-   ("u" "unswitched" tsc--wave-normally
-    :transient transient--do-return
-    :inapt-if-not tsc--child-scope-p)]
-
-  ;; in the body, we read the value of the parent and set our scope to
-  ;; non-nil if the switch is set
-  (interactive)
-  (let ((scope (transient-arg-value "--switch"
-                                    (transient-args 'tsc-inapt-parent))))
-    (message "scope: %s" scope)
-    (message "type: %s" (type-of scope))
-    (transient-setup 'tsc--inapt-children nil nil :scope (if scope t nil))))
+(defun tsc--switch-on-p ()
+  (transient-arg-value
+   "--switch"
+   (transient-args transient-current-command)))
 
 (transient-define-prefix tsc-inapt-parent ()
   "Prefix that configures child with inapt predicates."
+  :refresh-suffixes t ; important for updating inapt! (1)
+  ["Options"
+   ("-s" "switch" "--switch"
+    ;; we want to see the most recent value in `transient-args' (2)
+    :transient transient--do-call)]
 
-  [("-s" "switch" "--switch")
-   ("a" "show arguments" tsc-suffix-print-args)
-   ("c" "launch child prefix" tsc--inapt-children
-    :transient transient--do-recurse)])
+  ["Appropriate Suffixes"
+   ("s" "switched" tsc--wave-switchedly
+    :transient t
+    :inapt-if-not tsc--switch-on-p)
+   ("u" "unswitched" tsc--wave-unswitchedly
+    :transient t
+    :inapt-if tsc--switch-on-p)]
+
+  ["Appropiate Group"
+   :inapt-if-not tsc--switch-on-p
+   ("q" "query" tsc--wave-inquisitively)
+   ("w" "write" tsc--wave-writingly)])
 
 ;; (tsc-inapt-parent)
 

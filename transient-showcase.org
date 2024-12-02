@@ -1626,59 +1626,48 @@ Open the following example in buffers with different modes (or change modes manu
 #+end_src
 
 ** Inapt (Temporarily Inappropriate)
-"Greyed out" suffixes.  Inapt is better if an option is temporarily unavailable due to a state that varies with each invocation of the transient.
-
-Inapt predicates are supported on suffixes, but not on groups (which would have to modify every child).
-
-*Note*, like visibility predicates, =inapt-*= predicates do not take effect until the transient has its layout fully redone.  Therefore this example uses a child transient and updates the scope.
+"Greyed out" suffixes.  Inapt is better if an option is temporarily unavailable but the user should still know it exists.
 
 ✨ Adjust this example to use =:if= instead of =:inapt-if= to see the difference between visibility and inapt.
 
 #+begin_src elisp :tangle transient-showcase.el :var _=print-args-prelude :var __=levels-prelude
 
-  (defun tsc--child-scope-p ()
-    "Return the scope of the current transient.
-  When this is called in layouts, it's the transient being layed out"
-    (let ((scope (oref transient--prefix scope)))
-      (message "The scope is: %s" scope)
-      scope))
-
-  ;; the wave suffixes were :transient t as defined, so we need to manually
-  ;; override them to the `transient--do-return' value for :transient slot so
-  ;; that they return back to the parent.
-  (transient-define-prefix tsc--inapt-children ()
-    "Prefix with children using inapt predicates."
-    ["Inapt Predicates Child"
-     ("s" "switched" tsc--wave-surely
-      :transient transient--do-return
-      :inapt-if tsc--child-scope-p)
-     ("u" "unswitched" tsc--wave-normally
-      :transient transient--do-return
-      :inapt-if-not tsc--child-scope-p)]
-
-    ;; in the body, we read the value of the parent and set our scope to
-    ;; non-nil if the switch is set
-    (interactive)
-    (let ((scope (transient-arg-value "--switch"
-                                      (transient-args 'tsc-inapt-parent))))
-      (message "scope: %s" scope)
-      (message "type: %s" (type-of scope))
-      (transient-setup 'tsc--inapt-children nil nil :scope (if scope t nil))))
+  (defun tsc--switch-on-p ()
+    (transient-arg-value
+     "--switch"
+     (transient-args transient-current-command)))
 
   (transient-define-prefix tsc-inapt-parent ()
     "Prefix that configures child with inapt predicates."
+    :refresh-suffixes t ; important for updating inapt! (1)
+    ["Options"
+     ("-s" "switch" "--switch"
+      ;; we want to see the most recent value in `transient-args' (2)
+      :transient transient--do-call)]
 
-    [("-s" "switch" "--switch")
-     ("a" "show arguments" tsc-suffix-print-args)
-     ("c" "launch child prefix" tsc--inapt-children
-      :transient transient--do-recurse)])
+    ["Appropriate Suffixes"
+     ("s" "switched" tsc--wave-switchedly
+      :transient t
+      :inapt-if-not tsc--switch-on-p)
+     ("u" "unswitched" tsc--wave-unswitchedly
+      :transient t
+      :inapt-if tsc--switch-on-p)]
+
+    ["Appropiate Group"
+     :inapt-if-not tsc--switch-on-p
+     ("q" "query" tsc--wave-inquisitively)
+     ("w" "write" tsc--wave-writingly)])
 
   ;; (tsc-inapt-parent)
 
 #+end_src
 
-***  TODO Documentation in manual missing
-There is not a single mention of inapt even though it's fully implemented and works.
+1. *Note*, like visibility predicates, =inapt-= predicates do not *by default* take effect until the transient has its layout fully redone.  You must set the =:refresh-suffixes= slot on the *prefix*.
+
+2. The use of =transient--do-call= has a nuance.  Normally, changing an infix does not update the most recent value seen when calling ~transient-args~.  However, when the infix uses =transient--do-call= as it's pre-command, the value seen will be updated.  This allows ~tsc--switch-on-p~ to see the value and for the inapt predicates to function properly.
+
+*** Errata
+Calling ~transient-args~ with the symbol of the current command (=tsc-inapt-parent=) in ~tsc--switch-on-p~ causes infinite recursion as ~transient-args~ attempts to hydrate the transient instead of re-using the value that already is in motion via ~transient-current-command~.
 
 ** Levels
 Levels are another way to control visibility.
@@ -2391,7 +2380,7 @@ Definitions that are not that interesting on their own but are used in examples.
        ,(format "Wave at the user %s" name)
        :transient t
        (interactive)
-       (message (format "Waves at %s" (current-time-string)))))
+       (message (format "Waves %s at %s" ,name (current-time-string)))))
 
   ;; Each form results in a unique suffix definition.
   (tsc--define-waver "surely")
@@ -2400,6 +2389,10 @@ Definitions that are not that interesting on their own but are used in examples.
   (tsc--define-waver "definitely")
   (tsc--define-waver "eventually")
   (tsc--define-waver "hidden")
+  (tsc--define-waver "inquisitively")
+  (tsc--define-waver "writingly")
+  (tsc--define-waver "switchedly")
+  (tsc--define-waver "unswitchedly")
 
 #+end_src
 
