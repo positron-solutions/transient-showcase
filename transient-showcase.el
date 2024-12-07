@@ -96,7 +96,7 @@
   (interactive "P")
   (let ((args (transient-args (oref transient-current-prefix command)))
         (scope (transient-scope)))
-    (message "prefix-arg: %s \nprefix's scope value: %s \ntransient-args: %s"
+    (message "prefix-arg: %S \nprefix's scope value: %S \ntransient-args: %S"
              the-prefix-arg scope args)))
 
 ;; tsc-suffix-print-args command is incidentally created
