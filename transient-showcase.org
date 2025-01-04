@@ -53,7 +53,10 @@ Installations for straight and elpaca:
 
 #+end_src
 
-*Note* While the exported markdown version of this file is also the README for this repository, it's not intended to be used directly or by copy-pasting.  Many links will only open in Emacs.  Some definitions are included by reference from [[*Preludes][Preludes]]
+#+begin_export markdown
+> [!TIP]
+>  While the exported markdown version of this file is also the README for this repository, it's not intended to be used directly or by copy-pasting.  Many links will only open in Emacs.
+#+end_export
 *** Packaging :export_elisp:
 :PROPERTIES:
 :VISIBILITY: folded
@@ -90,7 +93,7 @@ This is a basic transient, using an anonymous lambda interactive command as its 
 
 After executing the block above, you can ~execute-extended-command~ (*M-x*) and select ~tsc-hello~ to show this transient.  All transient prefixes are also commands that show up in (*M-x*)
 
-*Note* If the example above is hard to read, review some [[info:elisp#Top][elisp]] [[*Essential Elisp][syntax]] and typical forms.
+If the example above is hard to read, review some [[info:elisp#Top][elisp]] [[*Essential Elisp][syntax]] and typical forms.
 #+toc: headlines 2
 * Contents :noexport:
 :PROPERTIES:
@@ -215,23 +218,24 @@ You can declare the same behavior 3-4 ways
 #+end_src
 
 See the [[*EIEIO - OOP in Elisp][EIEIO Appendix]] for introduction to exploring EIEIO objects and classes.
-** The Shorthand form
-Binding suffixes with the =("key" "description" suffix-or-command)= form within a group is extremely common.
+** The Shorthand Forms
+Binding suffixes with the =("key" "description" suffix-or-command)= form within a group is extremely common.  The ~transient-define-prefix~ macro evaluates this into a suffix.
 
 #+begin_src elisp :tangle no :var _=wave-prelude
 
   (transient-define-prefix tsc-wave ()
     "Prefix that waves at the user"
-    [("w" "wave" tsc-suffix-wave)])
+    [("w" "wave" tsc-suffix-wave)
+     ("e" "eval-expression" eval-expression)])
   ;; tsc-suffix-wave is a simple command from wave-prelude
 
   ;; (tsc-wave)
 
 #+end_src
 
-*Note:* Both commands and suffixes from ~transient-define-suffix~ can be used.  It's a good reason to use =private--namespace= style names for suffix actions since these commands don't usually show up in (*M-x*) by default.
-** Keyword Arguments Style
-You can customize the slot value (OOP attribute) of the transient, groups, and suffixes by adding extra =:foo value= style pairs.
+Both commands and suffixes declared with the ~transient-define-suffix~ macro can be used.  It's a good reason to use =private--namespace= style names for suffix since you don't usually want to call them directly.
+** Keyword Arguments
+You can customize the slot value (OOP attribute implemented with EIEIO) of the transient, groups, and suffixes by adding extra =:foo value= style pairs.
 
 Not all behaviors have a shorthand form, so as you use more behaviors, you will see more of the keyword argument style API.  Here we use the =:transient= property, set to true, meaning the suffix won't exit the transient.
 
@@ -366,7 +370,6 @@ The =:description= key is applied last and therefore wins in ambiguous declarati
   ;; (tsc-layout-dynamic-descriptions)
 
 #+end_src
-**** Errata
 *Note*, the uuid in the group description is generated on every key read, so multi-key sequences cause updates to the descriptions.  This is not likely to be changed because layout re-rendering is necessary to indicate the partially complete key sequence. 🤓
 *** Displaying Information
 The ~transient-information~ class can be used to show states that are purely informative, not having any keys.  Just pass =:info= in a suffix declaration to create a display-only element.  You can use a constant string or a function for reactivity.
@@ -507,12 +510,12 @@ would normally use.
 
   (transient-define-prefix tsc-layout-explicit-classes ()
     "Prefix with group class used to explicitly specify layout."
-    [:class transient-row "Row"
-            ("l" "wave left" tsc-suffix-wave)
-            ("r" "wave right" tsc-suffix-wave)]
-    [:class transient-column "Column"
-            ("t" "wave top" tsc-suffix-wave)
-            ("b" "wave bottom" tsc-suffix-wave)])
+    [ :class transient-row "Row"
+      ("l" "wave left" tsc-suffix-wave)
+      ("r" "wave right" tsc-suffix-wave)]
+    [ :class transient-column "Column"
+      ("t" "wave top" tsc-suffix-wave)
+      ("b" "wave bottom" tsc-suffix-wave)])
 
   ;; (tsc-layout-explicit-classes)
 
@@ -633,12 +636,9 @@ This form is useful if you want a command to /perhaps/ load yet another transien
 
 ⚠️ When the child is calling ~transient-setup~, it will not be possible to use ~transient--do-return~ or ~transient--do-recurse~ to get back to the parent unless you explicitly cooperate with the transient state implementation, which may not be stable between versions.
 ** Mixing Interactive
-You can mix normal Emacs completion flows with transient UI's.
+You can mix normal Emacs completion & user query flows with transient UI's.  Normal commands that retrieve user input in their interactive forms can be bound as suffixes.
 
 See [[info:elisp#Interactive Codes][Interactive codes]] are listed in the Elisp manual.
-
-*Note*, this also works when binding existing commands that recieve user
-input.
 
 #+begin_src elisp :tangle transient-showcase.el
 
@@ -656,7 +656,9 @@ input.
     "Prefix with interactive user input."
     ["Interactive Command Suffixes"
      ("s" "enter string" tsc--suffix-interactive-string)
-     ("b" "select buffer" tsc--suffix-interactive-buffer-name)])
+     ("b" "select buffer" tsc--suffix-interactive-buffer-name)
+     ;; using a normal command with a user query in its interactive form
+     ("f" "find file" find-file)])
 
   ;; (tsc-interactive-basic)
 
@@ -666,7 +668,7 @@ Sometimes you can complete your work without asking the user for more input.  In
 
 Below is a nested transient.
 
-- The body form of the nested child can return early without loading a new transient
+- The body form of the nested child can decline to call ~transient-setup~ leading to a simple return and no menu display
 - The parent uses ~transient--do-recurse~ to make it's child "return" to it
 - The "radiations" command in the child explicitly overrides this, using ~transient--do-exit~ so that it /does not/ return to the parent
 
@@ -697,7 +699,7 @@ These possible values for =:transient= change between transient versions.  See t
         (message (propertize "🐈 kitty cats! 🐈" 'face 'success))))
      ("r" "radiations"
       (lambda () (interactive)
-        (message (propertize "Oh no! radiation! ☢" 'face 'success)))
+        (message (propertize "Oh no! radiation! ☢" 'face 'error)))
       ;; radiation is dangerous!
       :transient transient--do-exit)]
 
@@ -717,19 +719,20 @@ These possible values for =:transient= change between transient versions.  See t
      ["Toggle Complexity"
       ("t" tsc--toggle-complex)]])
 
-  ;; (tsc-simple-messager)
-  ;; does not "return" when called independently
+  ;; (tsc-simple-messager) ; toggle complexity on
+
+  ;; Because `tsc--complex' is in a defvar, its behavior persists when called
+  ;; independently.  Because `tsc-simple-messager' is not in the menu stack when
+  ;; called this way, no return will be performed.
   ;; (tsc-complex-messager)
 
 #+end_src
 ** Pre-Commands Explained
-The value in the =:transient= slot affects the state of variables that the body of your command will see and what will happen after your command, during the post-command.
+Before evaluating the command of a suffix, a pre-command function is called and creates the conditions that your suffix may use to, for example, read variables that were just set on any infixes.  The pre-command function will also set up some states so that transient's post-command behavior can figure out if it needs to exit, save values, or enter another transient, and what else to do while entering that new transient.  The pre-command is stored in the =:transient= slot and holds a function symbol.
 
-The =:transient= slot holds a function symbol called the "pre-command."  Before your suffix body forms run, the pre-command is called and creates the conditions that your suffix may use to, for example, read variables that were just set on infixes.  If the pre-command calls ~transient-export~ then it will add to history.
+When using macros to define prefixes, you will often see =:transient= set to =t=.  In ~transient-define-prefix~ and ~transient-define-suffix~, the =t= value is actually translated to a pre-command of ~transient--do-call~ or ~transient--do-recurse~ depending on the situation.  These export arguments and then result in some menu flow.
 
-When using macros to define prefixes, you will often see =:transient= set to =t=.  In ~transient-define-prefix~ and ~transient-define-suffix~, the =t= value is actually translated to ~transient--do-call~ or ~transient--do-recurse~ depending on the situation.
-
-These functions set up some states so that post-command can figure out if it needs to exit, save values, or enter another transient, and what else to do while entering that new transient.
+If the prefix has any infixes, the pre-command may "export" them.  If the pre-command calls ~transient-export~ then it will also add those infix states to ~transient-history~.
 
 The [[https://magit.vc/manual/transient.html#Transient-State][official long manual]] has some more detail.  These examples should prepare you to visualize the forms used in those explanations.
 *** Warning! ⚠️
@@ -752,7 +755,11 @@ Not all pre-commands are compatible with all situations and suffixes!
 There's definitely some edge cases that are unnecessarily complex for the
 use case.  Think of how life was before ~transient--do-recurse~.
 * Using & Managing State
-There are several ways to create state.  The [[*Nesting & Flow Control][flow control]] examples in the previous section mainly covered how to get from one command to the other.  This section covers how to save values and then read them later, sometimes from a completely different transient.  *Coupled with [[*Custom Infix Types][custom infix types]], you can create some seriously rich user expression.*
+There are several ways to create state.  The [[*Nesting & Flow Control][flow control]] examples in the previous section mainly covered how to get from one command to the other.  This section covers how to save values and then read them later.
+
+Firstly, you can always persist values in Elisp state using defvars and defcustom values.  These can be buffer local.  You can save them to a file and rehydrate them yourself, and you can save them with whatever granularity is required.  This is the recommended way for non-CLI applications.
+
+Transient also has special support for persisting infix values across invocations.  Their interfaces and behavior is a good fit for CLI integrations.  *Coupled with [[*Custom Infix Types][custom infix types]], you can create some seriously rich user expression.*
 
 To spark your imagination, here's a non-exhaustive list of how to get data into your commands:
 
@@ -1013,7 +1020,7 @@ The following example can demonstrate the behavior with some user effort:
   (transient-define-prefix tsc-ping ()
     "Prefix demonstrating history sharing."
 
-    :history-key 'non-unique-name
+    :history-key 'highly-unique-name
 
     ["Ping"
      ("-g" "game" "--game=")
@@ -1023,7 +1030,7 @@ The following example can demonstrate the behavior with some user effort:
   (transient-define-prefix tsc-pong ()
     "Prefix demonstrating history sharing."
 
-    :history-key 'non-unique-name
+    :history-key 'highly-unique-name
 
     ["Pong"
      ("-g" "game" "--game=")
