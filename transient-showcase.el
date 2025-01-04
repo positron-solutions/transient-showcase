@@ -276,12 +276,12 @@
 
 (transient-define-prefix tsc-layout-explicit-classes ()
   "Prefix with group class used to explicitly specify layout."
-  [:class transient-row "Row"
-          ("l" "wave left" tsc-suffix-wave)
-          ("r" "wave right" tsc-suffix-wave)]
-  [:class transient-column "Column"
-          ("t" "wave top" tsc-suffix-wave)
-          ("b" "wave bottom" tsc-suffix-wave)])
+  [ :class transient-row "Row"
+    ("l" "wave left" tsc-suffix-wave)
+    ("r" "wave right" tsc-suffix-wave)]
+  [ :class transient-column "Column"
+    ("t" "wave top" tsc-suffix-wave)
+    ("b" "wave bottom" tsc-suffix-wave)])
 
 ;; (tsc-layout-explicit-classes)
 
@@ -356,7 +356,9 @@
   "Prefix with interactive user input."
   ["Interactive Command Suffixes"
    ("s" "enter string" tsc--suffix-interactive-string)
-   ("b" "select buffer" tsc--suffix-interactive-buffer-name)])
+   ("b" "select buffer" tsc--suffix-interactive-buffer-name)
+   ;; using a normal command with a user query in its interactive form
+   ("f" "find file" find-file)])
 
 ;; (tsc-interactive-basic)
 
@@ -383,7 +385,7 @@
       (message (propertize "🐈 kitty cats! 🐈" 'face 'success))))
    ("r" "radiations"
     (lambda () (interactive)
-      (message (propertize "Oh no! radiation! ☢" 'face 'success)))
+      (message (propertize "Oh no! radiation! ☢" 'face 'error)))
     ;; radiation is dangerous!
     :transient transient--do-exit)]
 
@@ -403,8 +405,11 @@
    ["Toggle Complexity"
     ("t" tsc--toggle-complex)]])
 
-;; (tsc-simple-messager)
-;; does not "return" when called independently
+;; (tsc-simple-messager) ; toggle complexity on
+
+;; Because `tsc--complex' is in a defvar, its behavior persists when called
+;; independently.  Because `tsc-simple-messager' is not in the menu stack when
+;; called this way, no return will be performed.
 ;; (tsc-complex-messager)
 
 ;; infix defined with a macro
@@ -556,7 +561,7 @@ This command can be called from it's parent, `tsc-snowcone-eater' or independent
 (transient-define-prefix tsc-ping ()
   "Prefix demonstrating history sharing."
 
-  :history-key 'non-unique-name
+  :history-key 'highly-unique-name
 
   ["Ping"
    ("-g" "game" "--game=")
@@ -566,7 +571,7 @@ This command can be called from it's parent, `tsc-snowcone-eater' or independent
 (transient-define-prefix tsc-pong ()
   "Prefix demonstrating history sharing."
 
-  :history-key 'non-unique-name
+  :history-key 'highly-unique-name
 
   ["Pong"
    ("-g" "game" "--game=")
