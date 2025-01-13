@@ -48,14 +48,14 @@ TODO this should be automated with the style of solutions from Elisp Repo Kit, u
 ** Export
 You need to install [[https://github.com/larstvei/ox-gfm][ox-gfm]].
 
-The markdown export needs to skip the Elisp sections.  You can configure this by running this expression inside the README.org buffer context. (~eval-expression~ when inside the buffer)
+The markdown export needs to skip the Elisp sections.  If this isn't automatic, you can configure it by running this expression inside the README.org buffer context. (~eval-expression~ when inside the buffer)
 
 #+begin_src elisp
-  (let ((org-export-exclude-tags '("export_elisp")))
+  (let ((org-export-exclude-tags '("export_elisp" "noexport")))
     (call-interactively #'org-gfm-export-to-markdown))
 #+end_src
 
-The table of contents will be printed with angle bracket links but normal title links at the top of the document.  Manually clobber the angle bracket link ToC with the one generated at the top.  It is silly.  I have raised the issue and been given the runaround from both package maintainers.
+The table of contents in the intended position will be printed with angle bracket links but normal title links at the top of the document.  Manually clobber the angle bracket link ToC with the one generated at the top.  It is silly.  I have raised the issue and been given the runaround from both org and ox-gfm maintainers.
 * Reproducing CI
 CI will tangle the README, load the package, and then try to run =tsc-showcase=.  It will also byte compile lint the package.
 
