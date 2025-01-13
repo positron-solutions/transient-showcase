@@ -104,8 +104,6 @@ To manually unload, run built-in command ~unload-feature~ and select your packag
 Next, add the package to your load-path and then require it or, more directly, call =emacs-lisp-byte-compile-and-load= or =emacs-lisp-native-compile-and-load=.
 * License
 This project is GPL3 licensed and a copy is distributed in the file, [[./COPYING][COPYING]].
-* Developer Certificate of Origin (DCO)
-This project requires signed commits.  Please set up your Github appropriately so that the check passes.
 ** GPG signature
 A GPG signed commit shows that the owner of the private key submitted the changes.  Wherever signatures are recorded in chains, they can demonstrate participation in changes elsewhere and awareness of what the submitter is participating in.  Corroborating user's signature across a history of works strengthens that user's attestation provided by DCO sign-off.
 ** User setup for submitting changes
