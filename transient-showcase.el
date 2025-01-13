@@ -1,8 +1,8 @@
 ;;; transient-showcase.el --- transient features & behavior showcase -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2022 Positron Solutions
+;; Copyright (C) 2022-2025 Positron Solutions
 
-;; Author: Psionik K <73710933+psionic-k@users.noreply.github.com>
+;; Author: Positron <contact@positron.solutions>
 ;; Keywords: convenience
 ;; Version: 0.1.0
 ;; Package-Requires: ((emacs "28.1"))
@@ -190,14 +190,14 @@
   (format "Temperature outside: %d" (random 100)))
 
 (transient-define-prefix tsc-information ()
-    "Prefix that displays some information."
-    ["Group Header"
-     (:info "Basic info")
-     (:info #'tsc--random-info)
-     (:info "Use :format to remove whitespace" :format "%d")
-     ("k" :info "Keys will be greyed out")
-     "" ; empty line
-     ("wg" "wave greenishly" tsc-suffix-wave)])
+  "Prefix that displays some information."
+  ["Group Header"
+   (:info "Basic info")
+   (:info #'tsc--random-info)
+   (:info "Use :format to remove whitespace" :format "%d")
+   ("k" :info "Keys will be greyed out")
+   "" ; empty line
+   ("wg" "wave greenishly" tsc-suffix-wave)])
 
 (transient-define-prefix tsc-layout-stacked ()
   "Prefix with layout that stacks groups on top of each other."
@@ -342,26 +342,6 @@
 
 ;; (tsc-parent-with-setup-suffix)
 
-(transient-define-suffix tsc--suffix-interactive-string (user-input)
-  "An interactive suffix that obtains string input from the user."
-  (interactive "sPlease just tell me what you want!: ")
-  (message "I think you want: %s" user-input))
-
-(transient-define-suffix tsc--suffix-interactive-buffer-name (buffer-name)
-  "An interactive suffix that obtains a buffer name from the user."
-  (interactive "b")
-  (message "You selected: %s" buffer-name))
-
-(transient-define-prefix tsc-interactive-basic ()
-  "Prefix with interactive user input."
-  ["Interactive Command Suffixes"
-   ("s" "enter string" tsc--suffix-interactive-string)
-   ("b" "select buffer" tsc--suffix-interactive-buffer-name)
-   ;; using a normal command with a user query in its interactive form
-   ("f" "find file" find-file)])
-
-;; (tsc-interactive-basic)
-
 (defvar tsc--complex nil "Show complex menu or not.")
 
 (transient-define-suffix tsc--toggle-complex ()
@@ -412,6 +392,164 @@
 ;; called this way, no return will be performed.
 ;; (tsc-complex-messager)
 
+(transient-define-suffix tsc--suffix-interactive-buffer-name (buffer-name)
+  "An interactive suffix that obtains a buffer name from the user.
+This uses the short interactive code."
+  (interactive "b")
+  (message "You selected: %s" buffer-name))
+
+(transient-define-suffix tsc--suffix-interactive-string (user-input)
+  "An interactive suffix that evalutates its arguments exlicitly."
+  (interactive (list
+                (read-string "Please just tell me what you want!: ")))
+  (message "I think you want: %s" user-input))
+
+(transient-define-prefix tsc-interactive ()
+  "Prefix with interactive suffixes."
+  ["Interactive Command Suffixes"
+   ("s" "enter string" tsc--suffix-interactive-string)
+   ("b" "select buffer" tsc--suffix-interactive-buffer-name)
+   ;; using a normal command with a user query in its interactive form
+   ("f" "find file" find-file)])
+
+;; (tsc-interactive)
+
+(defvar tsc-creativity-subjective "I Just press buttons on my gen-AI"
+  "An unverifiable statement about the user's creativity.")
+
+(defvar tsc-creatitity-objective 30
+  "User's creativity percentile as assesed by our oracle")
+
+(defun tsc-creativity-subjective-update (creativity)
+  "Update the users creativity assessment subjectively."
+  (interactive (list (read-string "User subjective creativity: "
+                                  tsc-creativity-subjective)))
+  (setq tsc-creativity-subjective creativity)
+  (message "Subjective creativity updated: %s" tsc-creativity-subjective))
+
+(defun tsc-creativity-objective-update (creativity)
+  "Update the users creativity assessment objectively."
+  (interactive (list (read-number "User objective creativity: "
+                            tsc-creativity-objective)))
+  (if (and (integerp creativity) (>= 100 creativity -1))
+      (progn (setq tsc-creativity-objective creativity)
+             (message "Objective creativity updated: %d"
+                      tsc-creativity-objective))
+    (user-error "Only integers between 0 and 100 allowed")))
+
+(defun tsc--creativity-subjective-describe ()
+  "Describe command and display current subjective state."
+  (format "subjective: %s" (propertize tsc-creativity-subjective
+                                       'face 'transient-value)))
+
+(defun tsc--creativity-objective-describe ()
+  "Describe command and display current objective state."
+  (format "objective: %s"
+          (propertize (number-to-string tsc-creativity-objective)
+                      'face 'transient-value)))
+
+;; When we can't jsut use a symbol for what we want to display, write a function
+(defun tsc--creativity-display ()
+  "Returns a formatted assessment of the users value as a human being."
+  (format "User creativity score of %s self-assesses: %s"
+          (propertize tsc-creativity-subjective 'face 'transient-value)
+          (propertize (number-to-string tsc-creatitity-objective)
+                      'face 'transient-value)))
+
+(transient-define-prefix tsc-defvar-settings ()
+  "A prefix demonstrating file-based ad-hoc persistence."
+  ;; Note the sharpquote (#') used to distinguish a symbol from just a function
+  ["Creativity\n"
+   (:info #'tsc--creativity-display)
+   " "
+   ("d" tsc-creativity-subjective-update :transient t
+    :description tsc--creativity-subjective-describe)
+   ("o" tsc-creativity-objective-update :transient t
+    :description tsc--creativity-objective-describe)])
+
+;; (tsc-defvar-settings)
+
+(defvar-local tsc--mode-line-memento nil
+  "A value we can use to restore the `mode-line-format'.")
+
+(defun tsc--toggle-mode-line ()
+  "Save and restore the mode line like a pro."
+  (interactive)
+  (if (null tsc--mode-line-memento)
+      (setq tsc--mode-line-memento
+            (buffer-local-set-state mode-line-format
+                                    "Wh000pTY D000PTY D0000!"))
+    (buffer-local-restore-state tsc--mode-line-memento)
+    (setq tsc--mode-line-memento nil))
+  ;; The mode line won't always redraw if we don't tell the command
+  ;; loop about what we did.
+  (force-window-update))
+
+(transient-define-prefix tsc-buffer-local ()
+  ["Mode Line Gizmo"
+   ("m" "toggle modeline" tsc--toggle-mode-line :transient t)])
+
+;; (tsc-buffer-local)
+
+;; This just sets the default group for the following defcustom
+(defgroup tsc-creativity nil "Creativity" :group 'local)
+
+;; This defvar is a bit longer than strictly necessary.  Lots of users load
+;; no-littering early in their init to make Elisp programs save files in more
+;; uniform locations.  This expression respects no-littering or works without
+;; it.
+(defcustom tsc-creativity-file
+  (if (and (featurep 'no-littering) (require 'no-littering nil t))
+      (no-littering-expand-var-file-name "tsc-creativity.el")
+    (expand-file-name "tsc-creativity.el" user-emacs-directory))
+  "Where settings are saved to."
+  :type 'file)
+
+(defun tsc-creatitivity-save ()
+  "Save the current creativity states."
+  (interactive)
+  (with-temp-buffer
+    " *tsc-peristence*"
+    (pp            ; pretty print
+     ;; Like writing a macro, you just use quasi-quoting to stitch
+     ;; together the structue you want to be in the output.
+     `(setq tsc-creativity-subjective ,tsc-creativity-subjective
+            tsc-creativity-subjective ,tsc-creativity-objective)
+     (current-buffer))
+    (write-file tsc-creativity-file)
+    (message "Transient showcase setting saved!")))
+
+(defun tsc-creativity-load ()
+  "Yes, just load what we wrote."
+  (interactive)
+  (if (file-exists-p tsc-creativity-file)
+      (load tsc-creativity-file)
+    (user-error "No saved settings exist")))
+
+(defun tsc-creativity-visit-settings ()
+  "Show us what we wrote."
+  (interactive)
+  (if (file-exists-p tsc-creativity-file)
+      (find-file tsc-creativity-file)
+    (user-error "No saved settings exist")))
+
+(transient-define-prefix tsc-persistent-settings ()
+"A prefix demonstrating file-based ad-hoc persistence."
+;; Note the sharpquote (#') used to distinguish a symbol from just a function in
+;; the :info class.  Info can understand a variable or a function as its value.
+["Creativity"
+ (:info #'tsc--creativity-display)
+ ("d" tsc-creativity-subjective-update :transient t
+  :description tsc--creativity-subjective-describe)
+ ("o" tsc-creativity-objective-update :transient t
+  :description tsc--creativity-objective-describe)]
+["Persistence"
+ ("s" "save" tsc-creativity-save)
+ ("l" "load" tsc-creativity-load
+  :inapt-if-not (lambda () (file-exists-p tsc-creativity-file)))
+ ("v" "visit" tsc-creativity-visit-settings
+  :inapt-if-not (lambda () (file-exists-p tsc-creativity-file)))])
+
 ;; infix defined with a macro
 (transient-define-argument tsc--exclusive-switches ()
   "This is a specialized infix for only selecting one of several values."
@@ -445,6 +583,33 @@
    ("s" "show arguments" tsc-suffix-print-args)])
 
 ;; (tsc-basic-infixes)
+
+(defvar tsc--position '(0 0) "A transient prefix location.")
+
+(transient-define-infix tsc--pos-infix ()
+  "A location, key, or command symbol."
+  :class 'transient-lisp-variable
+  :transient t
+  :prompt "An expression such as (0 0), \"p\", nil, 'tsc--msg-pos: "
+  :variable 'tsc--position)
+
+(transient-define-suffix tsc--msg-pos ()
+  "Message the element at location."
+  :transient 'transient--do-call
+  (interactive)
+  ;; lisp variables are not sent in the usual (transient-args) list.
+  ;; Just read `tsc--position' directly.
+  (let ((suffix (transient-get-suffix
+                 transient-current-command tsc--position)))
+    (message "%s" (oref suffix description))))
+
+(transient-define-prefix tsc-lisp-variable ()
+  "A prefix that updates and uses a lisp variable."
+  ["Location Printing"
+   [("p" "position" tsc--pos-infix)]
+   [("m" "message" tsc--msg-pos)]])
+
+;; (tsc-lisp-variable)
 
 (transient-define-suffix tsc--read-prefix-scope ()
   "Read the scope of the prefix."
@@ -606,7 +771,8 @@ This command can be called from it's parent, `tsc-snowcone-eater' or independent
 
   ;; (transient-reset) ; forget
   (transient-set) ; save for this session
-  ;; If you combine reset with set, you get a reset for future sessions only.
+  ;; If you combine reset save with reset, you get a reset for future
+  ;; sessions only.
   ;; (transient-save) ; save for this and future sessions
   ;; (transient-reset-value some-other-prefix-object)
 
@@ -647,33 +813,6 @@ This command can be called from it's parent, `tsc-snowcone-eater' or independent
    ("s" "show arguments" tsc-suffix-print-args)])
 
 ;; (tsc-enforcing-inputs)
-
-(defvar tsc--position '(0 0) "A transient prefix location.")
-
-(transient-define-infix tsc--pos-infix ()
- "A location, key, or command symbol."
- :class 'transient-lisp-variable
- :transient t
- :prompt "An expression such as (0 0), \"p\", nil, 'tsc--msg-pos: "
- :variable 'tsc--position)
-
-(transient-define-suffix tsc--msg-pos ()
- "Message the element at location."
- :transient 'transient--do-call
- (interactive)
- ;; lisp variables are not sent in the usual (transient-args) list.
- ;; Just read `tsc--position' directly.
- (let ((suffix (transient-get-suffix
-                transient-current-command tsc--position)))
-   (message "%s" (oref suffix description))))
-
-(transient-define-prefix tsc-lisp-variable ()
- "A prefix that updates and uses a lisp variable."
- ["Location Printing"
-  [("p" "position" tsc--pos-infix)]
-  [("m" "message" tsc--msg-pos)]])
-
-;; (tsc-lisp-variable)
 
 (transient-define-prefix tsc-switches-and-arguments (arg)
   "A prefix with switch and argument examples."
@@ -1048,7 +1187,7 @@ LAYOUT-CHILD is a transient layout vector or list."
            (message
             (propertize "You traversed into a child's list elements!"
                         'face 'warning))
-             (format "(child's interior) element: %s" layout-child)))))
+           (format "(child's interior) element: %s" layout-child)))))
     (cond
      ;; The description is sometimes a callable function with no arguments,
      ;; so let's call it in that case.  Note, the description may be
@@ -1267,7 +1406,7 @@ control such as replacing or exiting."
     ("le" "explicit class" tsc-layout-explicit-classes :transient t)
     ("ld" "descriptions" tsc-layout-descriptions :transient t)
     ;; padded description to sc
-    ("lD" "dynamic descriptions        "
+    ("lD" "dynamic descriptions            "
      tsc-layout-dynamic-descriptions :transient t)]
 
    ["Nesting & Flow Control"
@@ -1275,12 +1414,13 @@ control such as replacing or exiting."
     ("fb" "binding sub-prefix" tsc-simple-parent :transient t)
     ("fr" "sub-prefix with return" tsc-simple-parent-with-return :transient t)
     ("fm" "manual setup in suffix" tsc-parent-with-setup-suffix :transient t)
-    ("fi" "mixing interactive" tsc-interactive-basic :transient t)
+    ("fi" "mixing interactive" tsc-interactive :transient t)
     ("fe" "early return" tsc-simple-messager :transient t)]]
 
-  [["Managing State" ; padded right group
+  ["State Management"
+   ["Transient State & Peristence"
     ("sb" "a bunch of infixes" tsc-basic-infixes :transient t)
-    ("sc" "using scope (accepts prefix)" tsc-scope :transient t)
+    ("sc" "using scope (accepts prefix arg)" tsc-scope :transient t)
     ("sn" "set & save / snowcones" tsc-snowcone-eater :transient t)
     ("sp" "history key / ping-pong" tsc-ping :transient t)
     ("sg" "always forget / goldfish" tsc-goldfish :transient t)
@@ -1288,7 +1428,6 @@ control such as replacing or exiting."
     ("sd" "default values" tsc-default-values :transient t)
     ("sf" "enforcing inputs" tsc-enforcing-inputs :transient t)
     ("sl" "lisp variables" tsc-lisp-variable :transient t)]
-
    ["CLI arguments"
     ("cb" "basic arguments" tsc-switches-and-arguments :transient t)
     ("cm" "random-init infix" tsc-maybe-on :transient t)
@@ -1296,11 +1435,15 @@ control such as replacing or exiting."
     ("ce" "exclusive switches" tsc-exclusive-switches :transient t)
     ("ci" "incompatible switches" tsc-incompatible :transient t)
     ("co" "completions for choices" tsc-choices-with-completions :transient t)
-    ("cc" "cowsay cli wrapper" tsc-cowsay :transient t)]]
+    ("cc" "cowsay cli wrapper" tsc-cowsay :transient t)]
+   ["Ad-Hoc Vanilla Elisp" ; padded right in layouts
+    ("ev" "display & update defvar" tsc-defvar-settings)
+    ("el" "buffer local values" tsc-buffer-local)
+    ("ef" "file based persistence" tsc-persistent-settings)]]
 
   [["Visibility"
     ;; padded description to sc
-    ("vp" "predicates                  "
+    ("vp" "predicates                      "
      tsc-visibility-predicates :transient t)
     ("vi" "inapt (not suitable)" tsc-inapt :transient t)
     ("vl" "levels" tsc-levels-and-visibility :transient t)]
