@@ -417,7 +417,7 @@ This uses the short interactive code."
 (defvar tsc-creativity-subjective "I Just press buttons on my gen-AI"
   "An unverifiable statement about the user's creativity.")
 
-(defvar tsc-creatitity-objective 30
+(defvar tsc-creativity-objective 30
   "User's creativity percentile as assesed by our oracle")
 
 (defun tsc-creativity-subjective-update (creativity)
@@ -453,7 +453,7 @@ This uses the short interactive code."
   "Returns a formatted assessment of the users value as a human being."
   (format "User creativity score of %s self-assesses: %s"
           (propertize tsc-creativity-subjective 'face 'transient-value)
-          (propertize (number-to-string tsc-creatitity-objective)
+          (propertize (number-to-string tsc-creativity-objective)
                       'face 'transient-value)))
 
 (transient-define-prefix tsc-defvar-settings ()
