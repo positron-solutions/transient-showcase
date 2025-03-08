@@ -460,7 +460,7 @@ This uses the short interactive code."
   "A prefix demonstrating file-based ad-hoc persistence."
   ;; Note the sharpquote (#') used to distinguish a symbol from just a function
   ["Creativity\n"
-   (:info #'tsc--creativity-display)
+   (:info #'tsc--creativity-display :format " %d")
    " "
    ("d" tsc-creativity-subjective-update :transient t
     :description tsc--creativity-subjective-describe)
@@ -505,7 +505,7 @@ This uses the short interactive code."
   "Where settings are saved to."
   :type 'file)
 
-(defun tsc-creatitivity-save ()
+(defun tsc-creativity-save ()
   "Save the current creativity states."
   (interactive)
   (with-temp-buffer
@@ -514,7 +514,7 @@ This uses the short interactive code."
      ;; Like writing a macro, you just use quasi-quoting to stitch
      ;; together the structue you want to be in the output.
      `(setq tsc-creativity-subjective ,tsc-creativity-subjective
-            tsc-creativity-subjective ,tsc-creativity-objective)
+            tsc-creativity-objective ,tsc-creativity-objective)
      (current-buffer))
     (write-file tsc-creativity-file)
     (message "Transient showcase setting saved!")))
@@ -535,19 +535,20 @@ This uses the short interactive code."
 
 (transient-define-prefix tsc-persistent-settings ()
 "A prefix demonstrating file-based ad-hoc persistence."
+:refresh-suffixes t
 ;; Note the sharpquote (#') used to distinguish a symbol from just a function in
 ;; the :info class.  Info can understand a variable or a function as its value.
 ["Creativity"
- (:info #'tsc--creativity-display)
+ (:info #'tsc--creativity-display :format " %d")
  ("d" tsc-creativity-subjective-update :transient t
   :description tsc--creativity-subjective-describe)
  ("o" tsc-creativity-objective-update :transient t
   :description tsc--creativity-objective-describe)]
 ["Persistence"
- ("s" "save" tsc-creativity-save)
- ("l" "load" tsc-creativity-load
+ ("s" "save" tsc-creativity-save :transient t)
+ ("l" "load" tsc-creativity-load :transient t
   :inapt-if-not (lambda () (file-exists-p tsc-creativity-file)))
- ("v" "visit" tsc-creativity-visit-settings
+ ("v" "visit" tsc-creativity-visit-settings :transient t
   :inapt-if-not (lambda () (file-exists-p tsc-creativity-file)))])
 
 ;; infix defined with a macro
@@ -643,9 +644,6 @@ This uses the short interactive code."
 (transient-define-prefix tsc-scope (scope)
   "Prefix demonstrating use of scope."
 
-  ;; note!  this is a location where we definitely had to use
-  ;; `transient--prefix' or get the transient object from the tsc-scope
-  ;; symbol.  `transient-current-prefix' would not be correct here!
   [:description
    (lambda () (format "Scope: %s" (transient-scope)))
    [("r" "read scope" tsc--read-prefix-scope)
