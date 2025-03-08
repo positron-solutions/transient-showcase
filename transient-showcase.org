@@ -696,7 +696,7 @@ These possible values for =:transient= have been updated a few times.  See the [
   ;; (tsc-complex-messager)
 #+end_src
 ** Pre-Commands Explained
-Before evaluating the command of a suffix, a pre-command function is called and creates the conditions for the suffix to run and for the post-command behavior to decide what to do next.
+Before evaluating the command of a suffix, a pre-command function is called and creates the conditions for the suffix to run and for the post-command behavior to decide what to do next.  It's usually the "what to do next" part that motivates us to choose a specific pre-command.  *Not all pre-commands are compatible with all situations and suffixes!*
 
 If the prefix has any infixes, the pre-command may "export" them.  If the pre-command calls ~transient-export~ then it will also add those infix states to ~transient-history~.  Only exported infixes can be read within the suffix, which means the correct pre-command is a requirement for using ~transient-args~.
 
@@ -705,8 +705,8 @@ The pre-command function will also set up some states so that transient's post-c
 The pre-command is stored in the =:transient= slot and holds a function symbol.  When using macros to define prefixes, you will often see =:transient= set to =t=.  In ~transient-define-prefix~ and ~transient-define-suffix~, the =t= value is actually translated to a pre-command of ~transient--do-call~ or ~transient--do-recurse~ depending on the situation.  These export arguments and then result in some menu flow.
 
 The [[https://magit.vc/manual/transient.html#Transient-State][official long manual]] has some more detail.  These examples should prepare you to visualize the forms used in those explanations.
-*** Warning! ⚠️
-Some of the *trickiest bugs you can introduce* will happen when using the following variables and functions at varying points in command lifecycles:
+*** Note
+The following variables and functions at varying points in command lifecycles:
 
 - ~transient-current-command~
 - ~transient--command~
@@ -714,18 +714,13 @@ Some of the *trickiest bugs you can introduce* will happen when using the follow
 - ~transient--prefix~
 - ~transient-args~
 
-During the pre-command and post-command, these can change.  When you are overriding the pre-command, you may discover things such as the result of ~transient-args~ changing.  Calling ~transient-setup~ may update things.  Even if you call ~transient-args~ on on the specific transient, the results change during the lifecycle and depending on the pre-command.
+During the pre-command and post-command, these can change.  Recently some functions such as ~transient-prefix-object~ were created to "always" do the right thing.
 
-*In particular* it seems like layout predicates should use ~transient--prefix~ while suffix bodies should use ~transient-current-prefix~.
+When you are overriding the pre-command, you may discover things such as the result of ~transient-args~ changing.  Calling any of the other lifecycle methods such as ~transient-setup~ may further mutate states.  Customizing this behavior is akin to working on transient itself and does require knowledge of its behavior.
 
-Not all pre-commands are compatible with all situations and suffixes!
-
-[[Debugging][Debugging]]
-**** TODO Errata
-There's definitely some edge cases that are unnecessarily complex for the
-use case.  Think of how life was before ~transient--do-recurse~.
+If you need to watch states during the lifecycle, check [[Debugging][Debugging]]
 ** Combining With Interactive
-You can mix normal Emacs completion & user query flows with transient UI's.  Commands that retrieved user input in their interactive forms can be bound as suffixes and will behave normally when called.
+You can mix normal Emacs completion & user query flows with transient UI's.  Commands with interactive forms that retrieve user input can also be bound as suffixes and will behave normally when called.
 
 See [[info:elisp#Interactive Codes][Interactive codes]] listed in the Elisp manual for a list of the short codes.  The ~interactive~ docstring also contains a list.  You can also construct argument lists manually.
 #+begin_src elisp :tangle transient-showcase.el
@@ -1075,9 +1070,6 @@ Suffixes can then read back that scope in their body by calling ~transient-scope
   (transient-define-prefix tsc-scope (scope)
     "Prefix demonstrating use of scope."
 
-    ;; note!  this is a location where we definitely had to use
-    ;; `transient--prefix' or get the transient object from the tsc-scope
-    ;; symbol.  `transient-current-prefix' would not be correct here!
     [:description
      (lambda () (format "Scope: %s" (transient-scope)))
      [("r" "read scope" tsc--read-prefix-scope)
@@ -1099,7 +1091,7 @@ Suffixes can then read back that scope in their body by calling ~transient-scope
   ;; C-g to exit
 #+end_src
 **** Reading Scope Directly
-⚠️ *WARNING* When writing predicates that read or write the scope using ~oref~ and ~oset~, you will need to determine whether ~transient--prefix~ or ~transient-current-prefix~ is correct.  When called from a parent transient, you might end up picking the wrong prefix to read from at the wrong time.  These variables change throughout the lifecycle!  Use [[*Watching evaluation in Edebug][edebug]] you must!
+When writing predicates that read or write the scope using ~oref~ and ~oset~, call ~transient-prefix-object~ to obtain the correct prefix object for all (most) circumstances.  This function correctly handles the edge case where ~transient--prefix~ must temporarily be used.
 **** TODO Errata with prefix arg (=C-u= universal argument).
 Key binding sequences, such as =wa= instead of single-key prefix bindings, will unset the prefix argument (the old-school Emacs =C-u= prefix argument, not the prefix's scope or other explicit arguments)
 
@@ -1897,22 +1889,18 @@ The same thing, but parsing an entire group spec:
 
 If you need to define a dynamic group class, override ~transient-setup-children~.  It will work almost entirely the same as the examples above.  Set your group class in the prefix using the =:class= key.
 
-*Note* you don't need to be inside of a layout body to hack around with dynamic layouts.  Mess around in [[elisp:(ielm))][ielm]].
+*Note* you can replace ~transient--prefix~ with ~tsc-generated-group~ in the example above.  ~transient--prefix~ is just a variable that happens to hold the prefix during layout.  The quoting is strange because of the outer ~transient-define-prefix~ macro.
+
+*Note* you don't need to be inside of a layout body to hack around with dynamic layouts.  Mess around in [[elisp:(ielm))][ielm]]:
 
 #+begin_src elisp :tangle no :results replace
 
   (transient--parse-child 'magit-dispatch '("a" "action" (lambda () (interactive) (message "hey"))))
 
 #+end_src
-
-*Note* you can replace ~transient--prefix~ with ~tsc-generated-group~ in the
-example above.  ~transient--prefix~ is just a variable that happens to hold
-the prefix during layout.
-
 *** TODO Question
 - These functions do mostly the same job.  Why do we need to specify a
   prefix for ~transient-parse-suffixes~, for scope etc?
-
 ** Modifying layouts
 In this example, we will make a transient that can add new commands to itself.
 #+begin_src elisp :tangle transient-showcase.el
@@ -1952,7 +1940,7 @@ Exercises for the reader:
 See the ~transient-insert-suffix~ for documentation on the =LOC= argument.
 
 ** Using prefix scope in children
-Basically you are on your own.  ~transient-scope~ may work.  Just call ~(oref transient--prefix scope)~ during layout setup or ~(oref transient-current-prefix scope)~ during suffix bodies.
+Call ~transient-scope~!
 *** Obtaining Missing Scope
 Because suffixes are basically also commands (riding in the same symbol plist), a suffix can be called independently.  In this case, if its expecting to read the scope from the prefix when there is no prefix, it might fail.
 
